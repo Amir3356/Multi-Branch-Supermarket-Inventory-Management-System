@@ -1,0 +1,18 @@
+# Client
+client/node_modules/
+client/dist/
+client/.env
+
+# Server
+server/vendor/
+server/.env
+server/storage/*.key
+server/storage/logs/
+server/storage/framework/cache/
+server/storage/framework/sessions/
+server/storage/framework/views/
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
