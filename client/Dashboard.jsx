@@ -106,22 +106,6 @@ export default function Dashboard({ userEmail, onLogout }) {
             <span>Sales</span>
           </button>
 
-          <button
-            className={`nav-item ${activeTab === 'prescriptions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('prescriptions')}
-          >
-            <ClipboardList size={18} />
-            <span>Prescriptions</span>
-          </button>
-
-          <button
-            className={`nav-item ${activeTab === 'patients' ? 'active' : ''}`}
-            onClick={() => setActiveTab('patients')}
-          >
-            <Users size={18} />
-            <span>Patients</span>
-          </button>
-
           <div className="nav-group-title" style={{ marginTop: '1.2rem' }}>OPERATIONS</div>
 
           <button
@@ -130,14 +114,6 @@ export default function Dashboard({ userEmail, onLogout }) {
           >
             <PackageCheck size={18} />
             <span>Purchase</span>
-          </button>
-
-          <button
-            className={`nav-item ${activeTab === 'suppliers' ? 'active' : ''}`}
-            onClick={() => setActiveTab('suppliers')}
-          >
-            <Truck size={18} />
-            <span>Suppliers</span>
           </button>
 
           <button
@@ -321,8 +297,7 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th>Code</th>
-                        <th>Medicine Name</th>
+                        <th>Product Name</th>
                         <th>Category</th>
                         <th>Stock Level</th>
                         <th>Batch No.</th>
@@ -333,7 +308,6 @@ export default function Dashboard({ userEmail, onLogout }) {
                     <tbody>
                       {filteredMedicines.map((med) => (
                         <tr key={med.id}>
-                          <td className="font-mono">{med.id}</td>
                           <td className="fw-600">{med.name}</td>
                           <td>{med.category}</td>
                           <td>{med.stock} units</td>
@@ -374,8 +348,7 @@ export default function Dashboard({ userEmail, onLogout }) {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Code</th>
-                      <th>Medicine Name</th>
+                      <th>Product Name</th>
                       <th>Category</th>
                       <th>Current Stock</th>
                       <th>Batch Number</th>
@@ -386,7 +359,6 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <tbody>
                     {filteredMedicines.map((med) => (
                       <tr key={med.id}>
-                        <td className="font-mono">{med.id}</td>
                         <td className="fw-600">{med.name}</td>
                         <td>{med.category}</td>
                         <td>{med.stock} units</td>
@@ -409,8 +381,8 @@ export default function Dashboard({ userEmail, onLogout }) {
             <div className="content-section-card">
               <div className="section-header">
                 <div>
-                  <h2 className="page-title">Pharmacy Sales & POS</h2>
-                  <p className="page-desc">Manage customer prescription transactions, receipts, and daily sales records.</p>
+                  <h2 className="page-title">Sales History</h2>
+                  <p className="page-desc">Complete record of pharmacy sales transactions, receipts, and customer purchase logs.</p>
                 </div>
                 <button className="primary-action-btn">
                   <Plus size={16} /> New Sale Transaction
@@ -446,153 +418,47 @@ export default function Dashboard({ userEmail, onLogout }) {
                 </div>
               </div>
 
-              {/* Recent Sales Table */}
-              <div className="table-responsive">
+              {/* Sales History Table */}
+              <div className="table-responsive" style={{ marginTop: '1rem' }}>
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Invoice ID</th>
                       <th>Customer / Prescription</th>
+                      <th>Category</th>
+                      <th>Product Name</th>
                       <th>Items Purchased</th>
                       <th>Total Amount</th>
-                      <th>Payment Method</th>
+                      <th>Date Sold</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="font-mono">INV-9021</td>
                       <td className="fw-600">Walk-in Customer</td>
-                      <td>Amoxicillin 500mg (2x)</td>
+                      <td>Medicine</td>
+                      <td className="fw-600">Amoxicillin 500mg</td>
+                      <td>2 units</td>
                       <td className="fw-600">$42.00</td>
-                      <td><span className="batch-badge">Card</span></td>
-                      <td><span className="status-tag in-stock">Completed</span></td>
+                      <td>2026-10-02</td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
                     </tr>
                     <tr>
-                      <td className="font-mono">INV-9022</td>
                       <td className="fw-600">John Doe (Rx #4401)</td>
-                      <td>Paracetamol 650mg (1x)</td>
+                      <td>Analgesics</td>
+                      <td className="fw-600">Paracetamol 650mg</td>
+                      <td>1 unit</td>
                       <td className="fw-600">$18.50</td>
-                      <td><span className="batch-badge">Cash</span></td>
-                      <td><span className="status-tag in-stock">Completed</span></td>
+                      <td>2026-10-02</td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
                     </tr>
                     <tr>
-                      <td className="font-mono">INV-9023</td>
                       <td className="fw-600">Sarah Smith</td>
-                      <td>Omeprazole 20mg (3x)</td>
+                      <td>Gastrointestinal</td>
+                      <td className="fw-600">Omeprazole 20mg</td>
+                      <td>3 units</td>
                       <td className="fw-600">$64.00</td>
-                      <td><span className="batch-badge">Insurance</span></td>
-                      <td><span className="status-tag in-stock">Completed</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'prescriptions' && (
-            <div className="content-section-card">
-              <div className="section-header">
-                <div>
-                  <h2 className="page-title">Patient Prescriptions (Rx)</h2>
-                  <p className="page-desc">Manage digital doctor orders, refills, and dosage instructions.</p>
-                </div>
-                <button className="primary-action-btn">
-                  <Plus size={16} /> New Prescription
-                </button>
-              </div>
-
-              <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Rx Number</th>
-                      <th>Patient Name</th>
-                      <th>Prescribing Doctor</th>
-                      <th>Medication</th>
-                      <th>Refills Left</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="font-mono">RX-8801</td>
-                      <td className="fw-600">Robert Vance</td>
-                      <td>Dr. Emily Stone</td>
-                      <td>Metformin 850mg</td>
-                      <td>3 Refills</td>
-                      <td><span className="status-tag in-stock">Dispensed</span></td>
-                    </tr>
-                    <tr>
-                      <td className="font-mono">RX-8802</td>
-                      <td className="fw-600">Jessica Alba</td>
-                      <td>Dr. Michael Chen</td>
-                      <td>Atorvastatin 20mg</td>
-                      <td>1 Refill</td>
-                      <td><span className="status-tag low-stock">Pending Refill</span></td>
-                    </tr>
-                    <tr>
-                      <td className="font-mono">RX-8803</td>
-                      <td className="fw-600">David Miller</td>
-                      <td>Dr. Emily Stone</td>
-                      <td>Amoxicillin 500mg</td>
-                      <td>0 Refills</td>
-                      <td><span className="status-tag in-stock">Completed</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'patients' && (
-            <div className="content-section-card">
-              <div className="section-header">
-                <div>
-                  <h2 className="page-title">Patient Directory & Profiles</h2>
-                  <p className="page-desc">Manage registered patient history, medical contacts, and active prescriptions.</p>
-                </div>
-                <button className="primary-action-btn">
-                  <Plus size={16} /> Register Patient
-                </button>
-              </div>
-
-              <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Patient ID</th>
-                      <th>Patient Name</th>
-                      <th>Phone Number</th>
-                      <th>Insurance Provider</th>
-                      <th>Active Prescriptions</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="font-mono">PAT-401</td>
-                      <td className="fw-600">Robert Vance</td>
-                      <td>+1 (555) 019-2834</td>
-                      <td>BlueCross Shield</td>
-                      <td>2 Active Rx</td>
-                      <td><span className="status-tag in-stock">Active Patient</span></td>
-                    </tr>
-                    <tr>
-                      <td className="font-mono">PAT-402</td>
-                      <td className="fw-600">Jessica Alba</td>
-                      <td>+1 (555) 012-9981</td>
-                      <td>Aetna Health</td>
-                      <td>1 Active Rx</td>
-                      <td><span className="status-tag in-stock">Active Patient</span></td>
-                    </tr>
-                    <tr>
-                      <td className="font-mono">PAT-403</td>
-                      <td className="fw-600">David Miller</td>
-                      <td>+1 (555) 014-7720</td>
-                      <td>Medicare Plus</td>
-                      <td>3 Active Rx</td>
-                      <td><span className="status-tag in-stock">Active Patient</span></td>
+                      <td>2026-10-01</td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
                     </tr>
                   </tbody>
                 </table>
@@ -604,7 +470,7 @@ export default function Dashboard({ userEmail, onLogout }) {
             <div className="content-section-card">
               <div className="section-header">
                 <div>
-                  <h2 className="page-title">Purchase & Stock Intake</h2>
+                  <h2 className="page-title">Purchase</h2>
                   <p className="page-desc">Generate purchase orders to distributors and verify incoming stock batches.</p>
                 </div>
                 <button className="primary-action-btn">
@@ -616,33 +482,96 @@ export default function Dashboard({ userEmail, onLogout }) {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>PO Number</th>
                       <th>Supplier</th>
-                      <th>Items Ordered</th>
+                      <th>Category</th>
+                      <th>Product Name</th>
+                      <th>Quantity</th>
                       <th>Total Cost</th>
-                      <th>Expected Delivery</th>
+                      <th>Purchased On</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="font-mono">PO-10492</td>
                       <td className="fw-600">MedPharma Global Logistics</td>
-                      <td>Amoxicillin 500mg (1,000 units)</td>
+                      <td>Medicine</td>
+                      <td className="fw-600">Amoxicillin 500mg</td>
+                      <td>1,000 units</td>
                       <td className="fw-600">$1,850.00</td>
                       <td>2026-10-06</td>
-                      <td><span className="status-tag low-stock">In Transit</span></td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
                     </tr>
                     <tr>
-                      <td className="font-mono">PO-10493</td>
-                      <td className="fw-600">BioTech Pharma Supplies</td>
-                      <td>Atorvastatin 20mg (500 units)</td>
+                      <td className="fw-600">BeautyCare Supplies</td>
+                      <td>Cosmetic</td>
+                      <td className="fw-600">Face Cream</td>
+                      <td>200 units</td>
                       <td className="fw-600">$920.00</td>
                       <td>2026-10-10</td>
-                      <td><span className="status-tag in-stock">Delivered & Verified</span></td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
+                    </tr>
+                    <tr>
+                      <td className="fw-600">BioTech Pharma Supplies</td>
+                      <td>Medicine</td>
+                      <td className="fw-600">Atorvastatin 20mg</td>
+                      <td>500 units</td>
+                      <td className="fw-600">$920.00</td>
+                      <td>2026-10-10</td>
+                      <td><span className="status-tag in-stock">Paid</span></td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              {/* Purchase Payment & Transaction History Section */}
+              <div style={{ marginTop: '2.5rem' }}>
+                <div className="section-header">
+                  <div>
+                    <h3>Payment & Transaction History</h3>
+                    <p className="page-desc">Supplier settlement history and payment transaction records.</p>
+                  </div>
+                </div>
+
+                <div className="table-responsive" style={{ marginTop: '1rem' }}>
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Transaction Ref</th>
+                        <th>Supplier</th>
+                        <th>Payment Method</th>
+                        <th>Amount Paid</th>
+                        <th>Transaction Date</th>
+                        <th>Payment Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="font-mono">TXN-8091</td>
+                        <td className="fw-600">MedPharma Global Logistics</td>
+                        <td><span className="batch-badge">Bank Wire</span></td>
+                        <td className="fw-600">$1,850.00</td>
+                        <td>2026-10-06</td>
+                        <td><span className="status-tag in-stock">Cleared</span></td>
+                      </tr>
+                      <tr>
+                        <td className="font-mono">TXN-8092</td>
+                        <td className="fw-600">BeautyCare Supplies</td>
+                        <td><span className="batch-badge">Corporate Card</span></td>
+                        <td className="fw-600">$920.00</td>
+                        <td>2026-10-10</td>
+                        <td><span className="status-tag in-stock">Cleared</span></td>
+                      </tr>
+                      <tr>
+                        <td className="font-mono">TXN-8093</td>
+                        <td className="fw-600">BioTech Pharma Supplies</td>
+                        <td><span className="batch-badge">ACH Transfer</span></td>
+                        <td className="fw-600">$920.00</td>
+                        <td>2026-10-10</td>
+                        <td><span className="status-tag in-stock">Cleared</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -664,7 +593,7 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <thead>
                     <tr>
                       <th>Return ID</th>
-                      <th>Medicine Name</th>
+                      <th>Product Name</th>
                       <th>Batch ID</th>
                       <th>Quantity</th>
                       <th>Reason</th>
@@ -687,53 +616,6 @@ export default function Dashboard({ userEmail, onLogout }) {
                       <td>12 units</td>
                       <td>Damaged Packaging</td>
                       <td><span className="status-tag in-stock">Credit Approved</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'suppliers' && (
-            <div className="content-section-card">
-              <div className="section-header">
-                <div>
-                  <h2 className="page-title">Suppliers & Distributors</h2>
-                  <p className="page-desc">Track pharmaceutical vendors, purchase orders, and stock deliveries.</p>
-                </div>
-                <button className="primary-action-btn">
-                  <Plus size={16} /> Add Vendor
-                </button>
-              </div>
-
-              <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Vendor ID</th>
-                      <th>Company Name</th>
-                      <th>Contact Person</th>
-                      <th>Phone / Email</th>
-                      <th>Active Orders</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="font-mono">VEN-101</td>
-                      <td className="fw-600">MedPharma Global Logistics</td>
-                      <td>Alexander Wright</td>
-                      <td>support@medpharma.com</td>
-                      <td>2 Purchase Orders</td>
-                      <td><span className="status-tag in-stock">Verified Partner</span></td>
-                    </tr>
-                    <tr>
-                      <td className="font-mono">VEN-102</td>
-                      <td className="fw-600">BioTech Pharma Supplies</td>
-                      <td>Clara Oswald</td>
-                      <td>orders@biotechpharma.io</td>
-                      <td>1 Pending Delivery</td>
-                      <td><span className="status-tag in-stock">Active Supplier</span></td>
                     </tr>
                   </tbody>
                 </table>
