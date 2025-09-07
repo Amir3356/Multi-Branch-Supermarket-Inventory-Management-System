@@ -259,19 +259,6 @@ export default function Dashboard({ userEmail, onLogout }) {
 
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Total Medicine SKU</span>
-                    <div className="stat-icon-wrapper teal">
-                      <Pill size={20} />
-                    </div>
-                  </div>
-                  <div className="stat-value">2,840</div>
-                  <div className="stat-chip positive">
-                    <TrendingUp size={12} /> Active Catalog
-                  </div>
-                </div>
-
-                <div className="stat-card">
-                  <div className="stat-header">
                     <span className="stat-title">Low Stock Alerts</span>
                     <div className="stat-icon-wrapper warning">
                       <AlertTriangle size={20} />
