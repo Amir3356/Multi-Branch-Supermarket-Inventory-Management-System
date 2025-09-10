@@ -611,119 +611,14 @@ export default function Dashboard({ userEmail, onLogout }) {
           )}
 
           {activeTab === 'reports' && (
-            <div className="content-section-card">
-              <div className="section-header">
-                <div>
-                  <h2 className="page-title">Financial Reports & Profitability Analytics</h2>
-                  <p className="page-desc">Comprehensive breakdown of total revenue, operating expenses, and net profit margins.</p>
-                </div>
-                <button className="secondary-action-btn">
-                  <BarChart3 size={16} /> Export Financial PDF
-                </button>
+            <div className="content-section-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+              <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: 'rgba(6, 182, 212, 0.12)', color: 'var(--primary-cyan)', marginBottom: '1rem' }}>
+                <Clock size={36} />
               </div>
-
-              {/* Financial Metric Cards: Revenue, Expense, Profit, Asset Value */}
-              <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
-                <div className="stat-card">
-                  <div className="stat-header">
-                    <span className="stat-title">Monthly Revenue</span>
-                    <div className="stat-icon-wrapper cyan">
-                      <Receipt size={20} />
-                    </div>
-                  </div>
-                  <div className="stat-value">$42,850.00</div>
-                  <div className="stat-chip positive">
-                    <TrendingUp size={12} /> +12.4% vs last month
-                  </div>
-                </div>
-
-                <div className="stat-card">
-                  <div className="stat-header">
-                    <span className="stat-title">Operating Expenses</span>
-                    <div className="stat-icon-wrapper danger">
-                      <Wallet size={20} />
-                    </div>
-                  </div>
-                  <div className="stat-value">$26,120.00</div>
-                  <div className="stat-chip negative">
-                    Stock & Operational Costs
-                  </div>
-                </div>
-
-                <div className="stat-card">
-                  <div className="stat-header">
-                    <span className="stat-title">Net Profit</span>
-                    <div className="stat-icon-wrapper teal">
-                      <DollarSign size={20} />
-                    </div>
-                  </div>
-                  <div className="stat-value" style={{ color: '#34d399' }}>$16,730.00</div>
-                  <div className="stat-chip positive">
-                    <TrendingUp size={12} /> 39.0% Profit Margin
-                  </div>
-                </div>
-
-                <div className="stat-card">
-                  <div className="stat-header">
-                    <span className="stat-title">Total Stock Asset Value</span>
-                    <div className="stat-icon-wrapper teal">
-                      <Database size={20} />
-                    </div>
-                  </div>
-                  <div className="stat-value">$124,500.00</div>
-                  <div className="stat-chip positive">
-                    Asset Valuation
-                  </div>
-                </div>
-              </div>
-
-              {/* Expense Breakdown Table */}
-              <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
-                <div className="section-header">
-                  <h3>Monthly Expense Breakdown</h3>
-                </div>
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      <th>Category</th>
-                      <th>Description</th>
-                      <th>Monthly Expense</th>
-                      <th>% of Budget</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="fw-600">Medicine Stock Inventory Intake</td>
-                      <td>Bulk supplier purchase orders & batch refills</td>
-                      <td className="fw-600">$18,450.00</td>
-                      <td>70.6%</td>
-                      <td><span className="status-tag in-stock">Budget On-Track</span></td>
-                    </tr>
-                    <tr>
-                      <td className="fw-600">Pharmacy Staff Payroll</td>
-                      <td>Pharmacists & assistant salaries</td>
-                      <td className="fw-600">$5,800.00</td>
-                      <td>22.2%</td>
-                      <td><span className="status-tag in-stock">Fixed Cost</span></td>
-                    </tr>
-                    <tr>
-                      <td className="fw-600">Store Utilities & Refrigeration</td>
-                      <td>Cold-chain storage electricity & maintenance</td>
-                      <td className="fw-600">$1,120.00</td>
-                      <td>4.3%</td>
-                      <td><span className="status-tag in-stock">Operational</span></td>
-                    </tr>
-                    <tr>
-                      <td className="fw-600">Software & Licensing</td>
-                      <td>Pharmacy POS system & security compliance</td>
-                      <td className="fw-600">$750.00</td>
-                      <td>2.9%</td>
-                      <td><span className="status-tag in-stock">Active Subscription</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <h2 className="page-title" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Coming Soon</h2>
+              <p className="page-desc" style={{ maxWidth: '420px', margin: '0 auto' }}>
+                The Reports & Analytics feature is currently under development. Financial reporting and analytical exports will be available in the upcoming release.
+              </p>
             </div>
           )}
 
