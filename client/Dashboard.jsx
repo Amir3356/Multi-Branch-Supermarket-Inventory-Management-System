@@ -635,43 +635,14 @@ export default function Dashboard({ userEmail, onLogout }) {
           )}
 
           {activeTab === 'settings' && (
-            <div className="content-section-card">
-              <div className="section-header">
-                <div>
-                  <h2 className="page-title">Pharmacy System Settings</h2>
-                  <p className="page-desc">Configure application preferences, pharmacy details, and alert thresholds.</p>
-                </div>
+            <div className="content-section-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+              <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: 'rgba(6, 182, 212, 0.12)', color: 'var(--primary-cyan)', marginBottom: '1rem' }}>
+                <Clock size={36} />
               </div>
-
-              <div className="settings-grid" style={{ marginTop: '1.5rem' }}>
-                <div className="settings-box">
-                  <h4>Pharmacy Details</h4>
-                  <div className="settings-form">
-                    <div className="form-group">
-                      <label>Pharmacy Name</label>
-                      <input type="text" defaultValue="PharmaCare Central Pharmacy" className="input-field" />
-                    </div>
-                    <div className="form-group">
-                      <label>License Number</label>
-                      <input type="text" defaultValue="PHAR-9982-LIC" className="input-field" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="settings-box">
-                  <h4>Inventory Alert Thresholds</h4>
-                  <div className="settings-form">
-                    <div className="form-group">
-                      <label>Low Stock Warning Limit (Units)</label>
-                      <input type="number" defaultValue="20" className="input-field" />
-                    </div>
-                    <div className="form-group">
-                      <label>Expiry Alert Lead Time (Days)</label>
-                      <input type="number" defaultValue="60" className="input-field" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <h2 className="page-title" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Coming Soon</h2>
+              <p className="page-desc" style={{ maxWidth: '420px', margin: '0 auto' }}>
+                The System Settings feature is currently under development. Store configuration, alert thresholds, and system preferences will be available in the upcoming release.
+              </p>
             </div>
           )}
         </div>
