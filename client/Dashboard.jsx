@@ -40,12 +40,12 @@ export default function Dashboard({ userEmail, onLogout }) {
 
   // Demo Inventory Data
   const [medicines] = useState([
-    { id: 'MED-101', name: 'Amoxicillin 500mg', category: 'Antibiotics', stock: 450, batch: 'BT-8821', expiry: '2027-04-15', status: 'In Stock' },
-    { id: 'MED-102', name: 'Paracetamol 650mg', category: 'Analgesics', stock: 1200, batch: 'BT-9012', expiry: '2028-01-20', status: 'In Stock' },
-    { id: 'MED-103', name: 'Metformin 850mg', category: 'Antidiabetic', stock: 18, batch: 'BT-4410', expiry: '2026-11-05', status: 'Low Stock' },
-    { id: 'MED-104', name: 'Atorvastatin 20mg', category: 'Cardiovascular', stock: 320, batch: 'BT-3329', expiry: '2026-10-18', status: 'Expiring Soon' },
-    { id: 'MED-105', name: 'Omeprazole 20mg', category: 'Gastrointestinal', stock: 640, batch: 'BT-7721', expiry: '2027-08-30', status: 'In Stock' },
-    { id: 'MED-106', name: 'Azithromycin 250mg', category: 'Antibiotics', stock: 12, batch: 'BT-1045', expiry: '2026-12-10', status: 'Low Stock' }
+    { id: 'MED-101', name: 'Amoxicillin 500mg', category: 'Antibiotics', stock: 450, purchasePrice: 12.50, sellingPrice: 21.00, batch: 'BT-8821', expiry: '2027-04-15', status: 'In Stock' },
+    { id: 'MED-102', name: 'Paracetamol 650mg', category: 'Analgesics', stock: 1200, purchasePrice: 5.00, sellingPrice: 9.50, batch: 'BT-9012', expiry: '2028-01-20', status: 'In Stock' },
+    { id: 'MED-103', name: 'Metformin 850mg', category: 'Antidiabetic', stock: 18, purchasePrice: 8.20, sellingPrice: 14.00, batch: 'BT-4410', expiry: '2026-11-05', status: 'Low Stock' },
+    { id: 'MED-104', name: 'Atorvastatin 20mg', category: 'Cardiovascular', stock: 320, purchasePrice: 15.00, sellingPrice: 28.50, batch: 'BT-3329', expiry: '2026-10-18', status: 'Expiring Soon' },
+    { id: 'MED-105', name: 'Omeprazole 20mg', category: 'Gastrointestinal', stock: 640, purchasePrice: 9.80, sellingPrice: 18.00, batch: 'BT-7721', expiry: '2027-08-30', status: 'In Stock' },
+    { id: 'MED-106', name: 'Azithromycin 250mg', category: 'Antibiotics', stock: 12, purchasePrice: 14.00, sellingPrice: 24.00, batch: 'BT-1045', expiry: '2026-12-10', status: 'Low Stock' }
   ])
 
   // Demo Audit Logs Data
@@ -287,6 +287,8 @@ export default function Dashboard({ userEmail, onLogout }) {
                         <th>Product Name</th>
                         <th>Category</th>
                         <th>Stock Level</th>
+                        <th>Purchase Price</th>
+                        <th>Sells Price</th>
                         <th>Batch No.</th>
                         <th>Expiry Date</th>
                         <th>Status</th>
@@ -298,6 +300,8 @@ export default function Dashboard({ userEmail, onLogout }) {
                           <td className="fw-600">{med.name}</td>
                           <td>{med.category}</td>
                           <td>{med.stock} units</td>
+                          <td>${med.purchasePrice ? med.purchasePrice.toFixed(2) : '0.00'}</td>
+                          <td>${med.sellingPrice ? med.sellingPrice.toFixed(2) : '0.00'}</td>
                           <td><span className="batch-badge">{med.batch}</span></td>
                           <td>{med.expiry}</td>
                           <td>
@@ -338,6 +342,8 @@ export default function Dashboard({ userEmail, onLogout }) {
                       <th>Product Name</th>
                       <th>Category</th>
                       <th>Current Stock</th>
+                      <th>Purchase Price</th>
+                      <th>Sells Price</th>
                       <th>Batch Number</th>
                       <th>Expiration Date</th>
                       <th>Status</th>
@@ -349,6 +355,8 @@ export default function Dashboard({ userEmail, onLogout }) {
                         <td className="fw-600">{med.name}</td>
                         <td>{med.category}</td>
                         <td>{med.stock} units</td>
+                        <td>${med.purchasePrice ? med.purchasePrice.toFixed(2) : '0.00'}</td>
+                        <td>${med.sellingPrice ? med.sellingPrice.toFixed(2) : '0.00'}</td>
                         <td><span className="batch-badge">{med.batch}</span></td>
                         <td>{med.expiry}</td>
                         <td>
