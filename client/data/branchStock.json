@@ -1,0 +1,135 @@
+[
+  {
+    "medId": "MED-101",
+    "branchId": "BR-01",
+    "stock": 450,
+    "batch": "BT-8821",
+    "expiry": "2027-04-15"
+  },
+  {
+    "medId": "MED-101",
+    "branchId": "BR-02",
+    "stock": 180,
+    "batch": "BT-8821",
+    "expiry": "2027-04-15"
+  },
+  {
+    "medId": "MED-101",
+    "branchId": "BR-03",
+    "stock": 65,
+    "batch": "BT-8790",
+    "expiry": "2027-01-22"
+  },
+  {
+    "medId": "MED-101",
+    "branchId": "BR-04",
+    "stock": 40,
+    "batch": "BT-8790",
+    "expiry": "2027-01-22"
+  },
+  {
+    "medId": "MED-102",
+    "branchId": "BR-01",
+    "stock": 1200,
+    "batch": "BT-9012",
+    "expiry": "2028-01-20"
+  },
+  {
+    "medId": "MED-102",
+    "branchId": "BR-02",
+    "stock": 640,
+    "batch": "BT-9012",
+    "expiry": "2028-01-20"
+  },
+  {
+    "medId": "MED-102",
+    "branchId": "BR-03",
+    "stock": 410,
+    "batch": "BT-9012",
+    "expiry": "2028-01-20"
+  },
+  {
+    "medId": "MED-102",
+    "branchId": "BR-04",
+    "stock": 150,
+    "batch": "BT-9003",
+    "expiry": "2027-09-11"
+  },
+  {
+    "medId": "MED-103",
+    "branchId": "BR-01",
+    "stock": 18,
+    "batch": "BT-4410",
+    "expiry": "2026-11-05"
+  },
+  {
+    "medId": "MED-103",
+    "branchId": "BR-02",
+    "stock": 95,
+    "batch": "BT-4432",
+    "expiry": "2027-06-14"
+  },
+  {
+    "medId": "MED-103",
+    "branchId": "BR-03",
+    "stock": 72,
+    "batch": "BT-4432",
+    "expiry": "2027-06-14"
+  },
+  {
+    "medId": "MED-104",
+    "branchId": "BR-01",
+    "stock": 320,
+    "batch": "BT-3329",
+    "expiry": "2026-10-18"
+  },
+  {
+    "medId": "MED-104",
+    "branchId": "BR-02",
+    "stock": 110,
+    "batch": "BT-3351",
+    "expiry": "2027-03-02"
+  },
+  {
+    "medId": "MED-104",
+    "branchId": "BR-04",
+    "stock": 22,
+    "batch": "BT-3351",
+    "expiry": "2027-03-02"
+  },
+  {
+    "medId": "MED-105",
+    "branchId": "BR-01",
+    "stock": 640,
+    "batch": "BT-7721",
+    "expiry": "2027-08-30"
+  },
+  {
+    "medId": "MED-105",
+    "branchId": "BR-03",
+    "stock": 210,
+    "batch": "BT-7721",
+    "expiry": "2027-08-30"
+  },
+  {
+    "medId": "MED-105",
+    "branchId": "BR-04",
+    "stock": 90,
+    "batch": "BT-7740",
+    "expiry": "2027-12-01"
+  },
+  {
+    "medId": "MED-106",
+    "branchId": "BR-01",
+    "stock": 12,
+    "batch": "BT-1045",
+    "expiry": "2026-12-10"
+  },
+  {
+    "medId": "MED-106",
+    "branchId": "BR-02",
+    "stock": 85,
+    "batch": "BT-1060",
+    "expiry": "2027-05-19"
+  }
+]

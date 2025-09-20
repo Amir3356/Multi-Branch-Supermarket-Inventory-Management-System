@@ -1,0 +1,46 @@
+[
+  {
+    "id": "TRF-301",
+    "from": "BR-02",
+    "to": "BR-01",
+    "product": "Metformin 850mg",
+    "batch": "BT-4432",
+    "qty": 40,
+    "requestedBy": "Selam Tesfaye",
+    "date": "2026-10-04",
+    "status": "In Transit"
+  },
+  {
+    "id": "TRF-302",
+    "from": "BR-02",
+    "to": "BR-01",
+    "product": "Azithromycin 250mg",
+    "batch": "BT-1060",
+    "qty": 30,
+    "requestedBy": "Selam Tesfaye",
+    "date": "2026-10-04",
+    "status": "Pending Approval"
+  },
+  {
+    "id": "TRF-303",
+    "from": "BR-01",
+    "to": "BR-04",
+    "product": "Atorvastatin 20mg",
+    "batch": "BT-3329",
+    "qty": 60,
+    "requestedBy": "Yonas Alemu",
+    "date": "2026-10-02",
+    "status": "Received"
+  },
+  {
+    "id": "TRF-304",
+    "from": "BR-01",
+    "to": "BR-03",
+    "product": "Amoxicillin 500mg",
+    "batch": "BT-8821",
+    "qty": 100,
+    "requestedBy": "Hana Girma",
+    "date": "2026-09-29",
+    "status": "Received"
+  }
+]

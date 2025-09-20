@@ -1,0 +1,50 @@
+[
+  {
+    "id": "MED-101",
+    "name": "Amoxicillin 500mg",
+    "category": "Antibiotics",
+    "purchasePrice": 12.5,
+    "sellingPrice": 21,
+    "reorderLevel": 100
+  },
+  {
+    "id": "MED-102",
+    "name": "Paracetamol 650mg",
+    "category": "Analgesics",
+    "purchasePrice": 5,
+    "sellingPrice": 9.5,
+    "reorderLevel": 200
+  },
+  {
+    "id": "MED-103",
+    "name": "Metformin 850mg",
+    "category": "Antidiabetic",
+    "purchasePrice": 8.2,
+    "sellingPrice": 14,
+    "reorderLevel": 60
+  },
+  {
+    "id": "MED-104",
+    "name": "Atorvastatin 20mg",
+    "category": "Cardiovascular",
+    "purchasePrice": 15,
+    "sellingPrice": 28.5,
+    "reorderLevel": 50
+  },
+  {
+    "id": "MED-105",
+    "name": "Omeprazole 20mg",
+    "category": "Gastrointestinal",
+    "purchasePrice": 9.8,
+    "sellingPrice": 18,
+    "reorderLevel": 80
+  },
+  {
+    "id": "MED-106",
+    "name": "Azithromycin 250mg",
+    "category": "Antibiotics",
+    "purchasePrice": 14,
+    "sellingPrice": 24,
+    "reorderLevel": 40
+  }
+]

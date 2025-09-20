@@ -1,0 +1,30 @@
+[
+  {
+    "id": "EXP-1",
+    "name": "Rent",
+    "frequency": "Monthly",
+    "amount": 3000,
+    "status": "Active"
+  },
+  {
+    "id": "EXP-2",
+    "name": "Utilities",
+    "frequency": "Monthly",
+    "amount": 450,
+    "status": "Active"
+  },
+  {
+    "id": "EXP-3",
+    "name": "Maintenance",
+    "frequency": "Quarterly",
+    "amount": 800,
+    "status": "Active"
+  },
+  {
+    "id": "EXP-4",
+    "name": "Transportation",
+    "frequency": "Weekly",
+    "amount": 150,
+    "status": "Active"
+  }
+]

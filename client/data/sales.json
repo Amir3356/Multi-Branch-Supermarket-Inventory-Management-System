@@ -1,0 +1,57 @@
+[
+  {
+    "id": "SL-5001",
+    "branchId": "BR-01",
+    "customer": "Walk-in Customer",
+    "category": "Antibiotics",
+    "product": "Amoxicillin 500mg",
+    "qty": 2,
+    "total": 42,
+    "date": "2026-10-02",
+    "status": "Paid"
+  },
+  {
+    "id": "SL-5002",
+    "branchId": "BR-02",
+    "customer": "John Doe (Rx #4401)",
+    "category": "Analgesics",
+    "product": "Paracetamol 650mg",
+    "qty": 1,
+    "total": 18.5,
+    "date": "2026-10-02",
+    "status": "Paid"
+  },
+  {
+    "id": "SL-5003",
+    "branchId": "BR-03",
+    "customer": "Sarah Smith",
+    "category": "Gastrointestinal",
+    "product": "Omeprazole 20mg",
+    "qty": 3,
+    "total": 64,
+    "date": "2026-10-01",
+    "status": "Paid"
+  },
+  {
+    "id": "SL-5004",
+    "branchId": "BR-04",
+    "customer": "Walk-in Customer",
+    "category": "Analgesics",
+    "product": "Paracetamol 650mg",
+    "qty": 4,
+    "total": 38,
+    "date": "2026-10-01",
+    "status": "Paid"
+  },
+  {
+    "id": "SL-5005",
+    "branchId": "BR-01",
+    "customer": "Abebe K. (Rx #4410)",
+    "category": "Cardiovascular",
+    "product": "Atorvastatin 20mg",
+    "qty": 2,
+    "total": 57,
+    "date": "2026-09-30",
+    "status": "Paid"
+  }
+]

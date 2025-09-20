@@ -1,0 +1,35 @@
+[
+  {
+    "id": "PO-7001",
+    "branchId": "BR-01",
+    "supplier": "MedPharma Global Logistics",
+    "category": "Medicine",
+    "product": "Amoxicillin 500mg",
+    "qty": 1000,
+    "total": 1850,
+    "date": "2026-10-06",
+    "status": "Paid"
+  },
+  {
+    "id": "PO-7002",
+    "branchId": "BR-02",
+    "supplier": "BeautyCare Supplies",
+    "category": "Cosmetic",
+    "product": "Face Cream",
+    "qty": 200,
+    "total": 920,
+    "date": "2026-10-10",
+    "status": "Paid"
+  },
+  {
+    "id": "PO-7003",
+    "branchId": "BR-03",
+    "supplier": "BioTech Pharma Supplies",
+    "category": "Medicine",
+    "product": "Atorvastatin 20mg",
+    "qty": 500,
+    "total": 920,
+    "date": "2026-10-10",
+    "status": "Paid"
+  }
+]

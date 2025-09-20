@@ -1,0 +1,29 @@
+[
+  {
+    "id": "TXN-8091",
+    "branchId": "BR-01",
+    "supplier": "MedPharma Global Logistics",
+    "method": "Bank Wire",
+    "amount": 1850,
+    "date": "2026-10-06",
+    "status": "Cleared"
+  },
+  {
+    "id": "TXN-8092",
+    "branchId": "BR-02",
+    "supplier": "BeautyCare Supplies",
+    "method": "Corporate Card",
+    "amount": 920,
+    "date": "2026-10-10",
+    "status": "Cleared"
+  },
+  {
+    "id": "TXN-8093",
+    "branchId": "BR-03",
+    "supplier": "BioTech Pharma Supplies",
+    "method": "ACH Transfer",
+    "amount": 920,
+    "date": "2026-10-10",
+    "status": "Cleared"
+  }
+]
