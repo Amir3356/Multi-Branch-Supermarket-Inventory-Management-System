@@ -2,7 +2,7 @@
   {
     "id": "MED-101",
     "name": "Amoxicillin 500mg",
-    "category": "Antibiotics",
+    "category": "Medicines",
     "purchasePrice": 12.5,
     "sellingPrice": 21,
     "reorderLevel": 100
@@ -10,7 +10,7 @@
   {
     "id": "MED-102",
     "name": "Paracetamol 650mg",
-    "category": "Analgesics",
+    "category": "Medicines",
     "purchasePrice": 5,
     "sellingPrice": 9.5,
     "reorderLevel": 200
@@ -18,7 +18,7 @@
   {
     "id": "MED-103",
     "name": "Metformin 850mg",
-    "category": "Antidiabetic",
+    "category": "Medicines",
     "purchasePrice": 8.2,
     "sellingPrice": 14,
     "reorderLevel": 60
@@ -26,7 +26,7 @@
   {
     "id": "MED-104",
     "name": "Atorvastatin 20mg",
-    "category": "Cardiovascular",
+    "category": "Medicines",
     "purchasePrice": 15,
     "sellingPrice": 28.5,
     "reorderLevel": 50
@@ -34,7 +34,7 @@
   {
     "id": "MED-105",
     "name": "Omeprazole 20mg",
-    "category": "Gastrointestinal",
+    "category": "Medicines",
     "purchasePrice": 9.8,
     "sellingPrice": 18,
     "reorderLevel": 80
@@ -42,9 +42,65 @@
   {
     "id": "MED-106",
     "name": "Azithromycin 250mg",
-    "category": "Antibiotics",
+    "category": "Medicines",
     "purchasePrice": 14,
     "sellingPrice": 24,
     "reorderLevel": 40
+  },
+  {
+    "id": "MED-107",
+    "name": "Sunscreen SPF 50 (100ml)",
+    "category": "Cosmetics",
+    "purchasePrice": 7.5,
+    "sellingPrice": 13,
+    "reorderLevel": 30
+  },
+  {
+    "id": "MED-108",
+    "name": "Disposable Syringes 5ml",
+    "category": "Medical Supplies",
+    "purchasePrice": 9,
+    "sellingPrice": 15.5,
+    "reorderLevel": 25
+  },
+  {
+    "id": "MED-109",
+    "name": "Digital Thermometer",
+    "category": "Medical Equipment",
+    "purchasePrice": 4.2,
+    "sellingPrice": 8.99,
+    "reorderLevel": 15
+  },
+  {
+    "id": "MED-110",
+    "name": "Vitamin C 1000mg (60 Tablets)",
+    "category": "Vitamins & Supplements",
+    "purchasePrice": 6,
+    "sellingPrice": 11.5,
+    "reorderLevel": 40
+  },
+  {
+    "id": "MED-111",
+    "name": "Baby Diapers Size 3",
+    "category": "Baby & Mother Care",
+    "purchasePrice": 10.5,
+    "sellingPrice": 16,
+    "reorderLevel": 20
+  },
+  {
+    "id": "MED-112",
+    "name": "Adhesive Bandages",
+    "category": "First Aid",
+    "purchasePrice": 2.1,
+    "sellingPrice": 4.5,
+    "reorderLevel": 50
+  },
+  {
+    "id": "MED-113",
+    "name": "Hand Sanitizer 500ml",
+    "category": "Personal Care & Hygiene",
+    "purchasePrice": 3.3,
+    "sellingPrice": 6.25,
+    "reorderLevel": 35
   }
 ]

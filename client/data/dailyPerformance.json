@@ -1,0 +1,1162 @@
+[
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "transactions": 18,
+    "unitsSold": 52,
+    "revenue": 582.18,
+    "costOfGoods": 323.35,
+    "purchases": 2357.82,
+    "expenses": 60.43
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "transactions": 11,
+    "unitsSold": 27,
+    "revenue": 329.06,
+    "costOfGoods": 182.34,
+    "purchases": 1165.95,
+    "expenses": 38.34
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "transactions": 7,
+    "unitsSold": 16,
+    "revenue": 205.99,
+    "costOfGoods": 121.95,
+    "purchases": 0,
+    "expenses": 31.27
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "transactions": 5,
+    "unitsSold": 13,
+    "revenue": 133.89,
+    "costOfGoods": 70.74,
+    "purchases": 0,
+    "expenses": 23.12
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "transactions": 23,
+    "unitsSold": 63,
+    "revenue": 762.11,
+    "costOfGoods": 437.68,
+    "purchases": 0,
+    "expenses": 41.38
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 46,
+    "revenue": 445.45,
+    "costOfGoods": 255.49,
+    "purchases": 0,
+    "expenses": 37.95
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "transactions": 15,
+    "unitsSold": 41,
+    "revenue": 486.11,
+    "costOfGoods": 279.4,
+    "purchases": 819.49,
+    "expenses": 39.48
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 24,
+    "revenue": 303.88,
+    "costOfGoods": 167.22,
+    "purchases": 0,
+    "expenses": 17.39
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "transactions": 23,
+    "unitsSold": 61,
+    "revenue": 616.92,
+    "costOfGoods": 328.67,
+    "purchases": 0,
+    "expenses": 65.05
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "transactions": 16,
+    "unitsSold": 34,
+    "revenue": 334.85,
+    "costOfGoods": 182.87,
+    "purchases": 0,
+    "expenses": 28.15
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "transactions": 13,
+    "unitsSold": 33,
+    "revenue": 306.24,
+    "costOfGoods": 175.99,
+    "purchases": 0,
+    "expenses": 20.15
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 23,
+    "revenue": 297.48,
+    "costOfGoods": 155.54,
+    "purchases": 315.74,
+    "expenses": 13.65
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "transactions": 22,
+    "unitsSold": 61,
+    "revenue": 778.91,
+    "costOfGoods": 466.84,
+    "purchases": 1079.03,
+    "expenses": 72.81
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 44,
+    "revenue": 531.67,
+    "costOfGoods": 281.84,
+    "purchases": 0,
+    "expenses": 42.52
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "transactions": 12,
+    "unitsSold": 38,
+    "revenue": 371.14,
+    "costOfGoods": 216.57,
+    "purchases": 0,
+    "expenses": 26.22
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 27,
+    "revenue": 288.74,
+    "costOfGoods": 163.1,
+    "purchases": 0,
+    "expenses": 16.82
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "transactions": 25,
+    "unitsSold": 73,
+    "revenue": 914.03,
+    "costOfGoods": 521.48,
+    "purchases": 0,
+    "expenses": 37.67
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 36,
+    "revenue": 349.83,
+    "costOfGoods": 193.42,
+    "purchases": 1715.37,
+    "expenses": 26.13
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "transactions": 13,
+    "unitsSold": 35,
+    "revenue": 399.61,
+    "costOfGoods": 212.16,
+    "purchases": 0,
+    "expenses": 27.3
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 22,
+    "revenue": 268.23,
+    "costOfGoods": 147.87,
+    "purchases": 0,
+    "expenses": 21.21
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "transactions": 22,
+    "unitsSold": 57,
+    "revenue": 516.39,
+    "costOfGoods": 284.86,
+    "purchases": 0,
+    "expenses": 67.86
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "transactions": 14,
+    "unitsSold": 32,
+    "revenue": 337.99,
+    "costOfGoods": 197.03,
+    "purchases": 0,
+    "expenses": 41.11
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "transactions": 13,
+    "unitsSold": 41,
+    "revenue": 433,
+    "costOfGoods": 257.41,
+    "purchases": 0,
+    "expenses": 29.77
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 22,
+    "revenue": 253.2,
+    "costOfGoods": 145.15,
+    "purchases": 288.41,
+    "expenses": 14.32
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "transactions": 21,
+    "unitsSold": 60,
+    "revenue": 737.89,
+    "costOfGoods": 403.79,
+    "purchases": 0,
+    "expenses": 36.54
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "transactions": 13,
+    "unitsSold": 33,
+    "revenue": 325.14,
+    "costOfGoods": 169.27,
+    "purchases": 0,
+    "expenses": 43.03
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "transactions": 8,
+    "unitsSold": 20,
+    "revenue": 231.05,
+    "costOfGoods": 131.8,
+    "purchases": 0,
+    "expenses": 25.14
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "transactions": 5,
+    "unitsSold": 13,
+    "revenue": 163.9,
+    "costOfGoods": 94.32,
+    "purchases": 0,
+    "expenses": 23.35
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "transactions": 19,
+    "unitsSold": 46,
+    "revenue": 510.32,
+    "costOfGoods": 304.13,
+    "purchases": 0,
+    "expenses": 55.88
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 38,
+    "revenue": 466.86,
+    "costOfGoods": 267.17,
+    "purchases": 0,
+    "expenses": 37.41
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "transactions": 10,
+    "unitsSold": 23,
+    "revenue": 298.73,
+    "costOfGoods": 178.16,
+    "purchases": 710.45,
+    "expenses": 37.82
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "transactions": 7,
+    "unitsSold": 19,
+    "revenue": 239.8,
+    "costOfGoods": 141.66,
+    "purchases": 0,
+    "expenses": 13.95
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "transactions": 27,
+    "unitsSold": 76,
+    "revenue": 848.8,
+    "costOfGoods": 447.74,
+    "purchases": 0,
+    "expenses": 66.2
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "transactions": 14,
+    "unitsSold": 35,
+    "revenue": 380.48,
+    "costOfGoods": 222.99,
+    "purchases": 0,
+    "expenses": 29.76
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "transactions": 12,
+    "unitsSold": 32,
+    "revenue": 297,
+    "costOfGoods": 172.6,
+    "purchases": 1101.47,
+    "expenses": 38.44
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 22,
+    "revenue": 275.81,
+    "costOfGoods": 146.36,
+    "purchases": 0,
+    "expenses": 15.06
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "transactions": 26,
+    "unitsSold": 54,
+    "revenue": 689.92,
+    "costOfGoods": 372.74,
+    "purchases": 0,
+    "expenses": 68.87
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "transactions": 19,
+    "unitsSold": 54,
+    "revenue": 602.48,
+    "costOfGoods": 318.67,
+    "purchases": 0,
+    "expenses": 51.93
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "transactions": 11,
+    "unitsSold": 35,
+    "revenue": 391.9,
+    "costOfGoods": 203.98,
+    "purchases": 0,
+    "expenses": 37.39
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "transactions": 7,
+    "unitsSold": 20,
+    "revenue": 182.08,
+    "costOfGoods": 108.05,
+    "purchases": 0,
+    "expenses": 17.43
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "transactions": 26,
+    "unitsSold": 83,
+    "revenue": 986.62,
+    "costOfGoods": 571.03,
+    "purchases": 0,
+    "expenses": 79.76
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "transactions": 19,
+    "unitsSold": 50,
+    "revenue": 569.25,
+    "costOfGoods": 329.56,
+    "purchases": 0,
+    "expenses": 38.78
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "transactions": 14,
+    "unitsSold": 39,
+    "revenue": 403.95,
+    "costOfGoods": 213.57,
+    "purchases": 0,
+    "expenses": 24.54
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 18,
+    "revenue": 180.61,
+    "costOfGoods": 106.18,
+    "purchases": 0,
+    "expenses": 23.65
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "transactions": 28,
+    "unitsSold": 64,
+    "revenue": 671.32,
+    "costOfGoods": 366.74,
+    "purchases": 0,
+    "expenses": 48.12
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "transactions": 19,
+    "unitsSold": 48,
+    "revenue": 488.1,
+    "costOfGoods": 286.8,
+    "purchases": 0,
+    "expenses": 28.28
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "transactions": 11,
+    "unitsSold": 32,
+    "revenue": 288.59,
+    "costOfGoods": 173.01,
+    "purchases": 715.69,
+    "expenses": 30.57
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "transactions": 10,
+    "unitsSold": 21,
+    "revenue": 232.91,
+    "costOfGoods": 133.15,
+    "purchases": 0,
+    "expenses": 25.22
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "transactions": 26,
+    "unitsSold": 74,
+    "revenue": 865.47,
+    "costOfGoods": 491.78,
+    "purchases": 0,
+    "expenses": 76.54
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "transactions": 18,
+    "unitsSold": 38,
+    "revenue": 466.17,
+    "costOfGoods": 267.9,
+    "purchases": 0,
+    "expenses": 25.26
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "transactions": 16,
+    "unitsSold": 44,
+    "revenue": 513.17,
+    "costOfGoods": 268.03,
+    "purchases": 514.09,
+    "expenses": 37.37
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "transactions": 10,
+    "unitsSold": 24,
+    "revenue": 308.92,
+    "costOfGoods": 173.78,
+    "purchases": 0,
+    "expenses": 17.12
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "transactions": 16,
+    "unitsSold": 45,
+    "revenue": 530.88,
+    "costOfGoods": 301.95,
+    "purchases": 0,
+    "expenses": 74.93
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 41,
+    "revenue": 425.3,
+    "costOfGoods": 243.42,
+    "purchases": 0,
+    "expenses": 25.09
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "transactions": 11,
+    "unitsSold": 27,
+    "revenue": 328.25,
+    "costOfGoods": 174.46,
+    "purchases": 0,
+    "expenses": 28.24
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "transactions": 7,
+    "unitsSold": 18,
+    "revenue": 181.89,
+    "costOfGoods": 99.14,
+    "purchases": 0,
+    "expenses": 16.37
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "transactions": 23,
+    "unitsSold": 48,
+    "revenue": 482.52,
+    "costOfGoods": 286.27,
+    "purchases": 1598.07,
+    "expenses": 70.56
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "transactions": 11,
+    "unitsSold": 28,
+    "revenue": 306.76,
+    "costOfGoods": 165.46,
+    "purchases": 0,
+    "expenses": 27.3
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "transactions": 9,
+    "unitsSold": 28,
+    "revenue": 344.2,
+    "costOfGoods": 190.29,
+    "purchases": 0,
+    "expenses": 35.96
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "transactions": 7,
+    "unitsSold": 18,
+    "revenue": 192,
+    "costOfGoods": 105.9,
+    "purchases": 292.17,
+    "expenses": 15.32
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "transactions": 29,
+    "unitsSold": 77,
+    "revenue": 703.58,
+    "costOfGoods": 419.28,
+    "purchases": 0,
+    "expenses": 73.03
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "transactions": 20,
+    "unitsSold": 52,
+    "revenue": 664.13,
+    "costOfGoods": 397.16,
+    "purchases": 676.25,
+    "expenses": 33.55
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "transactions": 14,
+    "unitsSold": 32,
+    "revenue": 294.23,
+    "costOfGoods": 154.84,
+    "purchases": 766.94,
+    "expenses": 19.69
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "transactions": 11,
+    "unitsSold": 23,
+    "revenue": 234.68,
+    "costOfGoods": 123.98,
+    "purchases": 0,
+    "expenses": 20.01
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "transactions": 26,
+    "unitsSold": 67,
+    "revenue": 829.85,
+    "costOfGoods": 482.83,
+    "purchases": 1466.12,
+    "expenses": 39.3
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "transactions": 18,
+    "unitsSold": 43,
+    "revenue": 556.98,
+    "costOfGoods": 325.98,
+    "purchases": 0,
+    "expenses": 32.98
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "transactions": 14,
+    "unitsSold": 41,
+    "revenue": 422.98,
+    "costOfGoods": 228.19,
+    "purchases": 0,
+    "expenses": 26.09
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "transactions": 10,
+    "unitsSold": 30,
+    "revenue": 347.79,
+    "costOfGoods": 183.31,
+    "purchases": 0,
+    "expenses": 12.28
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "transactions": 25,
+    "unitsSold": 68,
+    "revenue": 789.8,
+    "costOfGoods": 461.76,
+    "purchases": 0,
+    "expenses": 58.17
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "transactions": 21,
+    "unitsSold": 54,
+    "revenue": 618.9,
+    "costOfGoods": 339.61,
+    "purchases": 0,
+    "expenses": 39.91
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "transactions": 13,
+    "unitsSold": 36,
+    "revenue": 384.97,
+    "costOfGoods": 221.69,
+    "purchases": 0,
+    "expenses": 32.66
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 17,
+    "revenue": 181.43,
+    "costOfGoods": 102.35,
+    "purchases": 0,
+    "expenses": 24.99
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "transactions": 31,
+    "unitsSold": 69,
+    "revenue": 759.02,
+    "costOfGoods": 433.87,
+    "purchases": 0,
+    "expenses": 42.62
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "transactions": 18,
+    "unitsSold": 55,
+    "revenue": 568.54,
+    "costOfGoods": 296.03,
+    "purchases": 751.79,
+    "expenses": 40.68
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "transactions": 13,
+    "unitsSold": 38,
+    "revenue": 449.18,
+    "costOfGoods": 243.27,
+    "purchases": 718.34,
+    "expenses": 26.8
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "transactions": 9,
+    "unitsSold": 23,
+    "revenue": 252.2,
+    "costOfGoods": 149.44,
+    "purchases": 0,
+    "expenses": 12.29
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "transactions": 27,
+    "unitsSold": 66,
+    "revenue": 761.23,
+    "costOfGoods": 405.41,
+    "purchases": 1751.5,
+    "expenses": 37
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "transactions": 15,
+    "unitsSold": 42,
+    "revenue": 378.09,
+    "costOfGoods": 198.76,
+    "purchases": 1543.57,
+    "expenses": 44.16
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "transactions": 16,
+    "unitsSold": 36,
+    "revenue": 333.72,
+    "costOfGoods": 194.98,
+    "purchases": 0,
+    "expenses": 20.95
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 19,
+    "revenue": 185.52,
+    "costOfGoods": 107.69,
+    "purchases": 0,
+    "expenses": 16.79
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "transactions": 23,
+    "unitsSold": 48,
+    "revenue": 484.27,
+    "costOfGoods": 282.95,
+    "purchases": 0,
+    "expenses": 39.24
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "transactions": 12,
+    "unitsSold": 30,
+    "revenue": 341.33,
+    "costOfGoods": 189.5,
+    "purchases": 0,
+    "expenses": 51.28
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "transactions": 10,
+    "unitsSold": 27,
+    "revenue": 311.18,
+    "costOfGoods": 163.34,
+    "purchases": 0,
+    "expenses": 26.31
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "transactions": 6,
+    "unitsSold": 17,
+    "revenue": 213.96,
+    "costOfGoods": 127.07,
+    "purchases": 0,
+    "expenses": 12.03
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "transactions": 22,
+    "unitsSold": 47,
+    "revenue": 542.76,
+    "costOfGoods": 303.41,
+    "purchases": 0,
+    "expenses": 55.78
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "transactions": 14,
+    "unitsSold": 35,
+    "revenue": 316.62,
+    "costOfGoods": 179.2,
+    "purchases": 0,
+    "expenses": 26.19
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "transactions": 10,
+    "unitsSold": 31,
+    "revenue": 335.63,
+    "costOfGoods": 174.55,
+    "purchases": 756.25,
+    "expenses": 36.28
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "transactions": 7,
+    "unitsSold": 18,
+    "revenue": 208.78,
+    "costOfGoods": 111.26,
+    "purchases": 0,
+    "expenses": 24.15
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "transactions": 29,
+    "unitsSold": 85,
+    "revenue": 1019.34,
+    "costOfGoods": 556.2,
+    "purchases": 0,
+    "expenses": 66.98
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "transactions": 19,
+    "unitsSold": 47,
+    "revenue": 527.52,
+    "costOfGoods": 281.7,
+    "purchases": 0,
+    "expenses": 44.99
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "transactions": 15,
+    "unitsSold": 41,
+    "revenue": 417.68,
+    "costOfGoods": 226.54,
+    "purchases": 1180.71,
+    "expenses": 24.91
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "transactions": 10,
+    "unitsSold": 20,
+    "revenue": 241.68,
+    "costOfGoods": 135.47,
+    "purchases": 0,
+    "expenses": 25.12
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "transactions": 34,
+    "unitsSold": 97,
+    "revenue": 1256.28,
+    "costOfGoods": 692.61,
+    "purchases": 0,
+    "expenses": 59.52
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "transactions": 18,
+    "unitsSold": 51,
+    "revenue": 487.02,
+    "costOfGoods": 274.44,
+    "purchases": 0,
+    "expenses": 47.8
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "transactions": 15,
+    "unitsSold": 43,
+    "revenue": 442.33,
+    "costOfGoods": 261.41,
+    "purchases": 0,
+    "expenses": 38.02
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 25,
+    "revenue": 289.82,
+    "costOfGoods": 173.69,
+    "purchases": 0,
+    "expenses": 25.1
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "transactions": 34,
+    "unitsSold": 82,
+    "revenue": 822.6,
+    "costOfGoods": 471.22,
+    "purchases": 0,
+    "expenses": 58.29
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "transactions": 20,
+    "unitsSold": 45,
+    "revenue": 539.08,
+    "costOfGoods": 303.6,
+    "purchases": 1177.29,
+    "expenses": 41.22
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "transactions": 15,
+    "unitsSold": 46,
+    "revenue": 433.26,
+    "costOfGoods": 230.61,
+    "purchases": 801.73,
+    "expenses": 32.19
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "transactions": 11,
+    "unitsSold": 29,
+    "revenue": 271.82,
+    "costOfGoods": 147.52,
+    "purchases": 0,
+    "expenses": 14.01
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "transactions": 25,
+    "unitsSold": 57,
+    "revenue": 608.97,
+    "costOfGoods": 318.5,
+    "purchases": 1076.08,
+    "expenses": 74.56
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "transactions": 19,
+    "unitsSold": 45,
+    "revenue": 499.47,
+    "costOfGoods": 292.62,
+    "purchases": 0,
+    "expenses": 33.78
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "transactions": 12,
+    "unitsSold": 38,
+    "revenue": 396.81,
+    "costOfGoods": 218.17,
+    "purchases": 581.97,
+    "expenses": 38.1
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "transactions": 11,
+    "unitsSold": 26,
+    "revenue": 273.01,
+    "costOfGoods": 159.9,
+    "purchases": 603.73,
+    "expenses": 15.25
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "transactions": 28,
+    "unitsSold": 64,
+    "revenue": 813.44,
+    "costOfGoods": 460.42,
+    "purchases": 1794.24,
+    "expenses": 69.46
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "transactions": 16,
+    "unitsSold": 49,
+    "revenue": 521.51,
+    "costOfGoods": 290.18,
+    "purchases": 0,
+    "expenses": 45.41
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "transactions": 17,
+    "unitsSold": 35,
+    "revenue": 422.41,
+    "costOfGoods": 229.73,
+    "purchases": 483,
+    "expenses": 17.54
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "transactions": 11,
+    "unitsSold": 29,
+    "revenue": 301.25,
+    "costOfGoods": 164.47,
+    "purchases": 463.18,
+    "expenses": 20.1
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "transactions": 17,
+    "unitsSold": 53,
+    "revenue": 635.86,
+    "costOfGoods": 368.21,
+    "purchases": 1684.63,
+    "expenses": 43.38
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "transactions": 11,
+    "unitsSold": 33,
+    "revenue": 315.42,
+    "costOfGoods": 187.18,
+    "purchases": 1557.36,
+    "expenses": 26.02
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "transactions": 10,
+    "unitsSold": 21,
+    "revenue": 257.77,
+    "costOfGoods": 147.16,
+    "purchases": 0,
+    "expenses": 36.22
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "transactions": 6,
+    "unitsSold": 14,
+    "revenue": 147.34,
+    "costOfGoods": 83.29,
+    "purchases": 0,
+    "expenses": 18.72
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "transactions": 22,
+    "unitsSold": 64,
+    "revenue": 805.25,
+    "costOfGoods": 456.32,
+    "purchases": 0,
+    "expenses": 37.81
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "transactions": 12,
+    "unitsSold": 24,
+    "revenue": 262.85,
+    "costOfGoods": 146.8,
+    "purchases": 0,
+    "expenses": 40.87
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "transactions": 10,
+    "unitsSold": 29,
+    "revenue": 358.66,
+    "costOfGoods": 204.36,
+    "purchases": 0,
+    "expenses": 26.4
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "transactions": 8,
+    "unitsSold": 17,
+    "revenue": 205.68,
+    "costOfGoods": 107.43,
+    "purchases": 0,
+    "expenses": 22.72
+  }
+]

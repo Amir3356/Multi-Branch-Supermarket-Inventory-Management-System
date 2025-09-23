@@ -8,7 +8,7 @@
     "qty": 40,
     "requestedBy": "Selam Tesfaye",
     "date": "2026-10-04",
-    "status": "In Transit"
+    "status": "Completed"
   },
   {
     "id": "TRF-302",
@@ -19,7 +19,7 @@
     "qty": 30,
     "requestedBy": "Selam Tesfaye",
     "date": "2026-10-04",
-    "status": "Pending Approval"
+    "status": "Completed"
   },
   {
     "id": "TRF-303",
@@ -30,7 +30,7 @@
     "qty": 60,
     "requestedBy": "Yonas Alemu",
     "date": "2026-10-02",
-    "status": "Received"
+    "status": "Completed"
   },
   {
     "id": "TRF-304",
@@ -41,6 +41,6 @@
     "qty": 100,
     "requestedBy": "Hana Girma",
     "date": "2026-09-29",
-    "status": "Received"
+    "status": "Completed"
   }
 ]

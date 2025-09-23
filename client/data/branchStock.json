@@ -131,5 +131,103 @@
     "stock": 85,
     "batch": "BT-1060",
     "expiry": "2027-05-19"
+  },
+  {
+    "medId": "MED-107",
+    "branchId": "BR-01",
+    "stock": 85,
+    "batch": "BT-5210",
+    "expiry": "2027-11-30"
+  },
+  {
+    "medId": "MED-107",
+    "branchId": "BR-04",
+    "stock": 18,
+    "batch": "BT-5210",
+    "expiry": "2027-11-30"
+  },
+  {
+    "medId": "MED-108",
+    "branchId": "BR-01",
+    "stock": 60,
+    "batch": "BT-6105",
+    "expiry": "2029-03-31"
+  },
+  {
+    "medId": "MED-108",
+    "branchId": "BR-02",
+    "stock": 32,
+    "batch": "BT-6105",
+    "expiry": "2029-03-31"
+  },
+  {
+    "medId": "MED-109",
+    "branchId": "BR-01",
+    "stock": 40,
+    "batch": "BT-7002",
+    "expiry": "2031-12-31"
+  },
+  {
+    "medId": "MED-109",
+    "branchId": "BR-03",
+    "stock": 9,
+    "batch": "BT-7002",
+    "expiry": "2031-12-31"
+  },
+  {
+    "medId": "MED-110",
+    "branchId": "BR-02",
+    "stock": 120,
+    "batch": "BT-3804",
+    "expiry": "2027-07-15"
+  },
+  {
+    "medId": "MED-110",
+    "branchId": "BR-04",
+    "stock": 55,
+    "batch": "BT-3791",
+    "expiry": "2026-11-20"
+  },
+  {
+    "medId": "MED-111",
+    "branchId": "BR-01",
+    "stock": 48,
+    "batch": "BT-2240",
+    "expiry": "2028-09-30"
+  },
+  {
+    "medId": "MED-111",
+    "branchId": "BR-03",
+    "stock": 26,
+    "batch": "BT-2240",
+    "expiry": "2028-09-30"
+  },
+  {
+    "medId": "MED-112",
+    "branchId": "BR-02",
+    "stock": 210,
+    "batch": "BT-1150",
+    "expiry": "2029-06-30"
+  },
+  {
+    "medId": "MED-112",
+    "branchId": "BR-04",
+    "stock": 75,
+    "batch": "BT-1150",
+    "expiry": "2029-06-30"
+  },
+  {
+    "medId": "MED-113",
+    "branchId": "BR-01",
+    "stock": 140,
+    "batch": "BT-8402",
+    "expiry": "2028-02-28"
+  },
+  {
+    "medId": "MED-113",
+    "branchId": "BR-03",
+    "stock": 22,
+    "batch": "BT-8402",
+    "expiry": "2028-02-28"
   }
 ]

@@ -5,14 +5,27 @@ import {
   columnFilteringFeature,
   globalFilteringFeature,
   rowSortingFeature,
-  rowPaginationFeature,
   createFilteredRowModel,
   createSortedRowModel,
-  createPaginatedRowModel,
   filterFn_equalsString,
   sortFn_text,
   sortFn_basic
 } from '@tanstack/react-table'
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine
+} from 'recharts'
 import {
   LayoutDashboard,
   Pill,
@@ -37,14 +50,12 @@ import {
   Wallet,
   Building2,
   ArrowLeftRight,
-  MapPin,
-  Phone,
-  Users,
   X,
   Save,
   Landmark,
   Trash2,
   Pencil,
+  Power,
   ShieldCheck,
   Bell,
   CheckCheck,
@@ -52,11 +63,7 @@ import {
   MailOpen,
   ArrowUp,
   ArrowDown,
-  ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight
+  ArrowUpDown
 } from 'lucide-react'
 
 // Static mock data (direct JSON imports, no API calls)
@@ -69,6 +76,10 @@ import PAYMENTS from './data/supplierPayments.json'
 import TRANSFERS from './data/transfers.json'
 import GOVERNMENT_TAXES from './data/governmentTaxes.json'
 import EXPENSE_CATEGORIES from './data/expenseCategories.json'
+import CATEGORIES from './data/categories.json'
+import EXPENSES from './data/expenses.json'
+import DAILY_PERFORMANCE from './data/dailyPerformance.json'
+import CATEGORY_SALES from './data/categorySales.json'
 
 const STATUS_TONE = {
   'In Stock': 'in-stock',
@@ -78,8 +89,7 @@ const STATUS_TONE = {
   'Cleared': 'in-stock',
   'Received': 'in-stock',
   'Active': 'in-stock',
-  'Pending Approval': 'low-stock',
-  'In Transit': 'in-transit',
+  'Completed': 'in-stock',
   'Inactive': 'inactive'
 }
 
@@ -104,7 +114,6 @@ const DEFAULT_SETTINGS = {
   expenseCategories: EXPENSE_CATEGORIES,
   receiptFooter: 'Thank you for choosing us. Get well soon!',
   requirePrescription: true,
-  transferApproval: true,
   maxTransferQty: 500,
   emailAlerts: true,
   dailySummary: false,
@@ -176,6 +185,9 @@ const persistNotificationState = (state) => {
   }
 }
 
+// Local calendar date as YYYY-MM-DD, matching the dates in the mock data
+const toDateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
 const startOfToday = () => {
   const d = new Date()
   d.setHours(0, 0, 0, 0)
@@ -202,7 +214,7 @@ const persistSettings = (settings) => {
 }
 
 const formatMoneyIn = (currency, value) =>
-  `${CURRENCIES[currency]?.symbol || '$'}${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  `${value < 0 ? '-' : ''}${CURRENCIES[currency]?.symbol || '$'}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 // Status is derived from each branch's own stock level and batch expiry, using the configured rules
 const getStockStatus = (stock, reorderLevel, expiry, settings) => {
@@ -213,8 +225,8 @@ const getStockStatus = (stock, reorderLevel, expiry, settings) => {
 }
 
 // Inventory rows: one row per medicine per branch
-const buildInventory = (settings) =>
-  BRANCH_STOCK.map((entry) => {
+const buildInventory = (settings, stockLevels) =>
+  stockLevels.map((entry) => {
     const med = MEDICINES.find((m) => m.id === entry.medId)
     const reorderLevel = settings.reorderLevels[med.id] ?? med.reorderLevel
     return {
@@ -238,10 +250,11 @@ function BranchTag({ branch }) {
   )
 }
 
-const EMPTY_BRANCH_FORM = { name: '', code: '', location: '', phone: '', staff: '', status: 'Active' }
+const EMPTY_BRANCH_FORM = { name: '', location: '', status: 'Active' }
 
-function AddBranchModal({ branches, onClose, onSave }) {
-  const [form, setForm] = useState(EMPTY_BRANCH_FORM)
+function BranchModal({ branch, branches, onClose, onSave }) {
+  const isEdit = Boolean(branch?.id)
+  const [form, setForm] = useState(isEdit ? { name: branch.name, location: branch.location, status: branch.status } : EMPTY_BRANCH_FORM)
   const [errors, setErrors] = useState({})
 
   useEffect(() => {
@@ -253,7 +266,7 @@ function AddBranchModal({ branches, onClose, onSave }) {
   }, [onClose])
 
   const updateField = (field) => (e) => {
-    const value = field === 'code' ? e.target.value.toUpperCase() : e.target.value
+    const value = e.target.value
     setForm((prev) => ({ ...prev, [field]: value }))
     setErrors((prev) => ({ ...prev, [field]: undefined }))
   }
@@ -261,18 +274,9 @@ function AddBranchModal({ branches, onClose, onSave }) {
   const validate = () => {
     const newErrors = {}
     if (!form.name.trim()) newErrors.name = 'Branch name is required'
-    else if (branches.some((b) => b.name.toLowerCase() === form.name.trim().toLowerCase())) newErrors.name = 'A branch with this name already exists'
-
-    if (!form.code.trim()) newErrors.code = 'Branch code is required'
-    else if (!/^[A-Z0-9]{2,4}$/.test(form.code.trim())) newErrors.code = 'Use 2–4 letters or numbers'
-    else if (branches.some((b) => b.code === form.code.trim())) newErrors.code = 'This code is already in use'
+    else if (branches.some((b) => b.id !== branch?.id && b.name.toLowerCase() === form.name.trim().toLowerCase())) newErrors.name = 'A branch with this name already exists'
 
     if (!form.location.trim()) newErrors.location = 'Location is required'
-
-    if (!form.phone.trim()) newErrors.phone = 'Phone number is required'
-    else if (!/^\+?[\d\s-]{7,}$/.test(form.phone.trim())) newErrors.phone = 'Enter a valid phone number'
-
-    if (form.staff !== '' && (!Number.isInteger(Number(form.staff)) || Number(form.staff) < 0)) newErrors.staff = 'Enter a whole number'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -283,10 +287,7 @@ function AddBranchModal({ branches, onClose, onSave }) {
     if (!validate()) return
     onSave({
       name: form.name.trim(),
-      code: form.code.trim(),
       location: form.location.trim(),
-      phone: form.phone.trim(),
-      staff: Number(form.staff) || 0,
       status: form.status
     })
   }
@@ -315,8 +316,8 @@ function AddBranchModal({ branches, onClose, onSave }) {
               <Building2 size={20} />
             </div>
             <div>
-              <h2 id="add-branch-title">Add New Branch</h2>
-              <p className="page-desc">Register a new pharmacy location in the network.</p>
+              <h2 id="add-branch-title">{isEdit ? 'Edit Branch' : 'Add New Branch'}</h2>
+              <p className="page-desc">{isEdit ? `Update the details of ${branch.name}.` : 'Register a new pharmacy location in the network.'}</p>
             </div>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
@@ -326,17 +327,8 @@ function AddBranchModal({ branches, onClose, onSave }) {
 
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
           <div className="modal-section-title">Branch Details</div>
-          <div className="modal-grid">
-            {field('name', 'Branch Name *', 'e.g. Northside Branch', { autoFocus: true })}
-            {field('code', 'Branch Code *', 'e.g. NS', { maxLength: 4 })}
-          </div>
+          {field('name', 'Branch Name *', 'e.g. Northside Branch', { autoFocus: true })}
           {field('location', 'Location / Address *', 'Street, area, city')}
-
-          <div className="modal-section-title">Contact & Pharmacists</div>
-          <div className="modal-grid">
-            {field('phone', 'Phone Number *', '+251 9xx xxx xxx', { type: 'tel' })}
-            {field('staff', 'Number of Pharmacists', '0', { type: 'number', min: 0 })}
-          </div>
           <div className="modal-grid">
             <div className="form-group">
               <label htmlFor="branch-status">Status</label>
@@ -352,7 +344,326 @@ function AddBranchModal({ branches, onClose, onSave }) {
               Cancel
             </button>
             <button type="submit" className="primary-action-btn">
-              <Plus size={16} /> Create Branch
+              {isEdit ? <><Save size={16} /> Save Changes</> : <><Plus size={16} /> Create Branch</>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
+
+function NewSaleModal({ branches, inventory, formatMoney, onClose, onSave }) {
+  const [form, setForm] = useState(EMPTY_SALE_FORM)
+  const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  // Only products the chosen branch actually has in stock can be sold there
+  const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0)
+  const categoryCount = (category) => branchStock.filter((i) => i.category === category).length
+  const branchProducts = branchStock
+    .filter((i) => i.category === form.category)
+    .sort((a, b) => a.name.localeCompare(b.name))
+  const product = branchProducts.find((i) => i.key === form.key)
+  const qty = Number(form.qty)
+  const total = product && Number.isInteger(qty) && qty > 0 ? product.sellingPrice * qty : 0
+
+  const update = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      // Changing branch clears category and product (stock differs per branch); changing category clears product
+      ...(field === 'branchId' ? { category: '', key: '', qty: '1' } : {}),
+      ...(field === 'category' ? { key: '', qty: '1' } : {})
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      [field]: undefined,
+      ...(field === 'branchId' ? { category: undefined, key: undefined, qty: undefined } : {}),
+      ...(field === 'category' ? { key: undefined, qty: undefined } : {})
+    }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newErrors = {}
+    if (!form.branchId) newErrors.branchId = 'Select the branch making this sale'
+    if (!form.category) newErrors.category = form.branchId ? 'Select a category' : 'Select a branch first'
+    if (!product) newErrors.key = form.category ? 'Select a product' : 'Select a category first'
+    if (!Number.isInteger(qty) || qty < 1) newErrors.qty = 'Enter a whole number of at least 1'
+    else if (product && qty > product.stock) newErrors.qty = `Only ${product.stock} units in stock at this branch`
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length) return
+
+    onSave({
+      branchId: form.branchId,
+      customer: form.customer.trim() || 'Walk-in Customer',
+      category: product.category,
+      product: product.name,
+      medId: product.medId,
+      qty,
+      total: Math.round(total * 100) / 100,
+      status: 'Paid'
+    })
+  }
+
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-sale-title">
+        <div className="modal-header">
+          <div className="modal-title-wrap">
+            <div className="stat-icon-wrapper teal">
+              <ShoppingCart size={20} />
+            </div>
+            <div>
+              <h2 id="new-sale-title">New Sale</h2>
+              <p className="page-desc">Record a sale to a customer at one of your branches.</p>
+            </div>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-group">
+            <label htmlFor="sale-branch">Branch *</label>
+            <select id="sale-branch" autoFocus className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={(e) => update('branchId', e.target.value)}>
+              <option value="">Select branch…</option>
+              {branches.filter((b) => b.status === 'Active').map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+            {errors.branchId && <span className="error-msg">{errors.branchId}</span>}
+          </div>
+
+          <div className="modal-section-title">Customer</div>
+          <div className="form-group">
+            <label htmlFor="sale-customer">Customer Name</label>
+            <input id="sale-customer" className="input-field" placeholder="Walk-in Customer" value={form.customer} onChange={(e) => update('customer', e.target.value)} />
+          </div>
+
+          <div className="modal-section-title">Product</div>
+          <div className="form-group">
+            <label htmlFor="sale-category">Category *</label>
+            <select id="sale-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.branchId}>
+              <option value="">{form.branchId ? 'Select category…' : 'Select a branch first'}</option>
+              {CATEGORIES.map((c) => {
+                const count = categoryCount(c)
+                return (
+                  <option key={c} value={c} disabled={!count}>
+                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(none in stock)'}
+                  </option>
+                )
+              })}
+            </select>
+            {errors.category && <span className="error-msg">{errors.category}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="sale-product">Product Name *</label>
+            <select id="sale-product" className={`input-field ${errors.key ? 'error' : ''}`} value={form.key} onChange={(e) => update('key', e.target.value)} disabled={!form.category}>
+              <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
+              {branchProducts.map((i) => (
+                <option key={i.key} value={i.key}>
+                  {i.name} — {formatMoney(i.sellingPrice)} · {i.stock} in stock
+                </option>
+              ))}
+            </select>
+            {errors.key && <span className="error-msg">{errors.key}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="sale-qty">Quantity *</label>
+            <input id="sale-qty" type="number" min="1" max={product?.stock} step="1" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
+            {errors.qty && <span className="error-msg">{errors.qty}</span>}
+          </div>
+
+          <div className="sale-summary">
+            <div><small>In Stock</small><strong>{product ? `${product.stock} units` : '—'}</strong></div>
+            <div><small>Unit Price</small><strong>{product ? formatMoney(product.sellingPrice) : '—'}</strong></div>
+            <div><small>Total</small><strong className="sale-total">{formatMoney(total)}</strong></div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="secondary-action-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="primary-action-btn">
+              <CheckCircle2 size={16} /> Complete Sale
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', qty: '' }
+
+function NewTransferModal({ branches, inventory, maxQty, onClose, onSave }) {
+  const [form, setForm] = useState(EMPTY_TRANSFER_FORM)
+  const [errors, setErrors] = useState({})
+  const activeBranches = branches.filter((b) => b.status === 'Active')
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  // Products come from the sending branch's stock
+  const sourceStock = inventory.filter((i) => i.branchId === form.from && i.stock > 0)
+  const categoryCount = (category) => sourceStock.filter((i) => i.category === category).length
+  const sourceProducts = sourceStock.filter((i) => i.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
+  const product = sourceProducts.find((i) => i.key === form.key)
+  const destinationEntry = product && inventory.find((i) => i.branchId === form.to && i.medId === product.medId)
+  const qty = Number(form.qty)
+  const validQty = product && Number.isInteger(qty) && qty > 0 && qty <= product.stock ? qty : 0
+
+  const update = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      // Changing the sending branch or category resets the product picked from its stock
+      ...(field === 'from' ? { category: '', key: '', qty: '' } : {}),
+      ...(field === 'category' ? { key: '', qty: '' } : {})
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      [field]: undefined,
+      ...(field === 'from' ? { to: undefined, category: undefined, key: undefined, qty: undefined } : {}),
+      ...(field === 'category' ? { key: undefined, qty: undefined } : {})
+    }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newErrors = {}
+    if (!form.from) newErrors.from = 'Select the branch sending the stock'
+    if (!form.to) newErrors.to = 'Select the branch receiving the stock'
+    else if (form.to === form.from) newErrors.to = 'Choose a different branch from the sending branch'
+    if (!form.category) newErrors.category = form.from ? 'Select a category' : 'Select the sending branch first'
+    if (!product) newErrors.key = form.category ? 'Select a product' : 'Select a category first'
+    if (!Number.isInteger(qty) || qty < 1) newErrors.qty = 'Enter a whole number of at least 1'
+    else if (product && qty > product.stock) newErrors.qty = `Only ${product.stock} units available at the sending branch`
+    else if (qty > maxQty) newErrors.qty = `A single transfer can move at most ${maxQty} units`
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length) return
+    onSave({
+      from: form.from,
+      to: form.to,
+      product: product.name,
+      medId: product.medId,
+      batch: product.batch,
+      expiry: product.expiry,
+      qty,
+      requestedBy: 'Pharmacist'
+    })
+  }
+
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-transfer-title">
+        <div className="modal-header">
+          <div className="modal-title-wrap">
+            <div className="stat-icon-wrapper warning">
+              <ArrowLeftRight size={20} />
+            </div>
+            <div>
+              <h2 id="new-transfer-title">New Stock Transfer</h2>
+              <p className="page-desc">Move stock from one branch to another. Stock moves as soon as you confirm.</p>
+            </div>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="modal-section-title">Branches</div>
+          <div className="modal-grid">
+            <div className="form-group">
+              <label htmlFor="transfer-from">From Branch *</label>
+              <select id="transfer-from" autoFocus className={`input-field ${errors.from ? 'error' : ''}`} value={form.from} onChange={(e) => update('from', e.target.value)}>
+                <option value="">Select branch…</option>
+                {activeBranches.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              {errors.from && <span className="error-msg">{errors.from}</span>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="transfer-to">To Branch *</label>
+              <select id="transfer-to" className={`input-field ${errors.to ? 'error' : ''}`} value={form.to} onChange={(e) => update('to', e.target.value)}>
+                <option value="">Select branch…</option>
+                {activeBranches.map((b) => (
+                  <option key={b.id} value={b.id} disabled={b.id === form.from}>{b.name}</option>
+                ))}
+              </select>
+              {errors.to && <span className="error-msg">{errors.to}</span>}
+            </div>
+          </div>
+
+          <div className="modal-section-title">Product</div>
+          <div className="form-group">
+            <label htmlFor="transfer-category">Category *</label>
+            <select id="transfer-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.from}>
+              <option value="">{form.from ? 'Select category…' : 'Select the sending branch first'}</option>
+              {CATEGORIES.map((c) => {
+                const count = categoryCount(c)
+                return (
+                  <option key={c} value={c} disabled={!count}>
+                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(none in stock)'}
+                  </option>
+                )
+              })}
+            </select>
+            {errors.category && <span className="error-msg">{errors.category}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="transfer-product">Product Name *</label>
+            <select id="transfer-product" className={`input-field ${errors.key ? 'error' : ''}`} value={form.key} onChange={(e) => update('key', e.target.value)} disabled={!form.category}>
+              <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
+              {sourceProducts.map((i) => (
+                <option key={i.key} value={i.key}>
+                  {i.name} · batch {i.batch} · {i.stock} available
+                </option>
+              ))}
+            </select>
+            {errors.key && <span className="error-msg">{errors.key}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="transfer-qty">Quantity *</label>
+            <input id="transfer-qty" type="number" min="1" max={product ? Math.min(product.stock, maxQty) : undefined} step="1" placeholder="Units to move" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
+            {errors.qty && <span className="error-msg">{errors.qty}</span>}
+          </div>
+
+          <div className="sale-summary">
+            <div><small>Available at Source</small><strong>{product ? `${product.stock} units` : '—'}</strong></div>
+            <div><small>Source After</small><strong>{product ? `${product.stock - validQty} units` : '—'}</strong></div>
+            <div><small>Destination After</small><strong>{product && form.to ? `${(destinationEntry?.stock || 0) + validQty} units` : '—'}</strong></div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="secondary-action-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="primary-action-btn">
+              <ArrowLeftRight size={16} /> Transfer Stock
             </button>
           </div>
         </form>
@@ -916,7 +1227,6 @@ function PolicyPanel({ settings, branchCount, onSave }) {
 const NOTIFICATION_TYPES = {
   'low-stock': { label: 'Low Stock', icon: AlertTriangle, tone: 'warning' },
   expiring: { label: 'Expiring', icon: Clock, tone: 'danger' },
-  transfer: { label: 'Transfers', icon: ArrowLeftRight, tone: 'cyan' },
   tax: { label: 'Government Tax', icon: Landmark, tone: 'teal' }
 }
 
@@ -938,7 +1248,7 @@ function NotificationsPanel({ notifications, readIds, scopeLabel, onToggleRead, 
       <div className="section-header">
         <div>
           <h2 className="page-title">Notifications · {scopeLabel}</h2>
-          <p className="page-desc">Stock alerts, transfer requests, and government tax reminders that need your attention.</p>
+          <p className="page-desc">Stock alerts and government tax reminders that need your attention.</p>
         </div>
         <button type="button" className="secondary-action-btn" onClick={onMarkAllRead} disabled={unreadCount === 0}>
           <CheckCheck size={16} /> Mark all as read
@@ -1017,20 +1327,18 @@ function NotificationsPanel({ notifications, readIds, scopeLabel, onToggleRead, 
   )
 }
 
-// TanStack Table setup for the Inventory page (features are module-level so they stay stable)
-const inventoryTableFeatures = tableFeatures({
+// TanStack Table features shared by the Inventory and Branches tables (module-level so they stay stable)
+const listTableFeatures = tableFeatures({
   columnFilteringFeature,
   globalFilteringFeature,
   rowSortingFeature,
-  rowPaginationFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
-  paginatedRowModel: createPaginatedRowModel(),
   filterFns: { equalsString: filterFn_equalsString },
   sortFns: { text: sortFn_text, basic: sortFn_basic }
 })
 
-const INVENTORY_CATEGORIES = [...new Set(MEDICINES.map((m) => m.category))].sort()
+const INVENTORY_CATEGORIES = CATEGORIES
 
 const INVENTORY_STATUSES = ['In Stock', 'Low Stock', 'Expiring Soon']
 
@@ -1043,7 +1351,6 @@ const INVENTORY_SORTS = {
   'price-desc': { label: 'Selling price (high to low)', sorting: [{ id: 'sellingPrice', desc: true }] }
 }
 
-const INVENTORY_PAGE_SIZES = [5, 10, 20, 50]
 
 const INVENTORY_DEFAULT_SORTING = INVENTORY_SORTS['name-asc'].sorting
 
@@ -1058,7 +1365,6 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState(INVENTORY_DEFAULT_SORTING)
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
 
   const columns = useMemo(() => {
     const branchName = (id) => branches.find((b) => b.id === id)?.name || ''
@@ -1087,23 +1393,20 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
   const activeColumnFilters = showBranch ? columnFilters : columnFilters.filter((f) => f.id !== 'branchId')
 
   const table = useTable({
-    features: inventoryTableFeatures,
+    features: listTableFeatures,
     columns,
     data,
-    state: { globalFilter, columnFilters: activeColumnFilters, sorting, pagination },
+    state: { globalFilter, columnFilters: activeColumnFilters, sorting },
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
-    onPaginationChange: setPagination,
     globalFilterFn: inventorySearchFn,
     getColumnCanGlobalFilter: (column) => column.id === 'name'
   })
 
-  const resetPage = () => setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   const filterValue = (id) => activeColumnFilters.find((f) => f.id === id)?.value ?? 'all'
   const setFilter = (id, value) => {
     table.getColumn(id)?.setFilterValue(value === 'all' ? undefined : value)
-    resetPage()
   }
 
   const sortKey = Object.keys(INVENTORY_SORTS).find((key) => JSON.stringify(INVENTORY_SORTS[key].sorting) === JSON.stringify(sorting)) ?? (sorting.length ? 'custom' : 'none')
@@ -1113,14 +1416,9 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
     setGlobalFilter('')
     setColumnFilters([])
     setSorting(INVENTORY_DEFAULT_SORTING)
-    resetPage()
   }
 
   const matchingCount = table.getFilteredRowModel().rows.length
-  const { pageIndex, pageSize } = pagination
-  const firstShown = matchingCount ? pageIndex * pageSize + 1 : 0
-  const lastShown = Math.min((pageIndex + 1) * pageSize, matchingCount)
-  const pageCount = Math.max(1, table.getPageCount())
   const visibleColumnCount = columns.length + 1
 
   return (
@@ -1137,7 +1435,6 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
             value={globalFilter}
             onChange={(e) => {
               setGlobalFilter(e.target.value)
-              resetPage()
             }}
           />
         </div>
@@ -1165,21 +1462,6 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
           </select>
         )}
 
-        <select
-          className="input-field filter-select"
-          aria-label="Sort by"
-          value={sortKey}
-          onChange={(e) => {
-            setSorting(e.target.value === 'none' ? [] : INVENTORY_SORTS[e.target.value].sorting)
-            resetPage()
-          }}
-        >
-          <option value="none">Sort: Default order</option>
-          {Object.entries(INVENTORY_SORTS).map(([key, opt]) => (
-            <option key={key} value={key}>Sort: {opt.label}</option>
-          ))}
-          {sortKey === 'custom' && <option value="custom" disabled>Sort: By column header</option>}
-        </select>
       </div>
 
       <div className="filter-summary">
@@ -1220,7 +1502,7 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
           <tbody>
             {table.getRowModel().rows.map((row, index) => (
               <tr key={row.id}>
-                <td>{pageIndex * pageSize + index + 1}</td>
+                <td>{index + 1}</td>
                 {row.getAllCells().map((cell) => (
                   <td key={cell.id}>
                     <table.FlexRender cell={cell} />
@@ -1239,41 +1521,433 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="table-pagination">
-        <span className="pagination-info">
-          Showing {firstShown}–{lastShown} of {matchingCount}
+    </>
+  )
+}
+
+const BRANCH_STATUSES = ['Active', 'Inactive']
+
+// Search matches the branch name, ID, or location
+const branchSearchFn = (row, _columnId, value) => {
+  const query = String(value).trim().toLowerCase()
+  const { name, id, location } = row.original
+  return [name, id, location].some((field) => String(field).toLowerCase().includes(query))
+}
+
+function BranchesTable({ data, selectedBranch, onEdit, onToggleStatus, onDelete }) {
+  const [globalFilter, setGlobalFilter] = useState('')
+  const [columnFilters, setColumnFilters] = useState([])
+  const [sorting, setSorting] = useState([])
+
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'name',
+      header: 'Branch Name',
+      sortFn: 'text',
+      cell: (info) => (
+        <span className="fw-600">
+          {info.getValue()}
+          {info.row.original.id === selectedBranch && <span className="current-chip">Viewing</span>}
         </span>
-
-        <div className="pagination-controls">
-          <label className="page-size">
-            Rows per page
-            <select className="input-field" value={pageSize} onChange={(e) => table.setPageSize(Number(e.target.value))}>
-              {INVENTORY_PAGE_SIZES.map((size) => (
-                <option key={size} value={size}>{size}</option>
-              ))}
-            </select>
-          </label>
-
-          <span className="pagination-info">Page {Math.min(pageIndex + 1, pageCount)} of {pageCount}</span>
-
-          <div className="pagination-buttons">
-            <button type="button" className="icon-btn" onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()} aria-label="First page" title="First page">
-              <ChevronsLeft size={16} />
+      )
+    },
+    { accessorKey: 'location', header: 'Location', sortFn: 'text' },
+    { accessorKey: 'status', header: 'Status', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <StatusTag status={info.getValue()} /> },
+    {
+      id: 'actions',
+      header: 'Actions',
+      enableSorting: false,
+      cell: (info) => {
+        const b = info.row.original
+        const isActive = b.status === 'Active'
+        return (
+          <div className="row-actions" style={{ justifyContent: 'flex-start' }}>
+            <button type="button" className="icon-btn" onClick={() => onEdit(b)} aria-label={`Edit ${b.name}`} title="Edit">
+              <Pencil size={15} />
             </button>
-            <button type="button" className="icon-btn" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} aria-label="Previous page" title="Previous page">
-              <ChevronLeft size={16} />
+            <button
+              type="button"
+              className={`icon-btn ${isActive ? 'deactivate-btn' : 'activate-btn'}`}
+              onClick={() => onToggleStatus(b)}
+              aria-label={`${isActive ? 'Deactivate' : 'Activate'} ${b.name}`}
+              title={isActive ? 'Deactivate' : 'Activate'}
+            >
+              <Power size={15} />
             </button>
-            <button type="button" className="icon-btn" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} aria-label="Next page" title="Next page">
-              <ChevronRight size={16} />
-            </button>
-            <button type="button" className="icon-btn" onClick={() => table.lastPage()} disabled={!table.getCanNextPage()} aria-label="Last page" title="Last page">
-              <ChevronsRight size={16} />
+            <button type="button" className="icon-danger-btn" onClick={() => onDelete(b)} aria-label={`Delete ${b.name}`} title="Delete">
+              <Trash2 size={15} />
             </button>
           </div>
+        )
+      }
+    }
+  ], [selectedBranch, onEdit, onToggleStatus, onDelete])
+
+  const table = useTable({
+    features: listTableFeatures,
+    columns,
+    data,
+    state: { globalFilter, columnFilters, sorting },
+    onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
+    onSortingChange: setSorting,
+    globalFilterFn: branchSearchFn,
+    getColumnCanGlobalFilter: (column) => column.id === 'name'
+  })
+
+  const statusFilter = columnFilters.find((f) => f.id === 'status')?.value ?? 'all'
+  const filtersActive = Boolean(globalFilter) || columnFilters.length > 0 || sorting.length > 0
+  const matchingCount = table.getFilteredRowModel().rows.length
+
+  const clearFilters = () => {
+    setGlobalFilter('')
+    setColumnFilters([])
+    setSorting([])
+  }
+
+  return (
+    <>
+      <div className="filter-bar">
+        <div className="filter-search">
+          <Search size={16} className="filter-search-icon" />
+          <input
+            type="search"
+            className="input-field"
+            placeholder="Search by name or location..."
+            aria-label="Search branches"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+          />
         </div>
+
+        <select
+          className="input-field filter-select"
+          aria-label="Filter by status"
+          value={statusFilter}
+          onChange={(e) => table.getColumn('status')?.setFilterValue(e.target.value === 'all' ? undefined : e.target.value)}
+        >
+          <option value="all">All Statuses</option>
+          {BRANCH_STATUSES.map((st) => (
+            <option key={st} value={st}>{st}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="filter-summary">
+        <span>
+          <Filter size={14} /> <strong>{matchingCount}</strong> of {data.length} branches match
+        </span>
+        {filtersActive && (
+          <button type="button" className="link-btn" onClick={clearFilters}>
+            <X size={14} /> Clear filters
+          </button>
+        )}
+      </div>
+
+      <div className="table-responsive" style={{ marginTop: '0.75rem' }}>
+        <table className="data-table">
+          <thead>
+            {table.getHeaderGroups().map((group) => (
+              <tr key={group.id}>
+                <th>No</th>
+                {group.headers.map((header) => {
+                  const sorted = header.column.getIsSorted()
+                  return (
+                    <th key={header.id} aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none'}>
+                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                        <button type="button" className="sort-header-btn" onClick={header.column.getToggleSortingHandler()}>
+                          <table.FlexRender header={header} />
+                          {sorted === 'asc' ? <ArrowUp size={13} /> : sorted === 'desc' ? <ArrowDown size={13} /> : <ArrowUpDown size={13} className="sort-idle" />}
+                        </button>
+                      ) : (
+                        <table.FlexRender header={header} />
+                      )}
+                    </th>
+                  )
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row, index) => (
+              <tr key={row.id}>
+                <td>{index + 1}</td>
+                {row.getAllCells().map((cell) => (
+                  <td key={cell.id}>
+                    <table.FlexRender cell={cell} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+            {matchingCount === 0 && (
+              <tr>
+                <td colSpan={columns.length + 1} style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
+                  No branches match your search or filters.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </>
+  )
+}
+
+// Chart colors: validated dark-surface palette (slot 1 blue, slot 2 orange) + recessive chrome
+const CHART_COLORS = {
+  series1: '#3987e5',
+  series2: '#d95926',
+  deEmphasis: '#475569',
+  grid: '#1f2937',
+  axis: '#64748b',
+  surface: '#111827'
+}
+
+const shortDate = (key) => new Date(`${key}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+// Round axis ticks (0 / 500 / 1,000 ...) that always include zero
+const niceTicks = (values, count = 4) => {
+  const max = Math.max(0, ...values)
+  const min = Math.min(0, ...values)
+  const raw = (max - min) / count || 1
+  const magnitude = 10 ** Math.floor(Math.log10(raw))
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * magnitude).find((st) => st >= raw)
+  const ticks = []
+  for (let t = Math.floor(min / step) * step; t <= Math.ceil(max / step) * step + step / 2; t += step) ticks.push(Math.round(t * 100) / 100)
+  return ticks
+}
+
+const compactNumber = (value) => (Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}K` : String(Math.round(value)))
+
+// One tooltip for every chart: the value leads, the series name follows, keyed with a short line
+function ChartTooltip({ active, payload, label, formatValue, labelFormatter }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="chart-tooltip">
+      <div className="chart-tooltip-label">{labelFormatter ? labelFormatter(label) : label}</div>
+      {payload.map((p) => (
+        <div key={p.dataKey} className="chart-tooltip-row">
+          <span className="chart-tooltip-key" style={{ background: p.color || p.payload?.fill }} />
+          <strong>{formatValue(p.value, p.dataKey)}</strong>
+          <span>{p.name}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ChartCard({ title, subtitle, legend, table, children }) {
+  return (
+    <div className="chart-card">
+      <div className="chart-card-head">
+        <h3>{title}</h3>
+        <p>{subtitle}</p>
+        {legend && (
+          <div className="chart-legend">
+            {legend.map((l) => (
+              <span key={l.label}>
+                <span className={`chart-legend-key ${l.shape || 'line'}`} style={{ background: l.color }} /> {l.label}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="chart-body">{children}</div>
+      {table && (
+        <details className="chart-table">
+          <summary>View data</summary>
+          <div className="table-responsive">
+            <table className="data-table">
+              <thead>
+                <tr>{table.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+              </thead>
+              <tbody>
+                {table.rows.map((row, i) => (
+                  <tr key={i}>{row.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      )}
+    </div>
+  )
+}
+
+const axisProps = {
+  stroke: CHART_COLORS.grid,
+  tick: { fill: CHART_COLORS.axis, fontSize: 11 },
+  tickLine: false,
+  axisLine: { stroke: CHART_COLORS.grid }
+}
+
+function DashboardCharts({ branchId, branches, formatMoney, currencySymbol }) {
+  const inBranch = (id) => branchId === 'all' || id === branchId
+  const money = (v) => formatMoney(v)
+  const axisMoney = (v) => `${v < 0 ? '-' : ''}${currencySymbol}${compactNumber(Math.abs(v))}`
+
+  // Daily totals for the selected branch (or the whole network)
+  const dates = [...new Set(DAILY_PERFORMANCE.map((r) => r.date))].sort()
+  const daily = dates.map((date) => {
+    const rows = DAILY_PERFORMANCE.filter((r) => r.date === date && inBranch(r.branchId))
+    const sum = (field) => Math.round(rows.reduce((s, r) => s + r[field], 0) * 100) / 100
+    const revenue = sum('revenue')
+    const expenses = sum('expenses')
+    return {
+      date,
+      transactions: sum('transactions'),
+      revenue,
+      expenses,
+      purchases: sum('purchases'),
+      profit: Math.round((revenue - sum('costOfGoods') - expenses) * 100) / 100
+    }
+  })
+  const rangeLabel = `Daily · ${shortDate(dates[0])} – ${shortDate(dates[dates.length - 1])}`
+
+  // Revenue per branch over the period; the selected branch is emphasised, the rest go gray
+  const byBranch = branches
+    .map((b) => ({
+      id: b.id,
+      name: b.name.replace(' Branch', '').replace(' (HQ)', ' HQ'),
+      fullName: b.name,
+      revenue: Math.round(DAILY_PERFORMANCE.filter((r) => r.branchId === b.id).reduce((s, r) => s + r.revenue, 0) * 100) / 100
+    }))
+    .filter((b) => b.revenue > 0)
+
+  // Units sold per category for the selected scope, highest first
+  const byCategory = CATEGORIES.map((category) => {
+    const rows = CATEGORY_SALES.filter((r) => r.category === category && inBranch(r.branchId))
+    return {
+      category,
+      unitsSold: rows.reduce((s, r) => s + r.unitsSold, 0),
+      revenue: Math.round(rows.reduce((s, r) => s + r.revenue, 0) * 100) / 100
+    }
+  }).sort((a, b) => b.unitsSold - a.unitsSold)
+
+  const ticksFor = (...fields) => {
+    const ticks = niceTicks(daily.flatMap((d) => fields.map((f) => d[f])))
+    return { ticks, domain: [ticks[0], ticks[ticks.length - 1]], interval: 0 }
+  }
+  const branchTicks = niceTicks(byBranch.map((b) => b.revenue))
+  const categoryTicks = niceTicks(byCategory.map((c) => c.unitsSold))
+
+  const timeTable = (field, label, format) => ({
+    columns: ['Date', label],
+    rows: daily.map((d) => [shortDate(d.date), format(d[field])])
+  })
+
+  const tooltip = (formatValue) => (
+    <Tooltip
+      cursor={{ stroke: CHART_COLORS.axis, strokeWidth: 1 }}
+      content={<ChartTooltip formatValue={formatValue} labelFormatter={shortDate} />}
+    />
+  )
+
+  const activeDot = (color) => ({ r: 4, fill: color, stroke: CHART_COLORS.surface, strokeWidth: 2 })
+
+  return (
+    <div className="chart-grid">
+      <ChartCard title="Sales Over Time" subtitle={`Sale transactions · ${rangeLabel}`} table={timeTable('transactions', 'Transactions', (v) => v.toLocaleString())}>
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart data={daily} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
+            <XAxis dataKey="date" tickFormatter={shortDate} minTickGap={24} {...axisProps} />
+            <YAxis tickFormatter={compactNumber} width={48} {...axisProps} axisLine={false} {...ticksFor('transactions')} />
+            {tooltip((v) => `${v.toLocaleString()} transactions`)}
+            <Area type="monotone" dataKey="transactions" name="Sales" stroke={CHART_COLORS.series1} strokeWidth={2} fill={CHART_COLORS.series1} fillOpacity={0.1} activeDot={activeDot(CHART_COLORS.series1)} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Purchases Over Time" subtitle={`Stock purchased from suppliers · ${rangeLabel}`} table={timeTable('purchases', 'Purchases', money)}>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={daily} margin={{ top: 8, right: 8, left: -12, bottom: 0 }} barCategoryGap={2}>
+            <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
+            <XAxis dataKey="date" tickFormatter={shortDate} minTickGap={24} {...axisProps} />
+            <YAxis tickFormatter={axisMoney} width={48} {...axisProps} axisLine={false} {...ticksFor('purchases')} />
+            <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltip formatValue={money} labelFormatter={shortDate} />} />
+            <Bar dataKey="purchases" name="Purchases" fill={CHART_COLORS.series1} radius={[4, 4, 0, 0]} maxBarSize={24} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Revenue & Expenses"
+        subtitle={`Sales revenue vs operating expenses · ${rangeLabel}`}
+        legend={[{ label: 'Revenue', color: CHART_COLORS.series1 }, { label: 'Expenses', color: CHART_COLORS.series2 }]}
+        table={{ columns: ['Date', 'Revenue', 'Expenses'], rows: daily.map((d) => [shortDate(d.date), money(d.revenue), money(d.expenses)]) }}
+      >
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={daily} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
+            <XAxis dataKey="date" tickFormatter={shortDate} minTickGap={24} {...axisProps} />
+            <YAxis tickFormatter={axisMoney} width={48} {...axisProps} axisLine={false} {...ticksFor('revenue', 'expenses')} />
+            {tooltip(money)}
+            <Line type="monotone" dataKey="revenue" name="Revenue" stroke={CHART_COLORS.series1} strokeWidth={2} dot={false} activeDot={activeDot(CHART_COLORS.series1)} />
+            <Line type="monotone" dataKey="expenses" name="Expenses" stroke={CHART_COLORS.series2} strokeWidth={2} dot={false} activeDot={activeDot(CHART_COLORS.series2)} />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard title="Profit Over Time" subtitle={`Revenue − cost of goods − expenses · ${rangeLabel}`} table={timeTable('profit', 'Profit', money)}>
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart data={daily} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
+            <XAxis dataKey="date" tickFormatter={shortDate} minTickGap={24} {...axisProps} />
+            <YAxis tickFormatter={axisMoney} width={48} {...axisProps} axisLine={false} {...ticksFor('profit')} />
+            <ReferenceLine y={0} stroke={CHART_COLORS.axis} strokeWidth={1} />
+            {tooltip(money)}
+            <Area type="monotone" dataKey="profit" name="Profit" stroke={CHART_COLORS.series1} strokeWidth={2} fill={CHART_COLORS.series1} fillOpacity={0.1} activeDot={activeDot(CHART_COLORS.series1)} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Sales by Branch"
+        subtitle={branchId === 'all' ? `Revenue per branch · ${rangeLabel.replace('Daily · ', '')}` : `Selected branch highlighted · ${rangeLabel.replace('Daily · ', '')}`}
+        table={{ columns: ['Branch', 'Revenue'], rows: byBranch.map((b) => [b.fullName, money(b.revenue)]) }}
+      >
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={byBranch} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={CHART_COLORS.grid} />
+            <XAxis dataKey="name" {...axisProps} />
+            <YAxis tickFormatter={axisMoney} width={48} {...axisProps} axisLine={false} ticks={branchTicks} domain={[0, branchTicks[branchTicks.length - 1]]} interval={0} />
+            <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltip formatValue={money} labelFormatter={(name) => byBranch.find((b) => b.name === name)?.fullName || name} />} />
+            <Bar dataKey="revenue" name="Revenue" radius={[4, 4, 0, 0]} maxBarSize={24}>
+              {byBranch.map((b) => (
+                <Cell key={b.id} fill={branchId === 'all' || b.id === branchId ? CHART_COLORS.series1 : CHART_COLORS.deEmphasis} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      <ChartCard
+        title="Top-Selling Categories"
+        subtitle={`Units sold by category · ${rangeLabel.replace('Daily · ', '')}`}
+        table={{ columns: ['Category', 'Units Sold', 'Revenue'], rows: byCategory.map((c) => [c.category, c.unitsSold.toLocaleString(), money(c.revenue)]) }}
+      >
+        <ResponsiveContainer width="100%" height={Math.max(220, byCategory.length * 30)}>
+          <BarChart data={byCategory} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
+            <CartesianGrid horizontal={false} stroke={CHART_COLORS.grid} />
+            <XAxis type="number" tickFormatter={compactNumber} {...axisProps} ticks={categoryTicks} domain={[0, categoryTicks[categoryTicks.length - 1]]} interval={0} />
+            <YAxis
+              type="category"
+              dataKey="category"
+              width={165}
+              {...axisProps}
+              axisLine={false}
+              interval={0}
+              tick={({ x, y, payload }) => (
+                <text x={x} y={y} dy={4} textAnchor="end" fill={CHART_COLORS.axis} fontSize={11}>{payload.value}</text>
+              )}
+            />
+            <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltip formatValue={(v) => `${v.toLocaleString()} units`} />} />
+            <Bar dataKey="unitsSold" name="Units sold" fill={CHART_COLORS.series1} radius={[0, 4, 4, 0]} maxBarSize={18} />
+          </BarChart>
+        </ResponsiveContainer>
+      </ChartCard>
+    </div>
   )
 }
 
@@ -1295,16 +1969,25 @@ export default function Dashboard({ userEmail, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
   const [settings, setSettings] = useState(loadSettings)
-  const [selectedBranch, setSelectedBranch] = useState(() =>
+  const [selectedBranch] = useState(() =>
     INITIAL_BRANCHES.some((b) => b.id === settings.defaultBranch) ? settings.defaultBranch : 'all'
   )
   const [branches, setBranches] = useState(INITIAL_BRANCHES)
+  const [dashboardBranch, setDashboardBranch] = useState('all')
   const [showAddBranch, setShowAddBranch] = useState(false)
   const [branchNotice, setBranchNotice] = useState(null)
+  const [editingBranch, setEditingBranch] = useState(null)
 
   const branchById = (id) => branches.find((b) => b.id === id)
   const formatMoney = (value) => formatMoneyIn(settings.currency, value)
-  const inventory = buildInventory(settings)
+  const [sales, setSales] = useState(SALES)
+  const [stockLevels, setStockLevels] = useState(BRANCH_STOCK)
+  const [showNewSale, setShowNewSale] = useState(false)
+  const [transfers, setTransfers] = useState(TRANSFERS)
+  const [showNewTransfer, setShowNewTransfer] = useState(false)
+  const [transferNotice, setTransferNotice] = useState(null)
+  const [saleNotice, setSaleNotice] = useState(null)
+  const inventory = buildInventory(settings, stockLevels)
   const [notificationState, setNotificationState] = useState(loadNotificationState)
 
   const handleSaveSettings = (next) => {
@@ -1317,17 +2000,53 @@ export default function Dashboard({ userEmail, onLogout }) {
     const newBranch = { ...data, id: `BR-${String(nextNumber).padStart(2, '0')}`, revenue: 0, expenses: 0 }
     setBranches((prev) => [...prev, newBranch])
     setShowAddBranch(false)
-    setBranchNotice(`${newBranch.name} (${newBranch.id}) was added successfully.`)
+    setBranchNotice({ type: 'success', text: `${newBranch.name} (${newBranch.id}) was added successfully.` })
+  }
+
+  const handleEditBranch = (data) => {
+    setBranches((prev) => prev.map((b) => (b.id === editingBranch.id ? { ...b, ...data } : b)))
+    setEditingBranch(null)
+    setBranchNotice({ type: 'success', text: `${data.name} was updated.` })
+  }
+
+  const handleToggleBranchStatus = (branch) => {
+    const status = branch.status === 'Active' ? 'Inactive' : 'Active'
+    setBranches((prev) => prev.map((b) => (b.id === branch.id ? { ...b, status } : b)))
+    setBranchNotice({
+      type: 'success',
+      text: status === 'Active'
+        ? `${branch.name} is now Active and can record sales again.`
+        : `${branch.name} is now Inactive. It can't be chosen when recording new sales.`
+    })
+  }
+
+  // A branch with stock or history can't be deleted (its records would lose their branch); deactivate it instead
+  const handleDeleteBranch = (branch) => {
+    const hasRecords =
+      stockLevels.some((e) => e.branchId === branch.id) ||
+      sales.some((s) => s.branchId === branch.id) ||
+      PURCHASES.some((p) => p.branchId === branch.id) ||
+      transfers.some((t) => t.from === branch.id || t.to === branch.id) ||
+      EXPENSES.some((e) => e.branchId === branch.id) ||
+      DAILY_PERFORMANCE.some((r) => r.branchId === branch.id)
+    if (hasRecords) {
+      setBranchNotice({ type: 'error', text: `${branch.name} can't be deleted because it has stock, sales, or other records. Deactivate it instead.` })
+      return
+    }
+    if (!window.confirm(`Delete ${branch.name}? This cannot be undone.`)) return
+    setBranches((prev) => prev.filter((b) => b.id !== branch.id))
+    if (dashboardBranch === branch.id) setDashboardBranch('all')
+    setBranchNotice({ type: 'success', text: `${branch.name} was deleted.` })
   }
 
   const isAllBranches = selectedBranch === 'all'
+  const activeBranchCount = branches.filter((b) => b.status === 'Active').length
   const currentBranch = branchById(selectedBranch)
   const scopeLabel = isAllBranches ? 'All Branches' : currentBranch.name
   const inScope = (branchId) => isAllBranches || branchId === selectedBranch
   const query = searchQuery.toLowerCase()
 
   // Branch-scoped data
-  const visibleBranches = branches.filter((b) => inScope(b.id))
   const scopedInventory = inventory.filter((item) => inScope(item.branchId))
   const filteredInventory = scopedInventory.filter(
     (item) =>
@@ -1336,20 +2055,44 @@ export default function Dashboard({ userEmail, onLogout }) {
       item.id.toLowerCase().includes(query) ||
       item.batch.toLowerCase().includes(query)
   )
-  const scopedSales = SALES.filter((s) => inScope(s.branchId))
+  const scopedSales = sales.filter((s) => inScope(s.branchId))
   const scopedPurchases = PURCHASES.filter((p) => inScope(p.branchId))
   const scopedPayments = PAYMENTS.filter((p) => inScope(p.branchId))
-  const scopedTransfers = TRANSFERS.filter((t) => inScope(t.from) || inScope(t.to))
+  const scopedTransfers = transfers.filter((t) => inScope(t.from) || inScope(t.to))
 
-  // Aggregated metrics for the selected scope
-  const totalRevenue = visibleBranches.reduce((sum, b) => sum + b.revenue, 0)
-  const totalExpenses = visibleBranches.reduce((sum, b) => sum + b.expenses, 0)
+  // Dashboard figures follow the Dashboard's own branch filter (All Branches or one branch)
+  const isDashboardAll = dashboardBranch === 'all'
+  const dashboardBranchInfo = branchById(dashboardBranch)
+  const dashboardScopeLabel = isDashboardAll ? 'All Branches' : dashboardBranchInfo?.name
+  const inDashboard = (branchId) => isDashboardAll || branchId === dashboardBranch
+  const dashboardInventory = inventory.filter((i) => inDashboard(i.branchId))
+  const dashboardLowStock = dashboardInventory.filter((i) => i.status === 'Low Stock').length
+  const dashboardExpiring = dashboardInventory.filter((i) => i.status === 'Expiring Soon').length
+
+  const totalRevenue = branches.filter((b) => inDashboard(b.id)).reduce((sum, b) => sum + b.revenue, 0)
+  const totalExpenses = branches.filter((b) => inDashboard(b.id)).reduce((sum, b) => sum + b.expenses, 0)
   const netProfit = totalRevenue - totalExpenses
   const profitMargin = totalRevenue ? (netProfit / totalRevenue) * 100 : 0
   const lowStockCount = scopedInventory.filter((i) => i.status === 'Low Stock').length
   const expiringCount = scopedInventory.filter((i) => i.status === 'Expiring Soon').length
   const salesTotal = scopedSales.reduce((sum, s) => sum + s.total, 0)
-  const pendingTransfers = scopedTransfers.filter((t) => t.status !== 'Received').length
+  const salesUnitsSold = scopedSales.reduce((sum, s) => sum + s.qty, 0)
+  const salesTodayList = scopedSales.filter((s) => s.date === toDateKey(new Date()))
+  const salesTodayTotal = salesTodayList.reduce((sum, s) => sum + s.total, 0)
+  const salesTodayUnits = salesTodayList.reduce((sum, s) => sum + s.qty, 0)
+
+  // Today's figures for the Dashboard branch filter
+  const todayKey = toDateKey(new Date())
+  const todaySales = sales.filter((s) => inDashboard(s.branchId) && s.date === todayKey)
+  const todayPurchases = PURCHASES.filter((p) => inDashboard(p.branchId) && p.date === todayKey)
+  const todayExpenses = EXPENSES.filter((e) => inDashboard(e.branchId) && e.date === todayKey)
+  const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0)
+  const todayUnitsSold = todaySales.reduce((sum, s) => sum + s.qty, 0)
+  const todayCostOfGoods = todaySales.reduce((sum, s) => sum + (MEDICINES.find((m) => m.name === s.product)?.purchasePrice || 0) * s.qty, 0)
+  const todayPurchaseTotal = todayPurchases.reduce((sum, p) => sum + p.total, 0)
+  const todayExpenseTotal = todayExpenses.reduce((sum, e) => sum + e.amount, 0)
+  const todayProfit = todayRevenue - todayCostOfGoods - todayExpenseTotal
+  const unitsTransferred = scopedTransfers.reduce((sum, t) => sum + t.qty, 0)
 
   // Notifications are generated from current stock, transfers, and tax policy
   const allNotifications = [
@@ -1380,18 +2123,6 @@ export default function Dashboard({ userEmail, onLogout }) {
           sort: 0
         }
       }),
-    ...scopedTransfers
-      .filter((t) => t.status !== 'Received')
-      .map((t) => ({
-        id: `trf-${t.id}-${t.status}`,
-        type: 'transfer',
-        tab: 'transfers',
-        branch: branchById(isAllBranches || t.to === selectedBranch ? t.to : t.from),
-        title: t.status === 'Pending Approval' ? `Transfer ${t.id} awaiting approval` : `Transfer ${t.id} in transit`,
-        message: `${t.qty} units of ${t.product} from ${branchById(t.from)?.name} to ${branchById(t.to)?.name}, requested by ${t.requestedBy}.`,
-        meta: `Requested ${formatDate(new Date(t.date))}`,
-        sort: 2
-      })),
     ...settings.tax.rates
       .filter((r) => r.status === 'Active')
       .map((r) => ({ rate: r, due: nextTaxDueDate(r) }))
@@ -1451,8 +2182,36 @@ export default function Dashboard({ userEmail, onLogout }) {
     }
   }
 
+  // Records a sale at the chosen branch and takes the quantity out of that branch's stock
+  const handleRecordSale = ({ medId, ...data }) => {
+    const nextNumber = Math.max(0, ...sales.map((s) => Number(String(s.id).split('-')[1]) || 0)) + 1
+    const sale = { id: `SL-${nextNumber}`, ...data, date: toDateKey(new Date()) }
+    setSales((prev) => [sale, ...prev])
+    setStockLevels((prev) => prev.map((e) => (e.medId === medId && e.branchId === data.branchId ? { ...e, stock: e.stock - data.qty } : e)))
+    setShowNewSale(false)
+    setSaleNotice(`Sale ${sale.id} recorded at ${branchById(data.branchId)?.name}: ${data.qty} × ${data.product} for ${formatMoney(data.total)}.`)
+  }
+
+  // Single-user system: a transfer completes immediately and moves the stock between the two branches
+  const handleRequestTransfer = ({ medId, expiry, ...data }) => {
+    const nextNumber = Math.max(0, ...transfers.map((t) => Number(String(t.id).split('-')[1]) || 0)) + 1
+    const transfer = { id: `TRF-${nextNumber}`, ...data, date: toDateKey(new Date()), status: 'Completed' }
+    setTransfers((prev) => [transfer, ...prev])
+    setStockLevels((prev) => {
+      const moved = prev.map((e) => {
+        if (e.medId === medId && e.branchId === data.from) return { ...e, stock: e.stock - data.qty }
+        if (e.medId === medId && e.branchId === data.to) return { ...e, stock: e.stock + data.qty }
+        return e
+      })
+      const destinationHasProduct = prev.some((e) => e.medId === medId && e.branchId === data.to)
+      return destinationHasProduct ? moved : [...moved, { medId, branchId: data.to, stock: data.qty, batch: data.batch, expiry }]
+    })
+    setShowNewTransfer(false)
+    setTransferNotice(`Transfer ${transfer.id} completed: ${data.qty} × ${data.product} moved from ${branchById(data.from)?.name} to ${branchById(data.to)?.name}.`)
+  }
+
   const openBranch = (branchId) => {
-    setSelectedBranch(branchId)
+    setDashboardBranch(branchId)
     setActiveTab('overview')
   }
 
@@ -1483,14 +2242,14 @@ export default function Dashboard({ userEmail, onLogout }) {
 
         <nav className="sidebar-nav">
           <div className="nav-group-title">MAIN MENU</div>
-          {navItem('overview', LayoutDashboard, 'Overview')}
+          {navItem('overview', LayoutDashboard, 'Dashboard')}
           {navItem('inventory', Package, 'Inventory', lowStockCount + expiringCount)}
           {navItem('sales', ShoppingCart, 'Sales')}
           {navItem('notifications', Bell, 'Notifications', unreadNotifications)}
 
           <div className="nav-group-title" style={{ marginTop: '1.2rem' }}>OPERATIONS</div>
           {navItem('orders', PackageCheck, 'Purchase')}
-          {navItem('transfers', ArrowLeftRight, 'Stock Transfers', pendingTransfers)}
+          {navItem('transfers', ArrowLeftRight, 'Stock Transfers')}
 
           <div className="nav-group-title" style={{ marginTop: '1.2rem' }}>ANALYTICS & AUDIT</div>
           {navItem('reports', BarChart3, 'Reports')}
@@ -1541,11 +2300,11 @@ export default function Dashboard({ userEmail, onLogout }) {
             <>
               <div className="content-title-row">
                 <div>
-                  <h1 className="page-title">{isAllBranches ? 'Network Overview' : `${currentBranch.name} Overview`}</h1>
+                  <h1 className="page-title">{isDashboardAll ? 'Network Dashboard' : `${dashboardBranchInfo.name} Dashboard`}</h1>
                   <p className="page-desc">
-                    {isAllBranches
+                    {isDashboardAll
                       ? 'Consolidated stock, financials, and alerts across every pharmacy branch.'
-                      : `Real-time stock, financials, and alerts for ${currentBranch.name} · ${currentBranch.location}.`}
+                      : `Real-time stock, financials, and alerts for ${dashboardBranchInfo.name} · ${dashboardBranchInfo.location}.`}
                   </p>
                 </div>
                 <button className="primary-action-btn" onClick={() => setActiveTab('inventory')}>
@@ -1553,8 +2312,110 @@ export default function Dashboard({ userEmail, onLogout }) {
                 </button>
               </div>
 
-              {/* Metric Stat Cards: Financials (Revenue, Expense, Profit) + Stock Status */}
-              <div className="stats-grid">
+              {/* Branch Filter: scopes every figure and chart on the Dashboard */}
+              <div className="dashboard-filter-row">
+                <label className="dashboard-filter">
+                  <Building2 size={16} />
+                  <span>Branch</span>
+                  <select className="input-field" value={dashboardBranch} onChange={(e) => setDashboardBranch(e.target.value)} aria-label="Dashboard branch filter">
+                    <option value="all">All Branches</option>
+                    {branches.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {/* Today's Figures */}
+              <div className="section-label">
+                <Clock size={14} /> Today · {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })} · {dashboardScopeLabel}
+              </div>
+              <div className="stats-grid today-grid">
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Today's Sales</span>
+                    <div className="stat-icon-wrapper cyan">
+                      <ShoppingCart size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{todaySales.length}</div>
+                  <div className="stat-chip neutral">
+                    {todaySales.length === 1 ? 'transaction' : 'transactions'} · {todayUnitsSold} units sold
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Today's Purchases</span>
+                    <div className="stat-icon-wrapper teal">
+                      <PackageCheck size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{formatMoney(todayPurchaseTotal)}</div>
+                  <div className="stat-chip neutral">
+                    {todayPurchases.length} {todayPurchases.length === 1 ? 'purchase order' : 'purchase orders'}
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Today's Expenses</span>
+                    <div className="stat-icon-wrapper danger">
+                      <Wallet size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{formatMoney(todayExpenseTotal)}</div>
+                  <div className="stat-chip negative">
+                    {todayExpenses.length} {todayExpenses.length === 1 ? 'expense' : 'expenses'} recorded
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Today's Revenue</span>
+                    <div className="stat-icon-wrapper cyan">
+                      <Receipt size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{formatMoney(todayRevenue)}</div>
+                  <div className="stat-chip positive">
+                    <TrendingUp size={12} /> From {todaySales.length} {todaySales.length === 1 ? 'sale' : 'sales'}
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Today's Profit</span>
+                    <div className={`stat-icon-wrapper ${todayProfit < 0 ? 'danger' : 'teal'}`}>
+                      <DollarSign size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value" style={{ color: todayProfit < 0 ? '#fb7185' : '#34d399' }}>{formatMoney(todayProfit)}</div>
+                  <div className={`stat-chip ${todayProfit < 0 ? 'negative' : 'positive'}`} title="Revenue − cost of goods sold − expenses">
+                    Revenue − cost of goods − expenses
+                  </div>
+                </div>
+              </div>
+
+              <div className="section-label" style={{ marginTop: '1.75rem' }}>
+                <BarChart3 size={14} /> Overall · {dashboardScopeLabel}
+              </div>
+
+              {/* Metric Stat Cards: Branches, Financials (Revenue, Expense, Profit) + Stock Status */}
+              <div className="stats-grid today-grid">
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Total Branches</span>
+                    <div className="stat-icon-wrapper cyan">
+                      <Building2 size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{branches.length}</div>
+                  <div className="stat-chip positive">
+                    <CheckCircle2 size={12} /> {activeBranchCount} active{branches.length - activeBranchCount ? ` · ${branches.length - activeBranchCount} inactive` : ''}
+                  </div>
+                </div>
+
                 <div className="stat-card">
                   <div className="stat-header">
                     <span className="stat-title">Total Revenue</span>
@@ -1564,7 +2425,7 @@ export default function Dashboard({ userEmail, onLogout }) {
                   </div>
                   <div className="stat-value">{formatMoney(totalRevenue)}</div>
                   <div className="stat-chip positive">
-                    <TrendingUp size={12} /> {scopeLabel}
+                    <TrendingUp size={12} /> {dashboardScopeLabel}
                   </div>
                 </div>
 
@@ -1601,15 +2462,26 @@ export default function Dashboard({ userEmail, onLogout }) {
                       <AlertTriangle size={20} />
                     </div>
                   </div>
-                  <div className="stat-value">{lowStockCount + expiringCount} Items</div>
+                  <div className="stat-value">{dashboardLowStock + dashboardExpiring} Items</div>
                   <div className="stat-chip negative">
-                    {lowStockCount} low · {expiringCount} expiring
+                    {dashboardLowStock} low · {dashboardExpiring} expiring
                   </div>
                 </div>
               </div>
 
+              {/* Charts */}
+              <div className="section-label" style={{ marginTop: '1.75rem' }}>
+                <TrendingUp size={14} /> Trends · {dashboardScopeLabel}
+              </div>
+              <DashboardCharts
+                branchId={dashboardBranch}
+                branches={branches}
+                formatMoney={formatMoney}
+                currencySymbol={(CURRENCIES[settings.currency]?.symbol || '$').trim()}
+              />
+
               {/* Branch Performance Comparison (network view only) */}
-              {isAllBranches && (
+              {isDashboardAll && (
                 <div className="content-section-card" style={{ marginTop: '1.5rem' }}>
                   <div className="section-header">
                     <h3>Branch Performance</h3>
@@ -1658,49 +2530,6 @@ export default function Dashboard({ userEmail, onLogout }) {
                   </div>
                 </div>
               )}
-
-              {/* Inventory Alerts Preview */}
-              <div className="content-section-card" style={{ marginTop: '1.5rem' }}>
-                <div className="section-header">
-                  <h3>Stock Requiring Attention</h3>
-                  <button className="link-btn" onClick={() => setActiveTab('inventory')}>
-                    View All <ArrowUpRight size={14} />
-                  </button>
-                </div>
-
-                <div className="table-responsive">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Product Name</th>
-                        {isAllBranches && <th>Branch</th>}
-                        <th>Category</th>
-                        <th>Stock Level</th>
-                        <th>Reorder Level</th>
-                        <th>Batch No.</th>
-                        <th>Expiry Date</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredInventory
-                        .filter((item) => item.status !== 'In Stock')
-                        .map((item) => (
-                          <tr key={item.key}>
-                            <td className="fw-600">{item.name}</td>
-                            {isAllBranches && <td><BranchTag branch={branchById(item.branchId)} /></td>}
-                            <td>{item.category}</td>
-                            <td>{item.stock} units</td>
-                            <td>{item.reorderLevel} units</td>
-                            <td><span className="batch-badge">{item.batch}</span></td>
-                            <td>{item.expiry}</td>
-                            <td><StatusTag status={item.status} /></td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </>
           )}
 
@@ -1738,10 +2567,20 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <h2 className="page-title">Sales History · {scopeLabel}</h2>
                   <p className="page-desc">Record of pharmacy sales transactions, receipts, and customer purchase logs per branch.</p>
                 </div>
-                <button className="primary-action-btn" disabled={isAllBranches} title={isAllBranches ? 'Select a branch to record a sale' : undefined}>
+                <button className="primary-action-btn" onClick={() => setShowNewSale(true)}>
                   <Plus size={16} /> New Sale Transaction
                 </button>
               </div>
+
+              {saleNotice && (
+                <div className="success-notice">
+                  <CheckCircle2 size={16} />
+                  <span>{saleNotice}</span>
+                  <button type="button" onClick={() => setSaleNotice(null)} aria-label="Dismiss">
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
               {/* Sales Stat Cards */}
               <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
@@ -1760,14 +2599,27 @@ export default function Dashboard({ userEmail, onLogout }) {
 
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Completed Orders</span>
+                    <span className="stat-title">Today's Sales</span>
                     <div className="stat-icon-wrapper cyan">
                       <ShoppingCart size={20} />
                     </div>
                   </div>
-                  <div className="stat-value">{scopedSales.length}</div>
+                  <div className="stat-value">{formatMoney(salesTodayTotal)}</div>
                   <div className="stat-chip neutral">
-                    <CheckCircle2 size={12} /> Processed
+                    <Clock size={12} /> {salesTodayList.length} {salesTodayList.length === 1 ? 'transaction' : 'transactions'} today
+                  </div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="stat-header">
+                    <span className="stat-title">Units Sold</span>
+                    <div className="stat-icon-wrapper warning">
+                      <Package size={20} />
+                    </div>
+                  </div>
+                  <div className="stat-value">{salesUnitsSold.toLocaleString()}</div>
+                  <div className="stat-chip neutral">
+                    {salesTodayUnits.toLocaleString()} {salesTodayUnits === 1 ? 'unit' : 'units'} today
                   </div>
                 </div>
               </div>
@@ -1897,32 +2749,42 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <h2 className="page-title">Stock Transfers · {scopeLabel}</h2>
                   <p className="page-desc">Move stock between branches to cover shortages and rebalance expiring batches.</p>
                 </div>
-                <button className="primary-action-btn">
-                  <Plus size={16} /> New Transfer Request
+                <button className="primary-action-btn" onClick={() => setShowNewTransfer(true)}>
+                  <Plus size={16} /> New Transfer
                 </button>
               </div>
+
+              {transferNotice && (
+                <div className="success-notice">
+                  <CheckCircle2 size={16} />
+                  <span>{transferNotice}</span>
+                  <button type="button" onClick={() => setTransferNotice(null)} aria-label="Dismiss">
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
               <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Pending / In Transit</span>
-                    <div className="stat-icon-wrapper warning">
+                    <span className="stat-title">Total Transfers</span>
+                    <div className="stat-icon-wrapper cyan">
                       <ArrowLeftRight size={20} />
                     </div>
                   </div>
-                  <div className="stat-value">{pendingTransfers}</div>
-                  <div className="stat-chip negative">Awaiting approval or receipt</div>
+                  <div className="stat-value">{scopedTransfers.length}</div>
+                  <div className="stat-chip positive"><CheckCircle2 size={12} /> All completed</div>
                 </div>
 
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Completed Transfers</span>
+                    <span className="stat-title">Units Transferred</span>
                     <div className="stat-icon-wrapper teal">
-                      <CheckCircle2 size={20} />
+                      <Package size={20} />
                     </div>
                   </div>
-                  <div className="stat-value">{scopedTransfers.length - pendingTransfers}</div>
-                  <div className="stat-chip positive">Received at destination</div>
+                  <div className="stat-value">{unitsTransferred.toLocaleString()}</div>
+                  <div className="stat-chip neutral">Moved between branches</div>
                 </div>
               </div>
 
@@ -1966,7 +2828,7 @@ export default function Dashboard({ userEmail, onLogout }) {
               <div className="section-header">
                 <div>
                   <h2 className="page-title">Branches</h2>
-                  <p className="page-desc">Manage pharmacy locations, contact details, and pharmacists across the network.</p>
+                  <p className="page-desc">Manage pharmacy locations across the network: edit details, activate or deactivate, and delete branches.</p>
                 </div>
                 <button className="primary-action-btn" onClick={() => setShowAddBranch(true)}>
                   <Plus size={16} /> Add Branch
@@ -1974,56 +2836,22 @@ export default function Dashboard({ userEmail, onLogout }) {
               </div>
 
               {branchNotice && (
-                <div className="success-notice">
-                  <CheckCircle2 size={16} />
-                  <span>{branchNotice}</span>
+                <div className={`success-notice ${branchNotice.type}`}>
+                  {branchNotice.type === 'error' ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}
+                  <span>{branchNotice.text}</span>
                   <button type="button" onClick={() => setBranchNotice(null)} aria-label="Dismiss">
                     <X size={14} />
                   </button>
                 </div>
               )}
 
-              <div className="branch-grid">
-                {branches.map((b) => {
-                  const summary = branchSummary(b.id)
-                  return (
-                    <div key={b.id} className={`branch-card ${selectedBranch === b.id ? 'selected' : ''}`}>
-                      <div className="branch-card-head">
-                        <div>
-                          <h3>{b.name}</h3>
-                          <span className="font-mono" style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{b.id} · {b.code}</span>
-                        </div>
-                        <StatusTag status={b.status} />
-                      </div>
-
-                      <div className="branch-card-meta">
-                        <span><MapPin size={14} /> {b.location}</span>
-                        <span><Phone size={14} /> {b.phone}</span>
-                        <span><Users size={14} /> {b.staff} {b.staff === 1 ? 'pharmacist' : 'pharmacists'}</span>
-                      </div>
-
-                      <div className="branch-card-stats">
-                        <div>
-                          <small>Revenue</small>
-                          <strong>{formatMoney(b.revenue)}</strong>
-                        </div>
-                        <div>
-                          <small>Units</small>
-                          <strong>{summary.units.toLocaleString()}</strong>
-                        </div>
-                        <div>
-                          <small>Alerts</small>
-                          <strong style={{ color: summary.alerts ? '#f59e0b' : 'var(--primary-emerald)' }}>{summary.alerts}</strong>
-                        </div>
-                      </div>
-
-                      <button className="secondary-action-btn" style={{ justifyContent: 'center' }} onClick={() => openBranch(b.id)}>
-                        View Branch Dashboard <ArrowRight size={14} />
-                      </button>
-                    </div>
-                  )
-                })}
-              </div>
+              <BranchesTable
+                data={branches}
+                selectedBranch={selectedBranch}
+                onEdit={setEditingBranch}
+                onToggleStatus={handleToggleBranchStatus}
+                onDelete={handleDeleteBranch}
+              />
             </div>
           )}
 
@@ -2056,13 +2884,50 @@ export default function Dashboard({ userEmail, onLogout }) {
           )}
 
           {activeTab === 'policy' && (
-            <PolicyPanel settings={settings} branchCount={branches.length} onSave={handleSaveSettings} />
+            <div className="content-section-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+              <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-dim)', marginBottom: '1rem' }}>
+                <ShieldCheck size={36} />
+              </div>
+              <h2 className="page-title" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>No Policy Data</h2>
+              <p className="page-desc" style={{ maxWidth: '420px', margin: '0 auto' }}>
+                No policies or rule configurations exist at this time.
+              </p>
+            </div>
           )}
         </div>
       </main>
 
+      {showNewTransfer && (
+        <NewTransferModal
+          branches={branches}
+          inventory={inventory}
+          maxQty={settings.maxTransferQty}
+          onClose={() => setShowNewTransfer(false)}
+          onSave={handleRequestTransfer}
+        />
+      )}
+
+      {showNewSale && (
+        <NewSaleModal
+          branches={branches}
+          inventory={inventory}
+          formatMoney={formatMoney}
+          onClose={() => setShowNewSale(false)}
+          onSave={handleRecordSale}
+        />
+      )}
+
+      {editingBranch && (
+        <BranchModal
+          branch={editingBranch}
+          branches={branches}
+          onClose={() => setEditingBranch(null)}
+          onSave={handleEditBranch}
+        />
+      )}
+
       {showAddBranch && (
-        <AddBranchModal
+        <BranchModal
           branches={branches}
           onClose={() => setShowAddBranch(false)}
           onSave={handleAddBranch}

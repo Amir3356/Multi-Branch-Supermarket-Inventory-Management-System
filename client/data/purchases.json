@@ -31,5 +31,27 @@
     "total": 920,
     "date": "2026-10-10",
     "status": "Paid"
+  },
+  {
+    "id": "PO-7004",
+    "branchId": "BR-01",
+    "supplier": "MedPharma Global Logistics",
+    "category": "Medicine",
+    "product": "Paracetamol 650mg",
+    "qty": 500,
+    "total": 2500,
+    "date": "2026-10-05",
+    "status": "Paid"
+  },
+  {
+    "id": "PO-7005",
+    "branchId": "BR-04",
+    "supplier": "HealthLine Distributors",
+    "category": "Medical Supplies",
+    "product": "Disposable Syringes 5ml",
+    "qty": 40,
+    "total": 360,
+    "date": "2026-10-05",
+    "status": "Paid"
   }
 ]
