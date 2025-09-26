@@ -225,9 +225,9 @@ const getStockStatus = (stock, reorderLevel, expiry, settings) => {
 }
 
 // Inventory rows: one row per medicine per branch
-const buildInventory = (settings, stockLevels) =>
+const buildInventory = (settings, stockLevels, products) =>
   stockLevels.map((entry) => {
-    const med = MEDICINES.find((m) => m.id === entry.medId)
+    const med = products.find((m) => m.id === entry.medId)
     const reorderLevel = settings.reorderLevels[med.id] ?? med.reorderLevel
     return {
       ...med,
@@ -355,7 +355,7 @@ function BranchModal({ branch, branches, onClose, onSave }) {
 
 const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
 
-function NewSaleModal({ branches, inventory, formatMoney, onClose, onSave }) {
+function NewSaleModal({ branches, inventory, categories, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_SALE_FORM)
   const [errors, setErrors] = useState({})
 
@@ -368,7 +368,7 @@ function NewSaleModal({ branches, inventory, formatMoney, onClose, onSave }) {
   }, [onClose])
 
   // Only products the chosen branch actually has in stock can be sold there
-  const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0)
+  const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0 && i.sellingPrice != null)
   const categoryCount = (category) => branchStock.filter((i) => i.category === category).length
   const branchProducts = branchStock
     .filter((i) => i.category === form.category)
@@ -457,7 +457,7 @@ function NewSaleModal({ branches, inventory, formatMoney, onClose, onSave }) {
             <label htmlFor="sale-category">Category *</label>
             <select id="sale-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.branchId}>
               <option value="">{form.branchId ? 'Select category…' : 'Select a branch first'}</option>
-              {CATEGORIES.map((c) => {
+              {categories.map((c) => {
                 const count = categoryCount(c)
                 return (
                   <option key={c} value={c} disabled={!count}>
@@ -510,7 +510,7 @@ function NewSaleModal({ branches, inventory, formatMoney, onClose, onSave }) {
 
 const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', qty: '' }
 
-function NewTransferModal({ branches, inventory, maxQty, onClose, onSave }) {
+function NewTransferModal({ branches, inventory, categories, maxQty, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_TRANSFER_FORM)
   const [errors, setErrors] = useState({})
   const activeBranches = branches.filter((b) => b.status === 'Active')
@@ -621,7 +621,7 @@ function NewTransferModal({ branches, inventory, maxQty, onClose, onSave }) {
             <label htmlFor="transfer-category">Category *</label>
             <select id="transfer-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.from}>
               <option value="">{form.from ? 'Select category…' : 'Select the sending branch first'}</option>
-              {CATEGORIES.map((c) => {
+              {categories.map((c) => {
                 const count = categoryCount(c)
                 return (
                   <option key={c} value={c} disabled={!count}>
@@ -664,6 +664,305 @@ function NewTransferModal({ branches, inventory, maxQty, onClose, onSave }) {
             </button>
             <button type="submit" className="primary-action-btn">
               <ArrowLeftRight size={16} /> Transfer Stock
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+const NEW_OPTION = '__new__'
+
+const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', categoryChoice: '', newCategory: '', productChoice: '', newProduct: '', qty: '', purchasePrice: '' }
+
+const sameText = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
+
+// Category and Product Name are picked from what was purchased before; "+ Add new" lets the pharmacist type a new one
+function NewPurchaseModal({ branches, inventory, products, categories, suppliers, formatMoney, onClose, onSave }) {
+  const [form, setForm] = useState(EMPTY_PURCHASE_FORM)
+  const [errors, setErrors] = useState({})
+  const activeBranches = branches.filter((b) => b.status === 'Active')
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  const isNewCategory = form.categoryChoice === NEW_OPTION
+  const isNewProduct = form.productChoice === NEW_OPTION
+  const category = isNewCategory ? form.newCategory.trim() : form.categoryChoice
+  const categoryProducts = isNewCategory ? [] : products.filter((p) => p.category === form.categoryChoice).sort((a, b) => a.name.localeCompare(b.name))
+  const existingProduct = !isNewProduct ? products.find((p) => p.id === form.productChoice) : null
+  const productName = isNewProduct ? form.newProduct.trim() : existingProduct?.name || ''
+  const currentStock = existingProduct ? inventory.find((i) => i.branchId === form.branchId && i.medId === existingProduct.id)?.stock ?? 0 : 0
+  const qty = Number(form.qty)
+  const purchasePrice = Number(form.purchasePrice)
+  const validQty = Number.isInteger(qty) && qty > 0 ? qty : 0
+  const total = validQty && purchasePrice > 0 ? validQty * purchasePrice : 0
+
+  const update = (field, value) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === 'categoryChoice') {
+        // A new category has no products yet, so the product must be new too
+        Object.assign(next, { productChoice: value === NEW_OPTION ? NEW_OPTION : '', newProduct: '', purchasePrice: '' })
+      }
+      if (field === 'productChoice') {
+        next.purchasePrice = value === NEW_OPTION ? '' : String(products.find((p) => p.id === value)?.purchasePrice ?? '')
+      }
+      return next
+    })
+    setErrors((prev) => ({
+      ...prev,
+      [field]: undefined,
+      ...(field === 'categoryChoice' ? { newCategory: undefined, productChoice: undefined, newProduct: undefined } : {}),
+      ...(field === 'productChoice' ? { newProduct: undefined, purchasePrice: undefined } : {})
+    }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newErrors = {}
+    if (!form.branchId) newErrors.branchId = 'Select the branch receiving the stock'
+    if (!form.supplier.trim()) newErrors.supplier = 'Supplier is required'
+
+    if (!form.categoryChoice) newErrors.categoryChoice = 'Select a category, or add a new one'
+    else if (isNewCategory && !category) newErrors.newCategory = 'Enter the new category name'
+    else if (isNewCategory && categories.some((c) => sameText(c, category))) newErrors.newCategory = `${categories.find((c) => sameText(c, category))} already exists. Pick it from the list.`
+
+    if (!form.productChoice) newErrors.productChoice = form.categoryChoice ? 'Select a product, or add a new one' : 'Select a category first'
+    else if (isNewProduct && !productName) newErrors.newProduct = 'Enter the new product name'
+    else if (isNewProduct) {
+      const duplicate = products.find((p) => sameText(p.name, productName))
+      if (duplicate) newErrors.newProduct = `${duplicate.name} already exists under ${duplicate.category}. Pick it from the list.`
+    }
+
+    if (!Number.isInteger(qty) || qty < 1) newErrors.qty = 'Enter a whole number of at least 1'
+    if (form.purchasePrice === '' || Number.isNaN(purchasePrice) || purchasePrice <= 0) newErrors.purchasePrice = 'Enter a price greater than 0'
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length) return
+    onSave({
+      branchId: form.branchId,
+      supplier: form.supplier.trim(),
+      category,
+      product: productName,
+      medId: existingProduct?.id || null,
+      purchasePrice: Math.round(purchasePrice * 100) / 100,
+      qty,
+      total: Math.round(total * 100) / 100
+    })
+  }
+
+  const field = (name, label, props = {}) => (
+    <div className="form-group">
+      <label htmlFor={`purchase-${name}`}>{label}</label>
+      <input id={`purchase-${name}`} className={`input-field ${errors[name] ? 'error' : ''}`} value={form[name]} onChange={(e) => update(name, e.target.value)} {...props} />
+      {errors[name] && <span className="error-msg">{errors[name]}</span>}
+    </div>
+  )
+
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-purchase-title">
+        <div className="modal-header">
+          <div className="modal-title-wrap">
+            <div className="stat-icon-wrapper teal">
+              <PackageCheck size={20} />
+            </div>
+            <div>
+              <h2 id="new-purchase-title">Create Purchase</h2>
+              <p className="page-desc">Buy stock from a supplier and receive it into a branch.</p>
+            </div>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="modal-grid">
+            <div className="form-group">
+              <label htmlFor="purchase-branch">Receiving Branch *</label>
+              <select id="purchase-branch" autoFocus className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={(e) => update('branchId', e.target.value)}>
+                <option value="">Select branch…</option>
+                {activeBranches.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              {errors.branchId && <span className="error-msg">{errors.branchId}</span>}
+            </div>
+            {field('supplier', 'Supplier *', { placeholder: 'Supplier name', list: 'purchase-suppliers' })}
+            <datalist id="purchase-suppliers">
+              {suppliers.map((sup) => <option key={sup} value={sup} />)}
+            </datalist>
+          </div>
+
+          <div className="modal-section-title">Product</div>
+          <div className="form-group">
+            <label htmlFor="purchase-category">Category *</label>
+            <select id="purchase-category" className={`input-field ${errors.categoryChoice ? 'error' : ''}`} value={form.categoryChoice} onChange={(e) => update('categoryChoice', e.target.value)}>
+              <option value="">Select category…</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+              <option value={NEW_OPTION}>+ Add new category</option>
+            </select>
+            {errors.categoryChoice && <span className="error-msg">{errors.categoryChoice}</span>}
+          </div>
+          {isNewCategory && field('newCategory', 'New Category Name *', { placeholder: 'e.g. Herbal Remedies', autoFocus: true })}
+
+          <div className="form-group">
+            <label htmlFor="purchase-product">Product Name *</label>
+            <select id="purchase-product" className={`input-field ${errors.productChoice ? 'error' : ''}`} value={form.productChoice} onChange={(e) => update('productChoice', e.target.value)} disabled={!form.categoryChoice || isNewCategory}>
+              <option value="">{form.categoryChoice ? 'Select product…' : 'Select a category first'}</option>
+              {categoryProducts.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+              <option value={NEW_OPTION}>+ Add new product</option>
+            </select>
+            {errors.productChoice && <span className="error-msg">{errors.productChoice}</span>}
+          </div>
+          {isNewProduct && (
+            <div className="form-group">
+              {field('newProduct', 'New Product Name *', { placeholder: 'e.g. Ginger Root Tea (20 bags)', autoFocus: !isNewCategory })}
+              <span className="field-hint new">New product: it will be added to Inventory. Set its selling price there with Add Medicine.</span>
+            </div>
+          )}
+
+          <div className="modal-grid">
+            {field('qty', 'Quantity *', { type: 'number', min: '1', step: '1', placeholder: 'Units bought' })}
+            {field('purchasePrice', 'Purchase Price (per unit) *', { type: 'number', min: '0', step: '0.01', placeholder: '0.00' })}
+          </div>
+
+          <div className="sale-summary">
+            <div><small>Current Stock</small><strong>{form.branchId && productName ? `${currentStock} units` : '—'}</strong></div>
+            <div><small>Stock After</small><strong>{form.branchId && productName ? `${currentStock + validQty} units` : '—'}</strong></div>
+            <div><small>Total Cost</small><strong className="sale-total">{formatMoney(total)}</strong></div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="secondary-action-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="primary-action-btn">
+              <PackageCheck size={16} /> Create Purchase
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// Inventory's Add Medicine: pick a product from the catalog (e.g. one added by a purchase) and set it up for sale
+function AddMedicineModal({ products, categories, formatMoney, onClose, onSave }) {
+  const [form, setForm] = useState({ category: '', medId: '', sellingPrice: '' })
+  const [errors, setErrors] = useState({})
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  const categoryProducts = products.filter((p) => p.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
+  const product = products.find((p) => p.id === form.medId)
+  const sellingPrice = Number(form.sellingPrice)
+  const margin = product && sellingPrice > 0 ? ((sellingPrice - product.purchasePrice) / sellingPrice) * 100 : null
+
+  const update = (field, value) => {
+    setForm((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === 'category') Object.assign(next, { medId: '', sellingPrice: '' })
+      if (field === 'medId') next.sellingPrice = String(products.find((p) => p.id === value)?.sellingPrice ?? '')
+      return next
+    })
+    setErrors((prev) => ({ ...prev, [field]: undefined, ...(field !== 'sellingPrice' ? { medId: undefined, sellingPrice: undefined } : {}) }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newErrors = {}
+    if (!form.category) newErrors.category = 'Select a category'
+    if (!product) newErrors.medId = form.category ? 'Select a product' : 'Select a category first'
+    if (form.sellingPrice === '' || Number.isNaN(sellingPrice) || sellingPrice <= 0) newErrors.sellingPrice = 'Enter a selling price greater than 0'
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length) return
+    onSave({ medId: product.id, name: product.name, sellingPrice: Math.round(sellingPrice * 100) / 100 })
+  }
+
+  return (
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal-card" style={{ maxWidth: '520px' }} role="dialog" aria-modal="true" aria-labelledby="add-medicine-title">
+        <div className="modal-header">
+          <div className="modal-title-wrap">
+            <div className="stat-icon-wrapper cyan">
+              <Pill size={20} />
+            </div>
+            <div>
+              <h2 id="add-medicine-title">Add Medicine</h2>
+              <p className="page-desc">Set up a purchased product for sale across all branches.</p>
+            </div>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="form-group">
+            <label htmlFor="medicine-category">Category *</label>
+            <select id="medicine-category" autoFocus className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)}>
+              <option value="">Select category…</option>
+              {categories.map((c) => {
+                const count = products.filter((p) => p.category === c).length
+                return (
+                  <option key={c} value={c} disabled={!count}>
+                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(no products yet)'}
+                  </option>
+                )
+              })}
+            </select>
+            {errors.category && <span className="error-msg">{errors.category}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="medicine-product">Product Name *</label>
+            <select id="medicine-product" className={`input-field ${errors.medId ? 'error' : ''}`} value={form.medId} onChange={(e) => update('medId', e.target.value)} disabled={!form.category}>
+              <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
+              {categoryProducts.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}{p.sellingPrice == null ? ' (selling price not set)' : ''}
+                </option>
+              ))}
+            </select>
+            {errors.medId && <span className="error-msg">{errors.medId}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="medicine-selling-price">Selling Price (per unit) *</label>
+            <input id="medicine-selling-price" type="number" min="0" step="0.01" placeholder="0.00" className={`input-field ${errors.sellingPrice ? 'error' : ''}`} value={form.sellingPrice} onChange={(e) => update('sellingPrice', e.target.value)} disabled={!product} />
+            {errors.sellingPrice && <span className="error-msg">{errors.sellingPrice}</span>}
+          </div>
+
+          <div className="sale-summary">
+            <div><small>Purchase Price</small><strong>{product ? formatMoney(product.purchasePrice) : '—'}</strong></div>
+            <div><small>Selling Price</small><strong>{product && sellingPrice > 0 ? formatMoney(sellingPrice) : '—'}</strong></div>
+            <div><small>Margin</small><strong className={margin != null && margin < 0 ? 'negative-text' : 'sale-total'}>{margin == null ? '—' : `${margin.toFixed(1)}%`}</strong></div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="secondary-action-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="primary-action-btn">
+              <Save size={16} /> Save Medicine
             </button>
           </div>
         </form>
@@ -1338,7 +1637,6 @@ const listTableFeatures = tableFeatures({
   sortFns: { text: sortFn_text, basic: sortFn_basic }
 })
 
-const INVENTORY_CATEGORIES = CATEGORIES
 
 const INVENTORY_STATUSES = ['In Stock', 'Low Stock', 'Expiring Soon']
 
@@ -1361,7 +1659,7 @@ const inventorySearchFn = (row, _columnId, value) => {
   return [name, id, batch].some((field) => field.toLowerCase().includes(query))
 }
 
-function InventoryTable({ data, branches, showBranch, formatMoney }) {
+function InventoryTable({ data, branches, categories, showBranch, formatMoney }) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState(INVENTORY_DEFAULT_SORTING)
@@ -1382,7 +1680,7 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
       { accessorKey: 'category', header: 'Category', filterFn: 'equalsString', sortFn: 'text' },
       { accessorKey: 'stock', header: 'Current Stock', sortFn: 'basic', cell: (info) => `${info.getValue()} units` },
       { accessorKey: 'purchasePrice', header: 'Purchase Price', sortFn: 'basic', cell: (info) => formatMoney(info.getValue()) },
-      { accessorKey: 'sellingPrice', header: 'Sells Price', sortFn: 'basic', cell: (info) => formatMoney(info.getValue()) },
+      { accessorKey: 'sellingPrice', header: 'Sells Price', sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatMoney(info.getValue())) },
       { accessorKey: 'batch', header: 'Batch Number', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
       { accessorKey: 'expiry', header: 'Expiration Date', sortFn: 'text' },
       { accessorKey: 'status', header: 'Status', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <StatusTag status={info.getValue()} /> }
@@ -1441,7 +1739,7 @@ function InventoryTable({ data, branches, showBranch, formatMoney }) {
 
         <select className="input-field filter-select" aria-label="Filter by category" value={filterValue('category')} onChange={(e) => setFilter('category', e.target.value)}>
           <option value="all">All Categories</option>
-          {INVENTORY_CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
@@ -1982,12 +2280,19 @@ export default function Dashboard({ userEmail, onLogout }) {
   const formatMoney = (value) => formatMoneyIn(settings.currency, value)
   const [sales, setSales] = useState(SALES)
   const [stockLevels, setStockLevels] = useState(BRANCH_STOCK)
+  const [products, setProducts] = useState(MEDICINES)
+  const [categories, setCategories] = useState(CATEGORIES)
+  const [showAddMedicine, setShowAddMedicine] = useState(false)
+  const [inventoryNotice, setInventoryNotice] = useState(null)
   const [showNewSale, setShowNewSale] = useState(false)
   const [transfers, setTransfers] = useState(TRANSFERS)
+  const [purchases, setPurchases] = useState(PURCHASES)
+  const [showNewPurchase, setShowNewPurchase] = useState(false)
+  const [purchaseNotice, setPurchaseNotice] = useState(null)
   const [showNewTransfer, setShowNewTransfer] = useState(false)
   const [transferNotice, setTransferNotice] = useState(null)
   const [saleNotice, setSaleNotice] = useState(null)
-  const inventory = buildInventory(settings, stockLevels)
+  const inventory = buildInventory(settings, stockLevels, products)
   const [notificationState, setNotificationState] = useState(loadNotificationState)
 
   const handleSaveSettings = (next) => {
@@ -2025,7 +2330,7 @@ export default function Dashboard({ userEmail, onLogout }) {
     const hasRecords =
       stockLevels.some((e) => e.branchId === branch.id) ||
       sales.some((s) => s.branchId === branch.id) ||
-      PURCHASES.some((p) => p.branchId === branch.id) ||
+      purchases.some((p) => p.branchId === branch.id) ||
       transfers.some((t) => t.from === branch.id || t.to === branch.id) ||
       EXPENSES.some((e) => e.branchId === branch.id) ||
       DAILY_PERFORMANCE.some((r) => r.branchId === branch.id)
@@ -2056,7 +2361,7 @@ export default function Dashboard({ userEmail, onLogout }) {
       item.batch.toLowerCase().includes(query)
   )
   const scopedSales = sales.filter((s) => inScope(s.branchId))
-  const scopedPurchases = PURCHASES.filter((p) => inScope(p.branchId))
+  const scopedPurchases = purchases.filter((p) => inScope(p.branchId))
   const scopedPayments = PAYMENTS.filter((p) => inScope(p.branchId))
   const scopedTransfers = transfers.filter((t) => inScope(t.from) || inScope(t.to))
 
@@ -2084,11 +2389,11 @@ export default function Dashboard({ userEmail, onLogout }) {
   // Today's figures for the Dashboard branch filter
   const todayKey = toDateKey(new Date())
   const todaySales = sales.filter((s) => inDashboard(s.branchId) && s.date === todayKey)
-  const todayPurchases = PURCHASES.filter((p) => inDashboard(p.branchId) && p.date === todayKey)
+  const todayPurchases = purchases.filter((p) => inDashboard(p.branchId) && p.date === todayKey)
   const todayExpenses = EXPENSES.filter((e) => inDashboard(e.branchId) && e.date === todayKey)
   const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0)
   const todayUnitsSold = todaySales.reduce((sum, s) => sum + s.qty, 0)
-  const todayCostOfGoods = todaySales.reduce((sum, s) => sum + (MEDICINES.find((m) => m.name === s.product)?.purchasePrice || 0) * s.qty, 0)
+  const todayCostOfGoods = todaySales.reduce((sum, s) => sum + (products.find((m) => m.name === s.product)?.purchasePrice || 0) * s.qty, 0)
   const todayPurchaseTotal = todayPurchases.reduce((sum, p) => sum + p.total, 0)
   const todayExpenseTotal = todayExpenses.reduce((sum, e) => sum + e.amount, 0)
   const todayProfit = todayRevenue - todayCostOfGoods - todayExpenseTotal
@@ -2210,6 +2515,37 @@ export default function Dashboard({ userEmail, onLogout }) {
     setTransferNotice(`Transfer ${transfer.id} completed: ${data.qty} × ${data.product} moved from ${branchById(data.from)?.name} to ${branchById(data.to)?.name}.`)
   }
 
+  // Records a purchase and adds the bought quantity to the receiving branch's stock
+  const handleCreatePurchase = ({ medId: knownMedId, purchasePrice, ...data }) => {
+    const nextNumber = Math.max(0, ...purchases.map((p) => Number(String(p.id).split('-')[1]) || 0)) + 1
+    const purchase = { id: `PO-${nextNumber}`, ...data, date: toDateKey(new Date()), status: 'Paid' }
+    let medId = knownMedId
+    if (!categories.includes(data.category)) setCategories((prev) => [...prev, data.category])
+    if (!medId) {
+      // A product typed into the purchase joins the catalog; its selling price is set later in Inventory → Add Medicine
+      const nextMed = Math.max(0, ...products.map((m) => Number(String(m.id).split('-')[1]) || 0)) + 1
+      medId = `MED-${nextMed}`
+      setProducts((prev) => [...prev, { id: medId, name: data.product, category: data.category, purchasePrice, sellingPrice: null, reorderLevel: 10 }])
+    }
+    setPurchases((prev) => [purchase, ...prev])
+    setStockLevels((prev) => {
+      const exists = prev.some((e) => e.medId === medId && e.branchId === data.branchId)
+      if (exists) return prev.map((e) => (e.medId === medId && e.branchId === data.branchId ? { ...e, stock: e.stock + data.qty } : e))
+      // A product new to this branch gets the purchase ID as its batch and a default two-year expiry
+      const expiry = new Date()
+      expiry.setFullYear(expiry.getFullYear() + 2)
+      return [...prev, { medId, branchId: data.branchId, stock: data.qty, batch: purchase.id, expiry: toDateKey(expiry) }]
+    })
+    setShowNewPurchase(false)
+    setPurchaseNotice(`Purchase ${purchase.id} created: ${data.qty} × ${data.product} from ${data.supplier} received into ${branchById(data.branchId)?.name} for ${formatMoney(data.total)}.${knownMedId ? '' : ' New product added to Inventory: set its selling price with Add Medicine.'}`)
+  }
+
+  const handleSaveMedicine = ({ medId, name, sellingPrice }) => {
+    setProducts((prev) => prev.map((m) => (m.id === medId ? { ...m, sellingPrice } : m)))
+    setShowAddMedicine(false)
+    setInventoryNotice(`${name} is ready for sale at ${formatMoney(sellingPrice)} per unit.`)
+  }
+
   const openBranch = (branchId) => {
     setDashboardBranch(branchId)
     setActiveTab('overview')
@@ -2282,37 +2618,16 @@ export default function Dashboard({ userEmail, onLogout }) {
       {/* Main Content Area */}
       <main className="dashboard-main">
         {/* Top Header Bar */}
-        <header className="dashboard-header">
-          <div className="header-search">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search medicines, batches, SKU codes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </header>
+        <header className="dashboard-header"></header>
 
         {/* Dynamic Views */}
         <div className="dashboard-content">
           {activeTab === 'overview' && (
             <>
-              <div className="content-title-row">
-                <div>
-                  <h1 className="page-title">{isDashboardAll ? 'Network Dashboard' : `${dashboardBranchInfo.name} Dashboard`}</h1>
-                  <p className="page-desc">
-                    {isDashboardAll
-                      ? 'Consolidated stock, financials, and alerts across every pharmacy branch.'
-                      : `Real-time stock, financials, and alerts for ${dashboardBranchInfo.name} · ${dashboardBranchInfo.location}.`}
-                  </p>
-                </div>
-                <button className="primary-action-btn" onClick={() => setActiveTab('inventory')}>
-                  <Plus size={16} /> Add New Batch
-                </button>
-              </div>
-
               {/* Branch Filter: scopes every figure and chart on the Dashboard */}
+              <p className="dashboard-filter-hint">
+                Select a branch to view its dashboard, or choose All Branches to see the whole network.
+              </p>
               <div className="dashboard-filter-row">
                 <label className="dashboard-filter">
                   <Building2 size={16} />
@@ -2545,15 +2860,26 @@ export default function Dashboard({ userEmail, onLogout }) {
                   )}
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <button className="primary-action-btn">
+                  <button className="primary-action-btn" onClick={() => setShowAddMedicine(true)}>
                     <Plus size={16} /> Add Medicine
                   </button>
                 </div>
               </div>
 
+              {inventoryNotice && (
+                <div className="success-notice">
+                  <CheckCircle2 size={16} />
+                  <span>{inventoryNotice}</span>
+                  <button type="button" onClick={() => setInventoryNotice(null)} aria-label="Dismiss">
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
               <InventoryTable
                 data={filteredInventory}
                 branches={branches}
+                categories={categories}
                 showBranch={isAllBranches}
                 formatMoney={formatMoney}
               />
@@ -2612,7 +2938,7 @@ export default function Dashboard({ userEmail, onLogout }) {
 
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Units Sold</span>
+                    <span className="stat-title">Quantity Sold</span>
                     <div className="stat-icon-wrapper warning">
                       <Package size={20} />
                     </div>
@@ -2665,10 +2991,20 @@ export default function Dashboard({ userEmail, onLogout }) {
                   <h2 className="page-title">Purchase · {scopeLabel}</h2>
                   <p className="page-desc">Generate purchase orders to distributors and receive incoming stock into a specific branch.</p>
                 </div>
-                <button className="primary-action-btn">
+                <button className="primary-action-btn" onClick={() => setShowNewPurchase(true)}>
                   <Plus size={16} /> Create Purchase
                 </button>
               </div>
+
+              {purchaseNotice && (
+                <div className="success-notice">
+                  <CheckCircle2 size={16} />
+                  <span>{purchaseNotice}</span>
+                  <button type="button" onClick={() => setPurchaseNotice(null)} aria-label="Dismiss">
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
 
               <div className="table-responsive" style={{ marginTop: '1.5rem' }}>
                 <table className="data-table">
@@ -2778,7 +3114,7 @@ export default function Dashboard({ userEmail, onLogout }) {
 
                 <div className="stat-card">
                   <div className="stat-header">
-                    <span className="stat-title">Units Transferred</span>
+                    <span className="stat-title">Quantity Transferred</span>
                     <div className="stat-icon-wrapper teal">
                       <Package size={20} />
                     </div>
@@ -2897,10 +3233,34 @@ export default function Dashboard({ userEmail, onLogout }) {
         </div>
       </main>
 
+      {showAddMedicine && (
+        <AddMedicineModal
+          products={products}
+          categories={categories}
+          formatMoney={formatMoney}
+          onClose={() => setShowAddMedicine(false)}
+          onSave={handleSaveMedicine}
+        />
+      )}
+
+      {showNewPurchase && (
+        <NewPurchaseModal
+          branches={branches}
+          inventory={inventory}
+          products={products}
+          categories={categories}
+          suppliers={[...new Set(purchases.map((p) => p.supplier))].sort()}
+          formatMoney={formatMoney}
+          onClose={() => setShowNewPurchase(false)}
+          onSave={handleCreatePurchase}
+        />
+      )}
+
       {showNewTransfer && (
         <NewTransferModal
           branches={branches}
           inventory={inventory}
+          categories={categories}
           maxQty={settings.maxTransferQty}
           onClose={() => setShowNewTransfer(false)}
           onSave={handleRequestTransfer}
@@ -2911,6 +3271,7 @@ export default function Dashboard({ userEmail, onLogout }) {
         <NewSaleModal
           branches={branches}
           inventory={inventory}
+          categories={categories}
           formatMoney={formatMoney}
           onClose={() => setShowNewSale(false)}
           onSave={handleRecordSale}
