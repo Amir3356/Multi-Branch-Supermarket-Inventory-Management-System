@@ -2101,3 +2101,328 @@ body {
 .negative-text {
   color: #fb7185;
 }
+
+/* Inventory: out-of-stock status and expiring dates */
+.status-tag.out-of-stock { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+
+.expiry-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #fb7185;
+  font-weight: 600;
+}
+
+/* Damaged: destructive confirm button */
+.danger-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: #e11d48;
+  color: #ffffff;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.danger-action-btn:hover {
+  background: #be123c;
+}
+
+/* Keep loss values red inside tables and summaries */
+.data-table td.negative-text,
+.sale-summary strong.negative-text {
+  color: #fb7185;
+}
+
+/* IDs, batch numbers and dates never break across lines */
+.batch-badge,
+.data-table td.font-mono,
+.data-table td.nowrap {
+  white-space: nowrap;
+}
+
+/* Dashboard: period + branch filters share one row */
+.dashboard-filter-row {
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.dashboard-filter.date-range {
+  gap: 0.75rem;
+}
+
+.dashboard-filter.date-range label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-filter.date-range .input-field {
+  min-width: 0;
+  width: 160px;
+  color-scheme: dark;
+}
+
+/* Charts: shown when a period has too little data to plot */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 220px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Button labels stay on one line */
+.primary-action-btn,
+.secondary-action-btn,
+.danger-action-btn {
+  white-space: nowrap;
+}
+
+/* Settings: single Minimum Stock Level field with its Save button */
+.min-stock-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 560px;
+  margin-top: 1.5rem;
+}
+
+.min-stock-box .form-group {
+  flex: 1;
+}
+
+.min-stock-box .primary-action-btn {
+  margin-top: 1.55rem;
+  height: 42px;
+}
+
+/* Audit Logs */
+.audit-description {
+  min-width: 320px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.audit-today-chip {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--primary-cyan);
+}
+
+/* ============================================================
+   Theme toggle + light theme
+   Dark is the default; [data-theme="light"] on <html> switches.
+   ============================================================ */
+.dashboard-header {
+  justify-content: flex-end;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  color: var(--primary-cyan);
+  border-color: var(--primary-cyan);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-dark: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-border: rgba(15, 23, 42, 0.08);
+  --bg-input: #ffffff;
+  --bg-input-hover: #f8fafc;
+  --bg-input-focus: #ffffff;
+  --primary-cyan: #0891b2;
+  --primary-emerald: #059669;
+  --primary-glow: rgba(8, 145, 178, 0.2);
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+  --border-subtle: rgba(15, 23, 42, 0.12);
+  --border-focus: #0891b2;
+  --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.18);
+  --shadow-glow: 0 0 0 3px rgba(8, 145, 178, 0.18);
+}
+
+/* Surfaces */
+:root[data-theme="light"] .dashboard-sidebar { background: #ffffff; }
+:root[data-theme="light"] .dashboard-header { background: rgba(255, 255, 255, 0.85); }
+:root[data-theme="light"] .sidebar-brand,
+:root[data-theme="light"] .sidebar-footer { border-color: rgba(15, 23, 42, 0.08); }
+:root[data-theme="light"] .user-profile-card,
+:root[data-theme="light"] .notification-item,
+:root[data-theme="light"] .sale-summary,
+:root[data-theme="light"] .settings-box { background: #f8fafc; }
+:root[data-theme="light"] .stat-card,
+:root[data-theme="light"] .chart-card,
+:root[data-theme="light"] .content-section-card { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
+:root[data-theme="light"] .modal-overlay { background: rgba(15, 23, 42, 0.35); }
+:root[data-theme="light"] .modal-card,
+:root[data-theme="light"] .chart-tooltip { background: #ffffff; }
+
+/* Text that was hard-coded white */
+:root[data-theme="light"] .page-title,
+:root[data-theme="light"] .stat-value,
+:root[data-theme="light"] .section-header h3,
+:root[data-theme="light"] .fw-600,
+:root[data-theme="light"] .settings-box h4,
+:root[data-theme="light"] .user-name,
+:root[data-theme="light"] .input-field,
+:root[data-theme="light"] .header-search input { color: var(--text-main); }
+:root[data-theme="light"] .logo-text {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+:root[data-theme="light"] .nav-item:hover,
+:root[data-theme="light"] .logout-btn:hover { color: var(--text-main); }
+
+/* Light washes that were white-on-dark */
+:root[data-theme="light"] .nav-item:hover,
+:root[data-theme="light"] .secondary-action-btn,
+:root[data-theme="light"] .view-toggle,
+:root[data-theme="light"] .theme-toggle,
+:root[data-theme="light"] .modal-close-btn:hover,
+:root[data-theme="light"] .filter-count,
+:root[data-theme="light"] .batch-badge { background: rgba(15, 23, 42, 0.05); }
+:root[data-theme="light"] .secondary-action-btn:hover { background: rgba(15, 23, 42, 0.09); }
+:root[data-theme="light"] .input-field:hover { border-color: rgba(15, 23, 42, 0.25); }
+:root[data-theme="light"] .data-table td { border-bottom-color: rgba(15, 23, 42, 0.06); }
+:root[data-theme="light"] .data-table tr:hover td { background: rgba(15, 23, 42, 0.025); }
+
+/* Dropdown option lists */
+:root[data-theme="light"] .modal-form select.input-field option,
+:root[data-theme="light"] .settings-panel select.input-field option,
+:root[data-theme="light"] .filter-select option,
+:root[data-theme="light"] .dashboard-filter .input-field option { background: #ffffff; color: var(--text-main); }
+
+/* Status colours darkened so they stay readable on white */
+:root[data-theme="light"] .status-tag.low-stock,
+:root[data-theme="light"] .stat-icon-wrapper.warning,
+:root[data-theme="light"] .unsaved-chip { color: #b45309; }
+:root[data-theme="light"] .status-tag.expiring-soon,
+:root[data-theme="light"] .status-tag.out-of-stock,
+:root[data-theme="light"] .stat-chip.negative,
+:root[data-theme="light"] .stat-icon-wrapper.danger,
+:root[data-theme="light"] .nav-badge.warning,
+:root[data-theme="light"] .danger-btn,
+:root[data-theme="light"] .negative-text,
+:root[data-theme="light"] .data-table td.negative-text,
+:root[data-theme="light"] .sale-summary strong.negative-text,
+:root[data-theme="light"] .expiry-warning,
+:root[data-theme="light"] .success-notice.error { color: #be123c; }
+:root[data-theme="light"] .sale-summary .sale-total { color: #059669; }
+
+/* Numbers coloured inline (profit green, loss red, warning orange) */
+:root[data-theme="light"] [style*="rgb(52, 211, 153)"] { color: #059669 !important; }
+:root[data-theme="light"] [style*="rgb(251, 113, 133)"] { color: #be123c !important; }
+:root[data-theme="light"] [style*="rgb(245, 158, 11)"] { color: #b45309 !important; }
+
+/* Date inputs and scrollbars follow the light scheme */
+:root[data-theme="light"] .dashboard-filter.date-range .input-field { color-scheme: light; }
+
+/* Disabled row actions (e.g. your own account) */
+.icon-btn:disabled,
+.icon-danger-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* Account roles */
+.role-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.role-tag.role-owner { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+.role-tag.role-pharmacist { background: rgba(6, 182, 212, 0.12); color: var(--primary-cyan); }
+.role-tag.role-cashier { background: rgba(16, 185, 129, 0.12); color: var(--primary-emerald); }
+.role-tag.role-purchase-officer { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+:root[data-theme="light"] .role-tag.role-owner { color: #6d28d9; }
+:root[data-theme="light"] .role-tag.role-purchase-officer { color: #b45309; }
+
+/* Account Provision: session monitoring */
+.sessions-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.sessions-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sessions-section h3 svg {
+  color: var(--primary-cyan);
+}
+
+.session-role {
+  margin-left: 0.5rem;
+  font-size: 0.68rem;
+  padding: 0.1rem 0.45rem;
+}
+
+.inline-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.inline-check input {
+  accent-color: var(--primary-cyan);
+  cursor: pointer;
+}
+
+.link-btn.danger-link {
+  color: #fb7185;
+}
+
+:root[data-theme="light"] .link-btn.danger-link {
+  color: #be123c;
+}
+
+.status-tag {
+  white-space: nowrap;
+}
+
+/* Sidebar links are router links now */
+a.nav-item {
+  text-decoration: none;
+}

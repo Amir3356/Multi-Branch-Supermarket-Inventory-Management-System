@@ -1,0 +1,6463 @@
+[
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 21,
+    "revenue": 235.58
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 39.21
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 37.76
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 18.7
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 86.95
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 54.35
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 50.17
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 59.46
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 12,
+    "revenue": 144.58
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 18.04
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 21.08
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.51
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 47.31
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 27.95
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 26.6
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 33.99
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 84.39
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 13.96
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.45
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.06
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 28.61
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 23.14
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 12.91
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 1,
+    "revenue": 24.47
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 5,
+    "revenue": 48.17
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 8.94
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 7.15
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 20.43
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 14.9
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 11.57
+  },
+  {
+    "date": "2026-09-06",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 18.24
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 27,
+    "revenue": 323.93
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 43.88
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 47.06
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 24.33
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 101.05
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 74.72
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 52.28
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 94.86
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 191.57
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 31.43
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 27.95
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.91
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 58.33
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 36.38
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 36.98
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 48.9
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 16,
+    "revenue": 188.05
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 39.11
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 35.5
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 14.25
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 72.68
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 52.91
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 33.41
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 50.2
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 130.13
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.39
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 17.42
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.34
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 43.88
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 32.47
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.15
+  },
+  {
+    "date": "2026-09-07",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 30.1
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 24,
+    "revenue": 246.69
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 49.39
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 32.04
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 17.59
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 9,
+    "revenue": 86.2
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 7,
+    "revenue": 66.38
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 52.13
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 66.5
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 136.49
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.5
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 22.96
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 47.86
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 28.42
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 26.59
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 39.03
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 15,
+    "revenue": 136.04
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 22.91
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 15.98
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.85
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 33.68
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 26.57
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 27.82
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 32.39
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 128.05
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 19.56
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 15.84
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.25
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 41.06
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 30.49
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 20.92
+  },
+  {
+    "date": "2026-09-08",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 34.31
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 26,
+    "revenue": 336.39
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 51.92
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 53.71
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 23.26
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 102
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 82.53
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 56.41
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 72.69
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 215.33
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 40.49
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 34.34
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 17.26
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 58.47
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 59.67
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 41.34
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 64.77
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 16,
+    "revenue": 151.8
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 28.18
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 19.36
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 12.06
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 52.58
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 33.51
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 30.93
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 42.72
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 119.11
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 15.73
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 17.71
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.51
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 42.54
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 23.46
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 26.34
+  },
+  {
+    "date": "2026-09-09",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 34.34
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 31,
+    "revenue": 391.22
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 73.23
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 45.95
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 22.87
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 9,
+    "revenue": 110.66
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 8,
+    "revenue": 105.04
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 66.58
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 98.48
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 132.88
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 24.89
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 26.78
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.16
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 55.42
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 32.62
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 29.55
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 34.53
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 16,
+    "revenue": 182.37
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 21.06
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 24.48
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 12.88
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 45.68
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 35.93
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 32.43
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 44.78
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 116.11
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 18.48
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 17.15
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.5
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 27.99
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 31.12
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 17.52
+  },
+  {
+    "date": "2026-09-10",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 33.36
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 25,
+    "revenue": 228.71
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 34.7
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 27.86
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 16.7
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 69.11
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 41.77
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 36.51
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 61.03
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 12,
+    "revenue": 131.48
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 25.84
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 22.99
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.09
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 47.74
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 35.03
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 23.37
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 41.45
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 193.84
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.53
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 21.97
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.22
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 53.39
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 45.26
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 30.33
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 51.46
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 112.21
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 15.21
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 13.08
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.07
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 31.51
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 26.99
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.14
+  },
+  {
+    "date": "2026-09-11",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 27.99
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 26,
+    "revenue": 325.71
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 51.45
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 40.04
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 25.58
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 91.58
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 69.75
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 56.78
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 77
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 141.28
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 25.05
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 17.65
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.28
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 40.85
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 31.3
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 23.89
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 36.84
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 100.52
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 13.09
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 10.81
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.24
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 31.44
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 22.29
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.14
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 1,
+    "revenue": 26.52
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 6,
+    "revenue": 71.92
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 10.45
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.53
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 23.6
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 14.24
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 11.27
+  },
+  {
+    "date": "2026-09-12",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 1,
+    "revenue": 16.84
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 211.49
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 39.51
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 30.83
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 17.51
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 63.83
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 53.56
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 46.3
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 47.29
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 15,
+    "revenue": 183.97
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 30.35
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 25.94
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 16.44
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 68.87
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 38.28
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 41.59
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 61.42
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 126.42
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 21.9
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 20.16
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.17
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 34.6
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 28.11
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 28.68
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 1,
+    "revenue": 29.69
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 8,
+    "revenue": 103.63
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 15.82
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 13.53
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.65
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 28.72
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 24.59
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 17.08
+  },
+  {
+    "date": "2026-09-13",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 29.78
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 29,
+    "revenue": 325.74
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 69.98
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 50.89
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 27.89
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 10,
+    "revenue": 113.53
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 8,
+    "revenue": 94.04
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 7,
+    "revenue": 79.96
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 9,
+    "revenue": 86.77
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 156.67
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 27.4
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 23.67
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.63
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 49.49
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 39.22
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 29.69
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 44.71
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 15,
+    "revenue": 138.75
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.17
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 16.27
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.85
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 31.84
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 22.4
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 21.35
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 36.37
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 118.59
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.9
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 17.88
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.94
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 33.55
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 24.09
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 24.43
+  },
+  {
+    "date": "2026-09-14",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 27.43
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 25,
+    "revenue": 318.93
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 41.23
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 40.62
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 21.02
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 95.37
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 68.77
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 44.76
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 59.22
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 25,
+    "revenue": 276.02
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 44.06
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 40.08
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 16.47
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 68.99
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 53
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 46.23
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 57.63
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 154.3
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 31.97
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 21.51
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.43
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 54.27
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 45.72
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 26.36
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 47.34
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 81.29
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 13.4
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 10.92
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 5.32
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 23.77
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 18.67
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 13.75
+  },
+  {
+    "date": "2026-09-15",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 1,
+    "revenue": 14.96
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 33,
+    "revenue": 394.96
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 65.49
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 61.85
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 3,
+    "revenue": 33.96
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 11,
+    "revenue": 133.1
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 9,
+    "revenue": 103.9
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 7,
+    "revenue": 86.77
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 9,
+    "revenue": 106.59
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 221.4
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 43.91
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 40.59
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 20.44
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 64.79
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 57.95
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 44.45
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 75.72
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 17,
+    "revenue": 181.22
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 21.82
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 25.67
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 11.64
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 55.74
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 39.94
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 31.21
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 36.71
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 72.45
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 14.2
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.97
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 5.77
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 19.79
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 20.76
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 13.22
+  },
+  {
+    "date": "2026-09-16",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 22.45
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 29,
+    "revenue": 306.55
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 48.98
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 37.36
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 22.39
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 87.44
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 57.44
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 44.63
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 66.53
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 22,
+    "revenue": 223.21
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 36.11
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 32.35
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 15.92
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 63.08
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 38.51
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 34.21
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 44.71
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 130.34
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 16.6
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.29
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.57
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 32.65
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 22.65
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 24.8
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 35.69
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 98.28
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 13.63
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 16.42
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.82
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 24.37
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 25.19
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.76
+  },
+  {
+    "date": "2026-09-17",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 28.44
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 30,
+    "revenue": 348.53
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 67.68
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 45.61
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 21.83
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 11,
+    "revenue": 131.32
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 7,
+    "revenue": 80.63
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 70.02
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 99.85
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 16,
+    "revenue": 198.46
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 25.47
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 22.63
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 14.48
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 55.47
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 52.49
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 37.82
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 59.35
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 17,
+    "revenue": 201.53
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 36.4
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 33.36
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 17.73
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 68.89
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 60.81
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 47.65
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 46.8
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 118.9
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 24.78
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 23.84
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.78
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 45.23
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 29.35
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 22.62
+  },
+  {
+    "date": "2026-09-18",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 33.42
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 208.64
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 31.87
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 28.02
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 15.42
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 79.6
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 61.71
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 37.31
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 68.31
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 148.74
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 35.5
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 24.14
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 15.48
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 64.16
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 46.36
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 37.18
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 53.74
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 138.66
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.67
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.85
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.61
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 44.34
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 31.55
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 24.7
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 36.87
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 70.21
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 12.63
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 12.02
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.16
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 23.46
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 19.34
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 16.33
+  },
+  {
+    "date": "2026-09-19",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 21.74
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 195.41
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 36.48
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 27.86
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 16.57
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 65.45
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 53.07
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 38.95
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 48.73
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 12,
+    "revenue": 133.01
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 16.65
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.62
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.53
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 42.9
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 26.14
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 20.85
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 38.06
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 12,
+    "revenue": 150.98
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 26.08
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 15.75
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.61
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 46.23
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 37.44
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 24.52
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 35.59
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 90.85
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 12.5
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 9.89
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 5.78
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 22.71
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 16.98
+  },
+  {
+    "date": "2026-09-20",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 16.71
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 31,
+    "revenue": 283.54
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 48.15
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 49.47
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 17.62
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 10,
+    "revenue": 92.54
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 9,
+    "revenue": 81.2
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 51.05
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 9,
+    "revenue": 80.01
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 24,
+    "revenue": 302.27
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 43.52
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 44.3
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 16.62
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 96.62
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 58.78
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 41.56
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 60.46
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 13,
+    "revenue": 115.41
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 23.01
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.65
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.48
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 38.03
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 34.92
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 21.28
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 33.45
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 97.51
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 18.1
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.84
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 5.98
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 33.63
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 21.06
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 18.85
+  },
+  {
+    "date": "2026-09-21",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 27.71
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 30,
+    "revenue": 369.15
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 64.24
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 50.57
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 27.67
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 10,
+    "revenue": 122.1
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 65.91
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 55.79
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 74.42
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 256.03
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 35.63
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 28.67
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 17.25
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 63.26
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 63.92
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 41.51
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 50.71
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 17,
+    "revenue": 180.07
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 31.4
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 26.64
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.52
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 57.84
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 40.52
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 27.19
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 45.8
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 156.63
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.75
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 19.6
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.86
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 49.97
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 28.08
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 29.82
+  },
+  {
+    "date": "2026-09-22",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 34.08
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 30,
+    "revenue": 344.34
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 46.99
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 42.7
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 22.05
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 84.91
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 8,
+    "revenue": 97.77
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 54.07
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 96.97
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 22,
+    "revenue": 252.3
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 39.95
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 32.34
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 19.17
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 80.06
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 70.02
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 47.79
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 77.27
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 13,
+    "revenue": 142.17
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 25.48
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 27.64
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.97
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 56.28
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 41.4
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 26.03
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 52
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 71.36
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 14.57
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 9.42
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.4
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 25.34
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 16.42
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 15.11
+  },
+  {
+    "date": "2026-09-23",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 22.81
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 28,
+    "revenue": 304.17
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 56.92
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 53.81
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 21.99
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 10,
+    "revenue": 110.99
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 62.83
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 64.93
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 83.38
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 23,
+    "revenue": 234.48
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 44.2
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 35.24
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 17.92
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 77.15
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 62.78
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 46.11
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 50.66
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 17,
+    "revenue": 204.32
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 27.93
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 25.05
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.28
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 55.09
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 38.44
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 35.23
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 52.84
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 110.61
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.85
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 13.83
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.19
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 32.82
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 24.35
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 18.65
+  },
+  {
+    "date": "2026-09-24",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 24.9
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 30,
+    "revenue": 344.81
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 41.99
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 38.22
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 25.25
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 90.91
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 7,
+    "revenue": 79.37
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 67.28
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 73.4
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 164.61
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 22.68
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 20.39
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.11
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 53.86
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 40.94
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 30.41
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 36.09
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 15,
+    "revenue": 137.9
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 22.08
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.82
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 11.52
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 49.37
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 27.2
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 30.96
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 35.87
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 83.61
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 11.16
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.42
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 5.21
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 23.8
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 14.85
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 13.38
+  },
+  {
+    "date": "2026-09-25",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 22.09
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 179.91
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 33.32
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 26.33
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 15.92
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 78.06
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 48.03
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 46.47
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 56.23
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 13,
+    "revenue": 146.37
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 24.55
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 16.81
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.56
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 40.9
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 38.27
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 27.01
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 37.86
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 120.11
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 22.48
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.8
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 11.08
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 44.41
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 32.15
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 24.33
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 37.82
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 83.13
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 15.92
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 12.97
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 7.26
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 29.03
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 18.54
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 18.64
+  },
+  {
+    "date": "2026-09-26",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 28.47
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 230.08
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 39.18
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 28.88
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.51
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 80.95
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 56.26
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 36.26
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 57.64
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 130.18
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 24.63
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.83
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.16
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 37.67
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 35.34
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 23.61
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 37.2
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 122.72
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 23.91
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 19.27
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.07
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 47.26
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 42.83
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 25.51
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 44.06
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 8,
+    "revenue": 96.15
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 13.43
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.76
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.7
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 29.9
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 16.9
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 13.55
+  },
+  {
+    "date": "2026-09-27",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 20.39
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 31,
+    "revenue": 371.88
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 74.57
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 65.27
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 3,
+    "revenue": 38.76
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 12,
+    "revenue": 141.26
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 11,
+    "revenue": 126.25
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 71.87
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 11,
+    "revenue": 129.48
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 208.74
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 33.35
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 26.67
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 15.57
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 82.69
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 53.54
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 39.57
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 67.39
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 192.09
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 29.47
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 23.64
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.84
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 50.2
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 32.38
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 28.35
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 50.71
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 8,
+    "revenue": 97.77
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 19.6
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 14.4
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.02
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 26.81
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 27.34
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 22.74
+  },
+  {
+    "date": "2026-09-28",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 25
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 40,
+    "revenue": 522.7
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 7,
+    "revenue": 84.76
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 5,
+    "revenue": 65.07
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 3,
+    "revenue": 37.04
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 11,
+    "revenue": 146.09
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 11,
+    "revenue": 140.25
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 8,
+    "revenue": 105.88
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 12,
+    "revenue": 154.49
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 182.47
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 32.21
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 29.43
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 18.61
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 71.57
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 59.04
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 47.74
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 45.95
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 185.6
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 33.09
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 29.6
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 16.08
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 53.71
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 38.52
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 31.89
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 53.84
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 112.06
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 22.29
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 14.59
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 10.56
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 42.88
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 30.71
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.83
+  },
+  {
+    "date": "2026-09-29",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 36.9
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 32,
+    "revenue": 318.29
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 6,
+    "revenue": 58.81
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 6,
+    "revenue": 63.62
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 3,
+    "revenue": 29.32
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 11,
+    "revenue": 106.45
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 9,
+    "revenue": 86.6
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 7,
+    "revenue": 67.68
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 91.83
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 18,
+    "revenue": 221.22
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 27.39
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 35.01
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 13.67
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 75.97
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 57.7
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 45.17
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 62.95
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 19,
+    "revenue": 175.84
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 30.63
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 28.04
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 11.93
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 51.59
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 51.19
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 32.9
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 7,
+    "revenue": 51.14
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 100.42
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 22.49
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 14.83
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.25
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 40.8
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 27.92
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 22.55
+  },
+  {
+    "date": "2026-09-30",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 33.56
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 25,
+    "revenue": 269.5
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 41.97
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 31.48
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 14.33
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 76.95
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 6,
+    "revenue": 62.47
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 51.66
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 60.61
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 216.54
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 32.16
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 27.18
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 16.33
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 6,
+    "revenue": 61.35
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 52.66
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 33.87
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 59.38
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 17,
+    "revenue": 182.35
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.77
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 23.51
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.42
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 44.71
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 41.48
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 32.69
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 41.88
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 116.92
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 16.79
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.82
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 9.12
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 32.93
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 27.3
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 19.14
+  },
+  {
+    "date": "2026-10-01",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 31.99
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 29,
+    "revenue": 367.07
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 5,
+    "revenue": 64.1
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 39.05
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 25.54
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 9,
+    "revenue": 111.68
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 69.82
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 58.95
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 77.23
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 217.22
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 29.32
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 35.93
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 14.56
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 71.87
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 45.67
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 5,
+    "revenue": 48.52
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 58.42
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 15,
+    "revenue": 176.01
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 3,
+    "revenue": 35.14
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 23.55
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 11.27
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 5,
+    "revenue": 62.96
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 4,
+    "revenue": 42.45
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 28.62
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 42.41
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 109
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.93
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 15.91
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.38
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 43.87
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 35.45
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 25.8
+  },
+  {
+    "date": "2026-10-02",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 5,
+    "revenue": 41.91
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 20,
+    "revenue": 244.44
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 51.63
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 3,
+    "revenue": 36.06
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 2,
+    "revenue": 19.01
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 7,
+    "revenue": 86.34
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 5,
+    "revenue": 64.82
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 4,
+    "revenue": 52.75
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 8,
+    "revenue": 80.81
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 14,
+    "revenue": 130.43
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 20.73
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 22.96
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.12
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 39.16
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 30.44
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 3,
+    "revenue": 24.68
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 38.9
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 9,
+    "revenue": 110.74
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 16.65
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 16.13
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 6.22
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 35.48
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 22.3
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 21.36
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 28.89
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 6,
+    "revenue": 66.28
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 10.22
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 9.28
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 1,
+    "revenue": 14.86
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 13.29
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 13.15
+  },
+  {
+    "date": "2026-10-03",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 3,
+    "revenue": 16.07
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Medicines",
+    "unitsSold": 28,
+    "revenue": 352.38
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Cosmetics",
+    "unitsSold": 4,
+    "revenue": 49.86
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Medical Supplies",
+    "unitsSold": 4,
+    "revenue": 47.23
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 18.37
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 8,
+    "revenue": 99.79
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Baby & Mother Care",
+    "unitsSold": 7,
+    "revenue": 85.48
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "First Aid",
+    "unitsSold": 6,
+    "revenue": 69.45
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-01",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 6,
+    "revenue": 82.69
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Medicines",
+    "unitsSold": 10,
+    "revenue": 113.74
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 17.98
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 18.8
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 8.8
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 3,
+    "revenue": 31.25
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Baby & Mother Care",
+    "unitsSold": 2,
+    "revenue": 24.07
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 18.19
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-02",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 2,
+    "revenue": 30.02
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Medicines",
+    "unitsSold": 11,
+    "revenue": 141.78
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Cosmetics",
+    "unitsSold": 2,
+    "revenue": 24.65
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Medical Supplies",
+    "unitsSold": 2,
+    "revenue": 28.68
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Medical Equipment",
+    "unitsSold": 1,
+    "revenue": 12.96
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 4,
+    "revenue": 44.48
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Baby & Mother Care",
+    "unitsSold": 3,
+    "revenue": 37.1
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "First Aid",
+    "unitsSold": 2,
+    "revenue": 27.48
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-03",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 41.53
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Medicines",
+    "unitsSold": 7,
+    "revenue": 88.01
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Cosmetics",
+    "unitsSold": 1,
+    "revenue": 15.44
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Medical Supplies",
+    "unitsSold": 1,
+    "revenue": 11.65
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Vitamins & Supplements",
+    "unitsSold": 2,
+    "revenue": 26.44
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Baby & Mother Care",
+    "unitsSold": 1,
+    "revenue": 16.61
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "First Aid",
+    "unitsSold": 1,
+    "revenue": 17.79
+  },
+  {
+    "date": "2026-10-04",
+    "branchId": "BR-04",
+    "category": "Personal Care & Hygiene",
+    "unitsSold": 4,
+    "revenue": 24.4
+  }
+]

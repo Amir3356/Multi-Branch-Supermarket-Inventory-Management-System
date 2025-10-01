@@ -121,7 +121,7 @@
   {
     "medId": "MED-106",
     "branchId": "BR-01",
-    "stock": 12,
+    "stock": 0,
     "batch": "BT-1045",
     "expiry": "2026-12-10"
   },
@@ -142,7 +142,7 @@
   {
     "medId": "MED-107",
     "branchId": "BR-04",
-    "stock": 18,
+    "stock": 0,
     "batch": "BT-5210",
     "expiry": "2027-11-30"
   },
@@ -170,7 +170,7 @@
   {
     "medId": "MED-109",
     "branchId": "BR-03",
-    "stock": 9,
+    "stock": 0,
     "batch": "BT-7002",
     "expiry": "2031-12-31"
   },

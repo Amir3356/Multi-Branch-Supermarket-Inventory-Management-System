@@ -1,0 +1,32 @@
+[
+  {
+    "id": "RTN-1001",
+    "saleId": "SL-5001",
+    "branchId": "BR-01",
+    "customer": "Walk-in Customer",
+    "medId": "MED-101",
+    "product": "Amoxicillin 500mg",
+    "category": "Medicines",
+    "batch": "BT-8821",
+    "qty": 1,
+    "reason": "Wrong item",
+    "condition": "Resellable",
+    "refund": 21,
+    "date": "2026-10-03"
+  },
+  {
+    "id": "RTN-1002",
+    "saleId": "SL-5004",
+    "branchId": "BR-04",
+    "customer": "Walk-in Customer",
+    "medId": "MED-102",
+    "product": "Paracetamol 650mg",
+    "category": "Medicines",
+    "batch": "BT-9003",
+    "qty": 2,
+    "reason": "Expired or defective",
+    "condition": "Damaged",
+    "refund": 19,
+    "date": "2026-10-02"
+  }
+]

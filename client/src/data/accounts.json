@@ -1,0 +1,38 @@
+[
+  {
+    "id": "ACC-001",
+    "fullName": "Selam Tesfaye",
+    "email": "selam@pharmacare.io",
+    "role": "Owner",
+    "branchId": "all",
+    "status": "Active",
+    "createdAt": "2026-01-12"
+  },
+  {
+    "id": "ACC-002",
+    "fullName": "Daniel Bekele",
+    "email": "daniel@pharmacare.io",
+    "role": "Pharmacist",
+    "branchId": "BR-02",
+    "status": "Active",
+    "createdAt": "2026-02-03"
+  },
+  {
+    "id": "ACC-003",
+    "fullName": "Hana Girma",
+    "email": "hana@pharmacare.io",
+    "role": "Cashier",
+    "branchId": "BR-03",
+    "status": "Active",
+    "createdAt": "2026-03-21"
+  },
+  {
+    "id": "ACC-004",
+    "fullName": "Yonas Alemu",
+    "email": "yonas@pharmacare.io",
+    "role": "Purchase Officer",
+    "branchId": "BR-04",
+    "status": "Inactive",
+    "createdAt": "2026-05-08"
+  }
+]

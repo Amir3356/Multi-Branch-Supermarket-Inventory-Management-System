@@ -1,0 +1,227 @@
+[
+  {
+    "id": "LOG-0025",
+    "date": "2026-10-05",
+    "time": "18:18",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5010",
+    "description": "5 × Hand Sanitizer 500ml sold to Walk-in Customer at Airport Branch for $31.25."
+  },
+  {
+    "id": "LOG-0024",
+    "date": "2026-10-05",
+    "time": "14:52",
+    "action": "Purchase created",
+    "module": "Purchase",
+    "record": "PO-7005",
+    "description": "40 × Disposable Syringes 5ml bought from HealthLine Distributors into Airport Branch for $360.00."
+  },
+  {
+    "id": "LOG-0023",
+    "date": "2026-10-05",
+    "time": "12:23",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5011",
+    "description": "2 × Omeprazole 20mg sold to Sara T. (Rx #4418) at Downtown Branch for $36.00."
+  },
+  {
+    "id": "LOG-0022",
+    "date": "2026-10-05",
+    "time": "12:02",
+    "action": "Purchase created",
+    "module": "Purchase",
+    "record": "PO-7004",
+    "description": "500 × Paracetamol 650mg bought from MedPharma Global Logistics into Main Branch (HQ) for $2,500.00."
+  },
+  {
+    "id": "LOG-0021",
+    "date": "2026-10-05",
+    "time": "12:00",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5009",
+    "description": "2 × Baby Diapers Size 3 sold to Dawit H. at Westside Branch for $32.00."
+  },
+  {
+    "id": "LOG-0020",
+    "date": "2026-10-05",
+    "time": "11:03",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5006",
+    "description": "4 × Paracetamol 650mg sold to Walk-in Customer at Main Branch (HQ) for $38.00."
+  },
+  {
+    "id": "LOG-0019",
+    "date": "2026-10-05",
+    "time": "10:13",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5008",
+    "description": "3 × Vitamin C 1000mg (60 Tablets) sold to Walk-in Customer at Downtown Branch for $34.50."
+  },
+  {
+    "id": "LOG-0018",
+    "date": "2026-10-05",
+    "time": "08:41",
+    "action": "Supplier return recorded",
+    "module": "Supplier Returns",
+    "record": "SRT-1001",
+    "description": "20 × Paracetamol 650mg sent back to MedPharma Global Logistics from Main Branch (HQ); credit $100.00."
+  },
+  {
+    "id": "LOG-0017",
+    "date": "2026-10-05",
+    "time": "08:10",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5007",
+    "description": "2 × Amoxicillin 500mg sold to Meron A. (Rx #4415) at Main Branch (HQ) for $42.00."
+  },
+  {
+    "id": "LOG-0016",
+    "date": "2026-10-04",
+    "time": "18:51",
+    "action": "Stock transferred",
+    "module": "Stock Transfers",
+    "record": "TRF-301",
+    "description": "40 × Metformin 850mg moved from Downtown Branch to Main Branch (HQ)."
+  },
+  {
+    "id": "LOG-0015",
+    "date": "2026-10-04",
+    "time": "18:17",
+    "action": "Stock transferred",
+    "module": "Stock Transfers",
+    "record": "TRF-302",
+    "description": "30 × Azithromycin 250mg moved from Downtown Branch to Main Branch (HQ)."
+  },
+  {
+    "id": "LOG-0014",
+    "date": "2026-10-04",
+    "time": "10:03",
+    "action": "Damaged item recorded",
+    "module": "Damaged",
+    "record": "DMG-1004",
+    "description": "1 × Digital Thermometer written off at Westside Branch (Defective item). Loss $4.20."
+  },
+  {
+    "id": "LOG-0013",
+    "date": "2026-10-03",
+    "time": "17:40",
+    "action": "Damaged item recorded",
+    "module": "Damaged",
+    "record": "DMG-1003",
+    "description": "8 × Amoxicillin 500mg written off at Airport Branch (Broken / crushed packaging). Loss $100.00."
+  },
+  {
+    "id": "LOG-0012",
+    "date": "2026-10-03",
+    "time": "12:10",
+    "action": "Customer return recorded",
+    "module": "Customer Returns",
+    "record": "RTN-1001",
+    "description": "1 × Amoxicillin 500mg returned from sale SL-5001 at Main Branch (HQ); $21.00 refunded (restocked)."
+  },
+  {
+    "id": "LOG-0011",
+    "date": "2026-10-02",
+    "time": "18:58",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5002",
+    "description": "1 × Paracetamol 650mg sold to John Doe (Rx #4401) at Downtown Branch for $18.50."
+  },
+  {
+    "id": "LOG-0010",
+    "date": "2026-10-02",
+    "time": "17:04",
+    "action": "Damaged item recorded",
+    "module": "Damaged",
+    "record": "DMG-1005",
+    "description": "2 × Paracetamol 650mg written off at Airport Branch (Customer return (RTN-1002)). Loss $10.00."
+  },
+  {
+    "id": "LOG-0009",
+    "date": "2026-10-02",
+    "time": "14:53",
+    "action": "Stock transferred",
+    "module": "Stock Transfers",
+    "record": "TRF-303",
+    "description": "60 × Atorvastatin 20mg moved from Main Branch (HQ) to Airport Branch."
+  },
+  {
+    "id": "LOG-0008",
+    "date": "2026-10-02",
+    "time": "14:06",
+    "action": "Customer return recorded",
+    "module": "Customer Returns",
+    "record": "RTN-1002",
+    "description": "2 × Paracetamol 650mg returned from sale SL-5004 at Airport Branch; $19.00 refunded (written off)."
+  },
+  {
+    "id": "LOG-0007",
+    "date": "2026-10-02",
+    "time": "10:46",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5001",
+    "description": "2 × Amoxicillin 500mg sold to Walk-in Customer at Main Branch (HQ) for $42.00."
+  },
+  {
+    "id": "LOG-0006",
+    "date": "2026-10-01",
+    "time": "17:49",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5003",
+    "description": "3 × Omeprazole 20mg sold to Sarah Smith at Westside Branch for $64.00."
+  },
+  {
+    "id": "LOG-0005",
+    "date": "2026-10-01",
+    "time": "14:47",
+    "action": "Damaged item recorded",
+    "module": "Damaged",
+    "record": "DMG-1002",
+    "description": "4 × Vitamin C 1000mg (60 Tablets) written off at Downtown Branch (Water damage). Loss $24.00."
+  },
+  {
+    "id": "LOG-0004",
+    "date": "2026-10-01",
+    "time": "10:02",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5004",
+    "description": "4 × Paracetamol 650mg sold to Walk-in Customer at Airport Branch for $38.00."
+  },
+  {
+    "id": "LOG-0003",
+    "date": "2026-09-30",
+    "time": "15:48",
+    "action": "Sale recorded",
+    "module": "Sales",
+    "record": "SL-5005",
+    "description": "2 × Atorvastatin 20mg sold to Abebe K. (Rx #4410) at Main Branch (HQ) for $57.00."
+  },
+  {
+    "id": "LOG-0002",
+    "date": "2026-09-29",
+    "time": "08:01",
+    "action": "Stock transferred",
+    "module": "Stock Transfers",
+    "record": "TRF-304",
+    "description": "100 × Amoxicillin 500mg moved from Main Branch (HQ) to Westside Branch."
+  },
+  {
+    "id": "LOG-0001",
+    "date": "2026-09-28",
+    "time": "17:27",
+    "action": "Damaged item recorded",
+    "module": "Damaged",
+    "record": "DMG-1001",
+    "description": "6 × Atorvastatin 20mg written off at Main Branch (HQ) (Broken / crushed packaging). Loss $90.00."
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "SRT-1001",
+    "purchaseId": "PO-7004",
+    "branchId": "BR-01",
+    "supplier": "MedPharma Global Logistics",
+    "medId": "MED-102",
+    "product": "Paracetamol 650mg",
+    "category": "Medicines",
+    "qty": 20,
+    "reason": "Wrong item delivered",
+    "credit": 100,
+    "date": "2026-10-05"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "DMG-1001",
+    "branchId": "BR-01",
+    "medId": "MED-104",
+    "product": "Atorvastatin 20mg",
+    "category": "Medicines",
+    "batch": "BT-3329",
+    "qty": 6,
+    "reason": "Broken / crushed packaging",
+    "lossValue": 90,
+    "date": "2026-09-28"
+  },
+  {
+    "id": "DMG-1002",
+    "branchId": "BR-02",
+    "medId": "MED-110",
+    "product": "Vitamin C 1000mg (60 Tablets)",
+    "category": "Vitamins & Supplements",
+    "batch": "BT-3804",
+    "qty": 4,
+    "reason": "Water damage",
+    "lossValue": 24,
+    "date": "2026-10-01"
+  },
+  {
+    "id": "DMG-1003",
+    "branchId": "BR-04",
+    "medId": "MED-101",
+    "product": "Amoxicillin 500mg",
+    "category": "Medicines",
+    "batch": "BT-8790",
+    "qty": 8,
+    "reason": "Broken / crushed packaging",
+    "lossValue": 100,
+    "date": "2026-10-03"
+  },
+  {
+    "id": "DMG-1004",
+    "branchId": "BR-03",
+    "medId": "MED-109",
+    "product": "Digital Thermometer",
+    "category": "Medical Equipment",
+    "batch": "BT-7002",
+    "qty": 1,
+    "reason": "Defective item",
+    "lossValue": 4.2,
+    "date": "2026-10-04"
+  },
+  {
+    "id": "DMG-1005",
+    "branchId": "BR-04",
+    "medId": "MED-102",
+    "product": "Paracetamol 650mg",
+    "category": "Medicines",
+    "batch": "BT-9003",
+    "qty": 2,
+    "reason": "Customer return (RTN-1002)",
+    "lossValue": 10,
+    "date": "2026-10-02"
+  }
+]

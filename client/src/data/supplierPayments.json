@@ -1,6 +1,7 @@
 [
   {
     "id": "TXN-8091",
+    "purchaseId": "PO-7001",
     "branchId": "BR-01",
     "supplier": "MedPharma Global Logistics",
     "method": "Bank Wire",
@@ -10,6 +11,7 @@
   },
   {
     "id": "TXN-8092",
+    "purchaseId": "PO-7002",
     "branchId": "BR-02",
     "supplier": "BeautyCare Supplies",
     "method": "Corporate Card",
@@ -19,6 +21,7 @@
   },
   {
     "id": "TXN-8093",
+    "purchaseId": "PO-7003",
     "branchId": "BR-03",
     "supplier": "BioTech Pharma Supplies",
     "method": "ACH Transfer",
