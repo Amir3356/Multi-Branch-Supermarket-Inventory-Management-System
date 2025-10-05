@@ -24,7 +24,8 @@ export const toggleBranchStatus = (branch) => (dispatch) => {
 }
 
 // A branch with stock or history can't be deleted (its records would lose their branch); deactivate it instead
-export const deleteBranch = (branch) => (dispatch, getState) => {
+// `confirm` is asked only once the branch is known to be deletable
+export const deleteBranch = (branch, confirm = () => true) => (dispatch, getState) => {
   const s = getState()
   const id = branch.id
   const hasRecords =
@@ -39,6 +40,7 @@ export const deleteBranch = (branch) => (dispatch, getState) => {
     EXPENSES.some((e) => e.branchId === id) ||
     DAILY_PERFORMANCE.some((r) => r.branchId === id)
   if (hasRecords) return { error: `${branch.name} can't be deleted because it has stock, sales, or other records. Deactivate it instead.` }
+  if (!confirm()) return { cancelled: true }
   dispatch(branchRemoved(id))
   dispatch(logAdded('Branch deleted', 'Branches', id, `${branch.name} (${branch.location}) was deleted.`))
   return { ok: true }
