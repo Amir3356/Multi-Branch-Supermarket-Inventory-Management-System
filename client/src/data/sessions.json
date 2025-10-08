@@ -1,7 +1,0 @@
-[
-  { "id": "SES-1001", "email": "daniel@pharmacare.io", "device": "Chrome on Windows", "ip": "10.0.2.15", "signedInMinutesAgo": 95, "lastActiveMinutesAgo": 3, "status": "Open" },
-  { "id": "SES-1002", "email": "hana@pharmacare.io", "device": "Safari on iPad", "ip": "10.0.3.22", "signedInMinutesAgo": 240, "lastActiveMinutesAgo": 42, "status": "Open" },
-  { "id": "SES-1003", "email": "hana@pharmacare.io", "device": "Chrome on Android", "ip": "10.0.3.40", "signedInMinutesAgo": 30, "lastActiveMinutesAgo": 1, "status": "Open" },
-  { "id": "SES-1004", "email": "selam@pharmacare.io", "device": "Chrome on macOS", "ip": "197.156.84.12", "signedInMinutesAgo": 600, "lastActiveMinutesAgo": 300, "status": "Open" },
-  { "id": "SES-1005", "email": "yonas@pharmacare.io", "device": "Firefox on Windows", "ip": "10.0.4.18", "signedInMinutesAgo": 3000, "lastActiveMinutesAgo": 2880, "status": "Ended", "endedMinutesAgo": 2880 }
-]

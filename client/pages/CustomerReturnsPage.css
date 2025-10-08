@@ -1,0 +1,5 @@
+/* CustomerReturnsPage.css - Customer Returns page specific styles */
+.customer-returns-summary {
+  display: flex;
+  gap: 1rem;
+}

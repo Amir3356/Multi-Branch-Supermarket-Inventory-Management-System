@@ -1,0 +1,128 @@
+/* InventoryPage.css - Inventory page filters, search & view toggles */
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.filter-bar .input-field {
+  height: 40px;
+  font-size: 0.88rem;
+}
+
+.filter-search {
+  position: relative;
+  flex: 1 1 260px;
+}
+
+.filter-search .input-field {
+  padding: 0 0.9rem 0 2.4rem;
+}
+
+.filter-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.filter-select {
+  flex: 0 1 190px;
+  width: auto;
+  padding: 0 0.9rem;
+  cursor: pointer;
+}
+
+.filter-select option {
+  background: #0f172a;
+}
+
+.filter-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.filter-summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-summary strong {
+  color: var(--text-main);
+}
+
+.view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.view-toggle button {
+  padding: 0.45rem 0.85rem;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 3px);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.view-toggle button.active {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--primary-cyan);
+}
+
+.sort-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.sort-header-btn:hover {
+  color: var(--text-main);
+}
+
+.sort-header-btn .sort-idle {
+  opacity: 0.35;
+}
+
+.sort-header-btn:hover .sort-idle {
+  opacity: 0.8;
+}
+
+.expiry-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #fb7185;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .filter-select {
+    flex: 1 1 100%;
+  }
+}

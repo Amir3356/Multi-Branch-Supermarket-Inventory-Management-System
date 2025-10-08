@@ -1,0 +1,5 @@
+/* SupplierReturnsPage.css - Supplier Returns page specific styles */
+.supplier-returns-summary {
+  display: flex;
+  gap: 1rem;
+}

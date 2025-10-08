@@ -1,0 +1,58 @@
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { Plus } from 'lucide-react'
+import { Notice, PageHeader } from '../components'
+import { useBranchScope } from '../hooks'
+import { addBranch, deleteBranch, toggleBranchStatus, updateBranch } from '../features/branches/branchesThunks'
+import BranchesTable from '../features/branches/BranchesTable'
+import BranchModal from '../features/branches/BranchModal'
+import './BranchesPage.css'
+
+export default function BranchesPage() {
+  const dispatch = useDispatch()
+  const { branches, selectedBranch } = useBranchScope()
+  const [showAddBranch, setShowAddBranch] = useState(false)
+  const [editingBranch, setEditingBranch] = useState(null)
+  const [notice, setNotice] = useState(null)
+
+  const run = async (thunk) => {
+    try {
+      setNotice({ type: 'success', text: await dispatch(thunk) })
+    } catch (error) {
+      setNotice({ type: 'error', text: error.message })
+    }
+  }
+
+  // Errors are thrown back to the modal so it can show them under the fields
+  const handleAdd = async (data) => {
+    await dispatch(addBranch(data))
+    setShowAddBranch(false)
+  }
+
+  const handleEdit = async (data) => {
+    setNotice({ type: 'success', text: await dispatch(updateBranch(editingBranch, data)) })
+    setEditingBranch(null)
+  }
+
+  const handleDelete = (branch) => {
+    if (!window.confirm(`Delete ${branch.name}? This cannot be undone.`)) return
+    run(deleteBranch(branch))
+  }
+
+  return (
+    <div className="content-section-card">
+      <PageHeader title="Branches" description="Manage pharmacy locations across the network: edit details, activate or deactivate, and delete branches.">
+        <button className="primary-action-btn" onClick={() => setShowAddBranch(true)}>
+          <Plus size={16} /> Add Branch
+        </button>
+      </PageHeader>
+
+      <Notice notice={notice} onDismiss={() => setNotice(null)} />
+
+      <BranchesTable data={branches} selectedBranch={selectedBranch} onEdit={setEditingBranch} onToggleStatus={(b) => run(toggleBranchStatus(b))} onDelete={handleDelete} />
+
+      {editingBranch && <BranchModal branch={editingBranch} branches={branches} onClose={() => setEditingBranch(null)} onSave={handleEdit} />}
+      {showAddBranch && <BranchModal branches={branches} onClose={() => setShowAddBranch(false)} onSave={handleAdd} />}
+    </div>
+  )
+}
