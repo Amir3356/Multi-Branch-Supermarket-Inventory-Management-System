@@ -86,9 +86,10 @@ export default function AccountModal({ account, branches, onClose, onSave }) {
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
           <div className="modal-section-title">Staff Member</div>
           {field('fullName', 'Full Name *', { placeholder: 'e.g. Meron Alemayehu', autoFocus: true })}
-          {isEdit
-            ? field('email', 'Email', { type: 'email', readOnly: true, disabled: true })
-            : field('email', 'Email *', { type: 'email', placeholder: 'name@example.com', autoComplete: 'off' })}
+          {field('email', 'Email *', { type: 'email', placeholder: 'name@example.com', autoComplete: 'off' })}
+          {isPending && form.email.trim().toLowerCase() !== account.email && (
+            <span className="field-hint">Saving sends a new invitation to this address; the old link stops working.</span>
+          )}
 
           <div className="modal-section-title">Access</div>
           <div className="form-group">

@@ -5,8 +5,10 @@ import { LogOut, Pill, User } from 'lucide-react'
 import { useBranchScope } from '../hooks'
 import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
-import { selectCurrentUser } from '../features/auth/authSlice'
-import { refreshCurrentUser, signOut as signOutThunk } from '../features/auth/authThunks'
+import { selectAuth, selectCurrentUser, sessionEnded } from '../features/auth/authSlice'
+import { realtime } from '../api/realtime'
+import { STORAGE_KEYS, readText, writeText } from '../utils'
+import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/authThunks'
 import { loadBranches } from '../features/branches/branchesThunks'
 import { selectSettings } from '../features/policy/settingsSlice'
 import { selectInventory } from '../features/inventory/selectors'
@@ -31,6 +33,58 @@ export default function DashboardLayout() {
     dispatch(refreshCurrentUser()).catch(() => {})
     dispatch(loadBranches()).catch(() => {})
   }, [dispatch])
+
+  // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),
+  // pushed over the WebSocket; the token's id is the part before "|"
+  const { token } = useSelector(selectAuth)
+  const sessionId = token?.split('|')[0]
+  useEffect(() => {
+    const echo = realtime()
+    if (!echo || !sessionId) return undefined
+    const channel = `session.${sessionId}`
+    echo.private(channel).listen('.session.ended', (event) => dispatch(sessionEnded(event.reason)))
+    return () => echo.leave(channel)
+  }, [dispatch, sessionId])
+
+  // Real use (clicks, typing, scrolling) drives two things:
+  //  - every 2 minutes of use, check in with the API, so the Owner sees accurate "last active"
+  //  - no use in any tab for the session timeout (server setting): sign out automatically
+  const timeoutMinutes = user?.sessionTimeoutMinutes || 0
+  useEffect(() => {
+    let usedSinceLastCheck = false
+    let lastSaved = 0
+    const markUsed = () => {
+      usedSinceLastCheck = true
+      const now = Date.now()
+      // Shared by every tab of this browser; saved at most every 10 seconds
+      if (now - lastSaved > 10000) {
+        lastSaved = now
+        writeText(STORAGE_KEYS.lastActivity, String(now))
+      }
+    }
+    markUsed() // opening or reloading a page counts as use
+    const events = ['pointerdown', 'keydown', 'scroll']
+    events.forEach((name) => window.addEventListener(name, markUsed, { passive: true }))
+
+    const checkIn = setInterval(() => {
+      if (!usedSinceLastCheck) return
+      usedSinceLastCheck = false
+      dispatch(refreshCurrentUser()).catch(() => {})
+    }, 120000)
+
+    const idleCheck = timeoutMinutes
+      ? setInterval(() => {
+          const lastUsed = Number(readText(STORAGE_KEYS.lastActivity)) || Date.now()
+          if (Date.now() - lastUsed >= timeoutMinutes * 60000) dispatch(signOutAfterInactivity())
+        }, 15000)
+      : null
+
+    return () => {
+      clearInterval(checkIn)
+      if (idleCheck) clearInterval(idleCheck)
+      events.forEach((name) => window.removeEventListener(name, markUsed))
+    }
+  }, [dispatch, timeoutMinutes])
 
   const badges = useMemo(() => {
     const scoped = inventory.filter((i) => inScope(i.branchId))

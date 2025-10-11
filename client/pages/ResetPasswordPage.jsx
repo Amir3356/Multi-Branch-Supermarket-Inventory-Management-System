@@ -7,7 +7,7 @@ import SubmitButton from '../features/auth/SubmitButton'
 import { AuthAlert, PasswordField } from '../features/auth/AuthField'
 import { validateNewPassword } from '../features/auth/passwordRules'
 import { resetPassword } from '../features/auth/authThunks'
-import { PATHS } from '../routes/paths'
+import { PATHS, homePathFor } from '../routes/paths'
 
 // Opened from the reset email: /reset-password?token=…&email=…
 export default function ResetPasswordPage() {
@@ -35,8 +35,9 @@ export default function ResetPasswordPage() {
     setIsSubmitting(true)
     setAlert(null)
     try {
-      const { message } = await dispatch(resetPassword({ token, email, password: form.password, passwordConfirmation: form.password_confirmation }))
-      navigate(PATHS.login, { replace: true, state: { notice: message } })
+      const user = await dispatch(resetPassword({ token, email, password: form.password, passwordConfirmation: form.password_confirmation }))
+      // Straight to their role's home page (RBAC), no second sign-in
+      navigate(homePathFor(user), { replace: true })
     } catch (err) {
       setErrors(err.fieldErrors || {})
       setAlert({ type: 'error', text: err.message })
@@ -51,10 +52,9 @@ export default function ResetPasswordPage() {
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <PasswordField id="password" label="New Password" value={form.password} onChange={update('password')} error={errors.password} autoFocus />
         <PasswordField id="password_confirmation" label="Confirm New Password" value={form.password_confirmation} onChange={update('password_confirmation')} error={errors.password_confirmation} />
-        <span className="field-hint">At least 8 characters, with letters and numbers.</span>
 
-        <SubmitButton busy={isSubmitting} busyLabel="Saving...">
-          Reset password
+        <SubmitButton busy={isSubmitting} busyLabel="Signing in...">
+          Sign In
         </SubmitButton>
 
         <Link to={PATHS.forgotPassword} className="forgot-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'center' }}>

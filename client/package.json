@@ -12,7 +12,9 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.13.0",
     "@tanstack/react-table": "^9.2.6",
+    "laravel-echo": "^2.5.0",
     "lucide-react": "^1.50.0",
+    "pusher-js": "^8.6.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-is": "^19.3.0",

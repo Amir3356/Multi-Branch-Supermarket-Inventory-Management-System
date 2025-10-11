@@ -6,8 +6,6 @@ use App\Features\Accounts\Models\User;
 use App\Shared\Enums\AccountStatus;
 use App\Shared\Enums\Role;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
 
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
@@ -29,14 +27,7 @@ class CreateOwnerCommand extends Command
 
         $name = text('Full name', required: true);
         $email = strtolower(text('Email', required: true, validate: ['email' => 'email:rfc|unique:users,email']));
-        $password = password('Password (at least 8 characters, letters and numbers)', required: true);
-
-        $validator = Validator::make(['password' => $password], ['password' => [Password::min(8)->letters()->numbers()]]);
-        if ($validator->fails()) {
-            $this->error($validator->errors()->first('password'));
-
-            return self::FAILURE;
-        }
+        $password = password('Password', required: true);
 
         User::create([
             'full_name' => $name,

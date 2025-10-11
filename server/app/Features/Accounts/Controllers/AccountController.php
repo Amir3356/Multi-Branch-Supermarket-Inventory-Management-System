@@ -7,6 +7,7 @@ use App\Features\Accounts\Requests\StoreAccountRequest;
 use App\Features\Accounts\Requests\UpdateAccountRequest;
 use App\Features\Accounts\Resources\AccountResource;
 use App\Features\Accounts\Services\InvitationService;
+use App\Features\Sessions\Services\SessionService;
 use App\Shared\Enums\AccountStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,10 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 // Owner-only: invite, edit, (de)activate and delete staff accounts
 class AccountController
 {
-    public function __construct(private InvitationService $invitations) {}
+    public function __construct(
+        private InvitationService $invitations,
+        private SessionService $sessions,
+    ) {}
 
     public function index(): AnonymousResourceCollection
     {
@@ -59,20 +63,44 @@ class AccountController
             abort(422, "This account hasn't accepted its invitation yet, so it can't be activated or deactivated.");
         }
 
+        $oldEmail = $account->email;
         $account->fill(array_filter([
             'full_name' => $data['fullName'] ?? null,
+            'email' => $data['email'] ?? null,
             'role' => $data['role'] ?? null,
             'branch_id' => $data['branchId'] ?? null,
             'status' => $data['status'] ?? null,
-        ]))->save();
+        ]));
+        $emailChanged = $account->isDirty('email');
+        $reinvite = $emailChanged && $account->status === AccountStatus::Invited;
+
+        $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite) {
+            $account->save();
+
+            if ($emailChanged) {
+                // A reset link sent to the old address must stop working
+                DB::table('password_reset_tokens')->where('email', $oldEmail)->delete();
+            }
+            // The old invitation went to the wrong address: replace it and email the new one
+            if ($reinvite) {
+                $this->invitations->send($account, $request->user());
+            }
+        }));
 
         // A deactivated user is signed out everywhere
         if ($account->status === AccountStatus::Inactive) {
-            $account->tokens()->delete();
+            $this->sessions->endAllFor($account, 'Account deactivated');
+        }
+
+        $message = "{$account->full_name}'s account was updated.";
+        if ($reinvite) {
+            $message .= " A new invitation was sent to {$account->email}.";
+        } elseif ($emailChanged) {
+            $message .= " They now sign in with {$account->email}.";
         }
 
         return response()->json([
-            'message' => "{$account->full_name}'s account was updated.",
+            'message' => $message,
             'account' => new AccountResource($account->load(['branch', 'invitation'])),
         ]);
     }
@@ -81,10 +109,13 @@ class AccountController
     {
         $this->ensureEditable($request, $account);
 
+        $open = $account->tokens()->whereNull('ended_at')->pluck('id')->all();
         DB::transaction(function () use ($account) {
             $account->tokens()->delete();
             $account->delete();
         });
+        $this->sessions->notifyEnded($open, 'Account deleted');
+        $this->sessions->announce('removed');
 
         return response()->json(['message' => "{$account->full_name}'s account was deleted."]);
     }

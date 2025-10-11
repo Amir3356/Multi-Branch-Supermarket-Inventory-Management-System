@@ -6,6 +6,7 @@ use App\Features\Accounts\Models\User;
 use App\Features\Auth\Requests\LoginRequest;
 use App\Features\Auth\Resources\AuthUserResource;
 use App\Features\Auth\Services\TokenIssuer;
+use App\Features\Sessions\Services\SessionService;
 use App\Shared\Enums\AccountStatus;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController
 {
-    public function __construct(private TokenIssuer $tokens) {}
+    public function __construct(private TokenIssuer $tokens, private SessionService $sessions) {}
 
     public function login(LoginRequest $request): JsonResponse
     {
@@ -45,7 +46,9 @@ class AuthController
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        // The browser's inactivity timer signs out with reason "inactivity"
+        $reason = $request->input('reason') === 'inactivity' ? SessionService::INACTIVITY_REASON : 'Signed out';
+        $this->sessions->end($request->user()->currentAccessToken(), $reason);
 
         return response()->json(['message' => 'Signed out.']);
     }

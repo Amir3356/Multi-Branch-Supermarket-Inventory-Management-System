@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { onUnauthorized, setAuthToken } from '../api/http'
 import { STORAGE_KEYS, writeJson, writeText } from '../utils'
-import authReducer, { loggedOut } from '../features/auth/authSlice'
+import authReducer, { sessionEnded } from '../features/auth/authSlice'
 import uiReducer from '../features/ui/uiSlice'
 import settingsReducer from '../features/policy/settingsSlice'
 import branchesReducer from '../features/branches/branchesSlice'
@@ -42,7 +42,7 @@ export const store = configureStore({
 
 // API calls carry the signed-in user's token; a 401 means it expired or was revoked
 setAuthToken(store.getState().auth.token)
-onUnauthorized(() => store.dispatch(loggedOut()))
+onUnauthorized(() => store.dispatch(sessionEnded()))
 
 // Per-viewer state survives a refresh: sign-in, policy settings, theme, and notification read state
 let previous = store.getState()

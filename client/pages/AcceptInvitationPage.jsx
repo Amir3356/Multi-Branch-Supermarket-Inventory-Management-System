@@ -84,7 +84,6 @@ export default function AcceptInvitationPage() {
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <PasswordField id="password" label="Password" value={form.password} onChange={update('password')} error={errors.password} autoFocus />
         <PasswordField id="password_confirmation" label="Confirm Password" value={form.password_confirmation} onChange={update('password_confirmation')} error={errors.password_confirmation} />
-        <span className="field-hint">At least 8 characters, with letters and numbers.</span>
 
         <SubmitButton busy={isSubmitting} busyLabel="Setting up...">
           Set password and continue

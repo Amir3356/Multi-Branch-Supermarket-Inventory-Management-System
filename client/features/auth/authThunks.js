@@ -1,5 +1,5 @@
 import { api } from '../../api/http'
-import { loggedIn, loggedOut, userRefreshed } from './authSlice'
+import { loggedIn, loggedOut, sessionEnded, userRefreshed } from './authSlice'
 
 // Each thunk returns the signed-in user, or throws ApiError for the page to show
 
@@ -26,20 +26,28 @@ export const acceptInvitation = (token, password, passwordConfirmation) => async
 export const requestPasswordReset = (email) => () =>
   api('/auth/forgot-password', { method: 'POST', body: { email } })
 
-export const resetPassword = ({ token, email, password, passwordConfirmation }) => async (dispatch) => {
-  const result = await api('/auth/reset-password', {
+// Sets the new password and signs straight in (every old session is signed out by the server)
+export const resetPassword = ({ token, email, password, passwordConfirmation }) => async (dispatch, getState) => {
+  const session = await api('/auth/reset-password', {
     method: 'POST',
     body: { token, email, password, password_confirmation: passwordConfirmation }
   })
-  // The reset signs out every device, this one included
-  dispatch(loggedOut())
-  return result
+  // Someone else was signed in on this browser: end their session first
+  if (getState().auth.token) await api('/auth/logout', { method: 'POST' }).catch(() => {})
+  dispatch(loggedIn(session))
+  return session.user
 }
 
 export const refreshCurrentUser = () => async (dispatch) => {
   const { data } = await api('/auth/me')
   dispatch(userRefreshed(data))
   return data
+}
+
+// The browser wasn't used for the session timeout: end the session on the server, then show why
+export const signOutAfterInactivity = () => async (dispatch) => {
+  await api('/auth/logout', { method: 'POST', body: { reason: 'inactivity' } }).catch(() => {})
+  dispatch(sessionEnded('Signed out after inactivity'))
 }
 
 export const signOut = () => async (dispatch) => {

@@ -1,70 +1,35 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { STORAGE_KEYS, describeDevice, minutesBetween, readJson } from '../../utils'
-import { loggedIn, loggedOut } from '../auth/authSlice'
+import { minutesBetween } from '../../utils'
 
-export const IDLE_AFTER_MINUTES = 15
-
-// Initial session created for currently signed-in user if available, without mock demo sessions
-const buildInitialSessions = () => {
-  const saved = readJson(STORAGE_KEYS.auth)
-  if (saved?.user?.email) {
-    return [{
-      id: 'SES-LOCAL-1',
-      email: saved.user.email,
-      device: describeDevice(),
-      ip: 'This device',
-      location: 'Addis Ababa, ET',
-      signedInAt: Date.now(),
-      lastActiveAt: Date.now(),
-      endedAt: null,
-      status: 'Open',
-      current: true
-    }]
-  }
-  return []
-}
-
-/** Active while used in the last 15 minutes, then Idle; ended sessions stay Ended */
-export const sessionState = (session, now) => {
+/** Active while used in the last `idleAfterMinutes`, then Idle; ended sessions stay Ended */
+export const sessionState = (session, now, idleAfterMinutes) => {
   if (session.status === 'Ended') return 'Ended'
-  return minutesBetween(now, session.lastActiveAt) > IDLE_AFTER_MINUTES ? 'Idle' : 'Active'
+  return minutesBetween(now, session.lastActiveAt) > idleAfterMinutes ? 'Idle' : 'Active'
 }
 
+// Signed-in sessions across all staff, from the API (Owner only). Times are timestamps (ms).
+// idleAfterMinutes comes from the server (SESSION_IDLE_MINUTES in server/.env).
 const sessionsSlice = createSlice({
   name: 'sessions',
-  initialState: buildInitialSessions,
+  initialState: { items: [], idleAfterMinutes: 15, signOutAfterMinutes: 30 },
   reducers: {
-    sessionsEnded(state, action) {
-      const { ids, at } = action.payload
-      state.forEach((s) => {
-        if (ids.includes(s.id)) {
-          s.status = 'Ended'
-          s.endedAt = at
-        }
-      })
+    sessionsLoaded(state, action) {
+      state.items = action.payload.items
+      state.idleAfterMinutes = action.payload.idleAfterMinutes
+      state.signOutAfterMinutes = action.payload.signOutAfterMinutes
+    },
+    sessionSaved(state, action) {
+      const index = state.items.findIndex((s) => s.id === action.payload.id)
+      if (index !== -1) state.items[index] = action.payload
+    },
+    sessionRemoved(state, action) {
+      state.items = state.items.filter((s) => s.id !== action.payload)
     }
-  },
-  extraReducers: (builder) => {
-    builder
-      // Signing in on this browser starts the "This device" session
-      .addCase(loggedIn, (state, action) => {
-        const { email, device, at } = action.payload
-        const count = state.filter((s) => s.current || String(s.id).startsWith('SES-LOCAL')).length
-        state.unshift({ id: `SES-LOCAL-${count + 1}`, email, device, ip: 'This device', location: 'Addis Ababa, ET', signedInAt: at, lastActiveAt: at, endedAt: null, status: 'Open', current: true })
-      })
-      // Signing out ends it
-      .addCase(loggedOut, (state, action) => {
-        state.forEach((s) => {
-          if (s.current) {
-            s.current = false
-            s.status = 'Ended'
-            s.endedAt = action.payload.at
-          }
-        })
-      })
   }
 })
 
-export const { sessionsEnded } = sessionsSlice.actions
-export const selectSessions = (state) => state.sessions
+export const { sessionsLoaded, sessionSaved, sessionRemoved } = sessionsSlice.actions
+export const selectSessions = (state) => state.sessions.items
+export const selectIdleAfterMinutes = (state) => state.sessions.idleAfterMinutes
+export const selectSignOutAfterMinutes = (state) => state.sessions.signOutAfterMinutes
 export default sessionsSlice.reducer

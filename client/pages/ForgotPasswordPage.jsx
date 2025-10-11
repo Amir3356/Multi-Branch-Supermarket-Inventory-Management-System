@@ -25,9 +25,11 @@ export default function ForgotPasswordPage() {
     setIsSubmitting(true)
     try {
       const { message } = await dispatch(requestPasswordReset(email.trim()))
-      setAlert({ type: 'success', text: `${message} Check your inbox and spam folder.` })
+      setAlert({ type: 'success', text: message })
     } catch (err) {
-      setAlert({ type: 'error', text: err.message })
+      // Account problems (no account, not set up, deactivated) show under the email field
+      if (err.fieldErrors?.email) setError(err.fieldErrors.email)
+      else setAlert({ type: 'error', text: err.message })
     } finally {
       setIsSubmitting(false)
     }

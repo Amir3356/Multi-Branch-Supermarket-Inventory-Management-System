@@ -8,11 +8,15 @@ import { PATHS } from '../routes/paths'
 import { selectCurrentUser } from '../features/auth/authSlice'
 import { signOut as signOutThunk } from '../features/auth/authThunks'
 import { selectAccounts } from '../features/accounts/accountsSlice'
-import { selectSessions } from '../features/accounts/sessionsSlice'
-import { deleteAccount, endSessions, loadAccounts, resendInvitation, saveAccount, toggleAccountStatus } from '../features/accounts/accountsThunks'
+import { selectIdleAfterMinutes, selectSessions, selectSignOutAfterMinutes } from '../features/accounts/sessionsSlice'
+import { deleteAccount, loadAccounts, resendInvitation, saveAccount, toggleAccountStatus } from '../features/accounts/accountsThunks'
+import { deleteSession, endSession, loadSessions } from '../features/accounts/sessionsThunks'
+import { realtime, watchConnection } from '../api/realtime'
 import AccountModal from '../features/accounts/AccountModal'
 import SessionsPanel from '../features/accounts/SessionsPanel'
 import './AccountProvisionPage.css'
+
+const FALLBACK_REFRESH_MS = 60000
 
 export default function AccountProvisionPage() {
   const dispatch = useDispatch()
@@ -22,6 +26,8 @@ export default function AccountProvisionPage() {
   const currentUser = useSelector(selectCurrentUser)
   const accounts = useSelector(selectAccounts)
   const sessions = useSelector(selectSessions)
+  const idleAfterMinutes = useSelector(selectIdleAfterMinutes)
+  const signOutAfterMinutes = useSelector(selectSignOutAfterMinutes)
   const [editingAccount, setEditingAccount] = useState(null)
   const [notice, setNotice] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -31,6 +37,48 @@ export default function AccountProvisionPage() {
     dispatch(loadAccounts())
       .catch((error) => setNotice({ type: 'error', text: error.message }))
       .finally(() => setIsLoading(false))
+  }, [dispatch])
+
+  // Session Monitoring is live over the WebSocket: the server pushes a message the moment someone
+  // signs in or out, and the list reloads. A slow check every minute covers a dropped connection.
+  const [isLive, setIsLive] = useState(false)
+  useEffect(() => {
+    let inFlight = false
+    let again = false
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return
+      if (inFlight) {
+        again = true
+        return
+      }
+      inFlight = true
+      dispatch(loadSessions())
+        .catch(() => {})
+        .finally(() => {
+          inFlight = false
+          if (again) {
+            again = false
+            refresh()
+          }
+        })
+    }
+
+    refresh()
+    const echo = realtime()
+    echo?.private('sessions').listen('.sessions.changed', refresh)
+    const stopWatching = watchConnection((connected) => {
+      setIsLive(connected)
+      // Catch up on anything missed while disconnected
+      if (connected) refresh()
+    })
+    const timer = setInterval(refresh, FALLBACK_REFRESH_MS)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      echo?.leave('sessions')
+      stopWatching()
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', refresh)
+    }
   }, [dispatch])
 
   // Runs one row action and shows its result; the row's buttons are disabled meanwhile
@@ -57,10 +105,25 @@ export default function AccountProvisionPage() {
     run(account, deleteAccount(account))
   }
 
+  const runSessionAction = async (thunk) => {
+    try {
+      setNotice({ type: 'success', text: await dispatch(thunk) })
+    } catch (error) {
+      setNotice({ type: 'error', text: error.message })
+    }
+  }
+
   const handleEndSession = (session) => {
     if (!window.confirm(`End ${session.email}'s session on ${session.device}? They will be signed out on that device.`)) return
-    dispatch(endSessions((s) => s.id === session.id, 'ended by the Owner'))
-    setNotice({ type: 'success', text: `${session.email} was signed out on ${session.device}.` })
+    runSessionAction(endSession(session))
+  }
+
+  const handleDeleteSession = (session) => {
+    const question = session.status === 'Ended'
+      ? `Remove ${session.email}'s ended session on ${session.device} from the list?`
+      : `Remove ${session.email}'s session on ${session.device}? They will be signed out on that device and it disappears from this list.`
+    if (!window.confirm(question)) return
+    runSessionAction(deleteSession(session))
   }
 
   const signOut = async () => {
@@ -72,7 +135,7 @@ export default function AccountProvisionPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title="Account Provision" description="Invite staff by email: Pharmacist, Cashier, and Purchase Officer. They set their own password from the link.">
+      <PageHeader centered title="Account Provision" description="Invite staff by email: Pharmacist, Cashier, and Purchase Officer. They set their own password from the link.">
         <button className="primary-action-btn" onClick={() => setEditingAccount({})}>
           <UserPlus size={16} /> Create Account
         </button>
@@ -166,7 +229,7 @@ export default function AccountProvisionPage() {
         </table>
       </div>
 
-      <SessionsPanel sessions={sessions} accounts={accounts} branchById={branchById} now={now} onEnd={handleEndSession} onSignOut={signOut} />
+      <SessionsPanel sessions={sessions} idleAfterMinutes={idleAfterMinutes} signOutAfterMinutes={signOutAfterMinutes} isLive={isLive} branchById={branchById} now={now} onEnd={handleEndSession} onDelete={handleDeleteSession} onSignOut={signOut} />
 
       {editingAccount && <AccountModal account={editingAccount} branches={branches} onClose={() => setEditingAccount(null)} onSave={handleSave} />}
     </div>

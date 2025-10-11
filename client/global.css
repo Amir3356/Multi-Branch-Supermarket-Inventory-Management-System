@@ -131,7 +131,8 @@ body {
   width: 100vw;
   background-color: var(--bg-dark);
   color: var(--text-main);
-  overflow-x: hidden;
+  /* clip, not hidden: hidden would make this a scroll container and stop the sidebar sticking */
+  overflow-x: clip;
 }
 
 .dashboard-sidebar {
@@ -143,6 +144,10 @@ body {
   justify-content: space-between;
   padding: 1.5rem 1rem;
   flex-shrink: 0;
+  /* Pinned to the window so the profile card and Sign Out stay visible at the bottom on long pages */
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
 .sidebar-brand {
@@ -191,6 +196,9 @@ body {
   gap: 0.35rem;
   margin-top: 1.5rem;
   flex: 1;
+  /* Only the links scroll when a role has more than fits */
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .nav-group-title {
@@ -256,6 +264,7 @@ a.nav-item {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .user-profile-card {

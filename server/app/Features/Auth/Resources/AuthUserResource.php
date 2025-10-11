@@ -13,6 +13,8 @@ class AuthUserResource extends AccountResource
         return parent::toArray($request) + [
             'sections' => $this->role->sections(),
             'homeSection' => $this->role->homeSection(),
+            // The browser signs out after this many minutes without use (0 = never)
+            'sessionTimeoutMinutes' => config('pharmacy.session_timeout_minutes'),
         ];
     }
 }

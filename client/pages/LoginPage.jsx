@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Mail } from 'lucide-react'
 import AuthShell from '../features/auth/AuthShell'
 import SubmitButton from '../features/auth/SubmitButton'
 import { AuthAlert, AuthField, PasswordField } from '../features/auth/AuthField'
 import { signIn } from '../features/auth/authThunks'
+import { selectAuth } from '../features/auth/authSlice'
 import { PATHS, canOpen, homePathFor } from '../routes/paths'
 
 export default function LoginPage() {
@@ -16,8 +17,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  // e.g. "Your password was reset" handed over from the reset page
-  const [alert, setAlert] = useState(location.state?.notice ? { type: 'success', text: location.state.notice } : null)
+  const { notice: endedNotice } = useSelector(selectAuth)
+  // "Your password was reset" handed over from the reset page, or why the last session ended
+  const [alert, setAlert] = useState(() => {
+    if (location.state?.notice) return { type: 'success', text: location.state.notice }
+    if (endedNotice) return { type: 'error', text: endedNotice }
+    return null
+  })
 
   const validateForm = () => {
     const newErrors = {}
