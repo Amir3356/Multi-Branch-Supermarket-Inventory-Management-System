@@ -14,6 +14,7 @@ import { deleteSession, endSession, loadSessions } from '../features/accounts/se
 import { realtime, watchConnection } from '../api/realtime'
 import AccountModal from '../features/accounts/AccountModal'
 import SessionsPanel from '../features/accounts/SessionsPanel'
+import AccessReviewsPanel from '../features/accounts/AccessReviewsPanel'
 import './AccountProvisionPage.css'
 
 const FALLBACK_REFRESH_MS = 60000
@@ -100,6 +101,12 @@ export default function AccountProvisionPage() {
     setEditingAccount(null)
   }
 
+  // From an access review: remove access that's no longer needed
+  const handleReviewDeactivate = (account) => {
+    if (!window.confirm(`Deactivate ${account.fullName}? They will be signed out and can no longer sign in.`)) return
+    run(account, toggleAccountStatus(account))
+  }
+
   const handleDelete = (account) => {
     if (!window.confirm(`Delete the account for ${account.fullName}? They will no longer be able to sign in.`)) return
     run(account, deleteAccount(account))
@@ -135,7 +142,7 @@ export default function AccountProvisionPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader centered title="Account Provision" description="Invite staff by email: Pharmacist, Cashier, and Purchase Officer. They set their own password from the link.">
+      <PageHeader centered title="Account Provision" description="Invite staff by email: Pharmacist, Cashier, and Procurement Officer. They set their own password from the link.">
         <button className="primary-action-btn" onClick={() => setEditingAccount({})}>
           <UserPlus size={16} /> Create Account
         </button>
@@ -228,6 +235,8 @@ export default function AccountProvisionPage() {
           </tbody>
         </table>
       </div>
+
+      <AccessReviewsPanel accounts={accounts} onDeactivate={handleReviewDeactivate} onNotice={setNotice} />
 
       <SessionsPanel sessions={sessions} idleAfterMinutes={idleAfterMinutes} signOutAfterMinutes={signOutAfterMinutes} isLive={isLive} branchById={branchById} now={now} onEnd={handleEndSession} onDelete={handleDeleteSession} onSignOut={signOut} />
 

@@ -2,6 +2,7 @@
 
 namespace App\Features\Accounts\Controllers;
 
+use App\Features\Accounts\Models\RoleChange;
 use App\Features\Accounts\Models\User;
 use App\Features\Accounts\Requests\StoreAccountRequest;
 use App\Features\Accounts\Requests\UpdateAccountRequest;
@@ -72,10 +73,22 @@ class AccountController
             'status' => $data['status'] ?? null,
         ]));
         $emailChanged = $account->isDirty('email');
+        $previousRole = $account->isDirty('role') ? $account->getOriginal('role') : null;
         $reinvite = $emailChanged && $account->status === AccountStatus::Invited;
 
-        $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite) {
+        $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite, $previousRole) {
             $account->save();
+
+            // Kept for access reviews (privilege creep)
+            if ($previousRole) {
+                RoleChange::create([
+                    'user_id' => $account->id,
+                    'from_role' => $previousRole,
+                    'to_role' => $account->role,
+                    'changed_by' => $request->user()->id,
+                    'changed_at' => now(),
+                ]);
+            }
 
             if ($emailChanged) {
                 // A reset link sent to the old address must stop working

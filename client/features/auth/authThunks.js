@@ -17,6 +17,11 @@ export const acceptInvitation = (token, password, passwordConfirmation) => async
     method: 'POST',
     body: { password, password_confirmation: passwordConfirmation }
   })
+  return startSession(session, dispatch, getState)
+}
+
+// After accepting an invitation or resetting a password: sign in and return the user
+const startSession = async (session, dispatch, getState) => {
   // Someone else was signed in on this browser: end their session first
   if (getState().auth.token) await api('/auth/logout', { method: 'POST' }).catch(() => {})
   dispatch(loggedIn(session))
@@ -32,10 +37,7 @@ export const resetPassword = ({ token, email, password, passwordConfirmation }) 
     method: 'POST',
     body: { token, email, password, password_confirmation: passwordConfirmation }
   })
-  // Someone else was signed in on this browser: end their session first
-  if (getState().auth.token) await api('/auth/logout', { method: 'POST' }).catch(() => {})
-  dispatch(loggedIn(session))
-  return session.user
+  return startSession(session, dispatch, getState)
 }
 
 export const refreshCurrentUser = () => async (dispatch) => {

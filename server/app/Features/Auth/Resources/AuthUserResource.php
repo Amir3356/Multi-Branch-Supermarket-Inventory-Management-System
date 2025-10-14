@@ -15,6 +15,8 @@ class AuthUserResource extends AccountResource
             'homeSection' => $this->role->homeSection(),
             // The browser signs out after this many minutes without use (0 = never)
             'sessionTimeoutMinutes' => config('pharmacy.session_timeout_minutes'),
+            // Whether the browser should ask for its location after sign-in
+            'askDeviceLocation' => config('pharmacy.device_location'),
         ];
     }
 }

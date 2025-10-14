@@ -30,7 +30,7 @@ export const NAV_GROUPS = [
   {
     title: 'OPERATIONS',
     items: [
-      { section: 'purchases', path: PATHS.purchases, label: 'Purchase', icon: PackageCheck },
+      { section: 'purchases', path: PATHS.purchases, label: 'Procurement', icon: PackageCheck },
       { section: 'supplierReturns', path: PATHS.supplierReturns, label: 'Supplier Returns', icon: PackageMinus },
       { section: 'transfers', path: PATHS.transfers, label: 'Stock Transfers', icon: ArrowLeftRight },
       { section: 'damaged', path: PATHS.damaged, label: 'Damaged', icon: PackageX }

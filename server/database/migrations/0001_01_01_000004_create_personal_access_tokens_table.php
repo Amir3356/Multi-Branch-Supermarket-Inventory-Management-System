@@ -20,9 +20,11 @@ return new class extends Migration
             $table->text('name');
             $table->string('token', 64)->unique();
             $table->text('abilities')->nullable();
-            // Where the session was last used from, e.g. "Addis Ababa, Ethiopia"
+            // Where the session was last used from: "Addis Ababa, Bole, Ethiopia" from the device's
+            // location (when the browser allows it), else "Addis Ababa, Ethiopia" from the IP address
             $table->string('ip_address', 45)->nullable();
             $table->string('location', 120)->nullable();
+            $table->string('location_source', 10)->nullable(); // device | ip
             $table->timestamp('last_used_at')->nullable();
             // Set when the session is ended (sign out, ended by the Owner, deactivation, password reset, inactivity)
             $table->timestamp('ended_at')->nullable();

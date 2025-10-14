@@ -24,6 +24,8 @@ class SessionResource extends JsonResource
             'device' => SessionService::describeDevice($this->name),
             'ip' => $this->ip_address,
             'location' => $this->location,
+            // device = from the browser's location (precise); ip = from the IP address (city only)
+            'locationSource' => $this->location_source,
             'signedInAt' => $this->created_at->toIso8601String(),
             'lastActiveAt' => ($this->last_used_at ?? $this->created_at)->toIso8601String(),
             'status' => $this->ended_at || $expired ? 'Ended' : 'Open',

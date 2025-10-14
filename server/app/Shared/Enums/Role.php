@@ -21,7 +21,7 @@ enum Role: string
             self::Owner => 'Owner',
             self::Pharmacist => 'Pharmacist',
             self::Cashier => 'Cashier',
-            self::PurchaseOfficer => 'Purchase Officer',
+            self::PurchaseOfficer => 'Procurement Officer',
         };
     }
 

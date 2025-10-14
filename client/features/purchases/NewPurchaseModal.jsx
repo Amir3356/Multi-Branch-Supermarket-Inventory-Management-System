@@ -101,7 +101,7 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
               <PackageCheck size={20} />
             </div>
             <div>
-              <h2 id="new-purchase-title">Create Purchase</h2>
+              <h2 id="new-purchase-title">Create Procurement</h2>
               <p className="page-desc">Buy stock from a supplier and receive it into a branch.</p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
               Cancel
             </button>
             <button type="submit" className="primary-action-btn">
-              <PackageCheck size={16} /> Create Purchase
+              <PackageCheck size={16} /> Create Procurement
             </button>
           </div>
         </form>

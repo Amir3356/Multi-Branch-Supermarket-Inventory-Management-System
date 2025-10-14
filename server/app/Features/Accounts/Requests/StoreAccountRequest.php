@@ -30,7 +30,7 @@ class StoreAccountRequest extends FormRequest
     {
         return [
             'email.unique' => 'Another account already uses this email.',
-            'role.in' => 'Choose Pharmacist, Cashier or Purchase Officer.',
+            'role.in' => 'Choose Pharmacist, Cashier or Procurement Officer.',
             'branchId.exists' => 'Choose a valid branch.',
         ];
     }

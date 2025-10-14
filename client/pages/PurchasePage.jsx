@@ -39,9 +39,9 @@ export default function PurchasePage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Purchase · ${scopeLabel}`} description="Generate purchase orders to distributors and receive incoming stock into a specific branch.">
+      <PageHeader title={`Procurement · ${scopeLabel}`} description="Generate purchase orders to distributors and receive incoming stock into a specific branch.">
         <button className="primary-action-btn" onClick={() => setShowNewPurchase(true)}>
-          <Plus size={16} /> Create Purchase
+          <Plus size={16} /> Create Procurement
         </button>
       </PageHeader>
 

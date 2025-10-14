@@ -4,6 +4,7 @@ import {
   LogOut,
   Building2,
   UserCheck,
+  MapPin,
   Monitor,
   Radio,
   Trash2,
@@ -112,7 +113,17 @@ export default function SessionsPanel({ sessions, idleAfterMinutes, signOutAfter
                   </td>
                   <td className="nowrap">{s.device}</td>
                   <td className="font-mono">{s.ip || '—'}</td>
-                  <td className="nowrap">{s.location || '—'}</td>
+                  <td className="nowrap">
+                    {s.location ? (
+                      <span
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                        title={s.locationSource === 'device' ? "From the device's location" : 'Approximate, from the IP address'}
+                      >
+                        {s.locationSource === 'device' && <MapPin size={13} aria-hidden="true" />}
+                        {s.location}
+                      </span>
+                    ) : '—'}
+                  </td>
                   <td className="nowrap">{formatSessionTime(new Date(s.signedInAt), now)}</td>
                   <td className="nowrap">
                     {s.state === 'Ended' ? `Ended ${timeAgo(s.endedAt, now)}` : timeAgo(s.lastActiveAt, now)}

@@ -8,7 +8,7 @@ import { useEscapeKey } from '../../hooks'
 const ACCOUNT_ROLES = {
   pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Dashboard, inventory, stock transfers, damaged items, policy and reports' },
   cashier: { label: 'Cashier', hint: 'Sales, customer returns and reports' },
-  purchase_officer: { label: 'Purchase Officer', hint: 'Purchases, supplier returns and reports' }
+  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement, supplier returns and reports' }
 }
 
 const EMPTY_ACCOUNT_FORM = { fullName: '', email: '', role: '', branchId: '', status: 'Active' }

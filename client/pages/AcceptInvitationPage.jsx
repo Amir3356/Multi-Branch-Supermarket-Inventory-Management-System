@@ -48,6 +48,7 @@ export default function AcceptInvitationPage() {
     setAlert(null)
     try {
       const user = await dispatch(acceptInvitation(token, form.password, form.password_confirmation))
+      // Straight to their role's home page (RBAC), no second sign-in
       navigate(homePathFor(user), { replace: true })
     } catch (err) {
       setErrors(err.fieldErrors || {})

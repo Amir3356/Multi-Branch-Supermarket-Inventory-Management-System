@@ -7,7 +7,8 @@ import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
 import { selectAuth, selectCurrentUser, sessionEnded } from '../features/auth/authSlice'
 import { realtime } from '../api/realtime'
-import { STORAGE_KEYS, readText, writeText } from '../utils'
+import { api } from '../api/http'
+import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
 import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/authThunks'
 import { loadBranches } from '../features/branches/branchesThunks'
 import { selectSettings } from '../features/policy/settingsSlice'
@@ -45,6 +46,18 @@ export default function DashboardLayout() {
     echo.private(channel).listen('.session.ended', (event) => dispatch(sessionEnded(event.reason)))
     return () => echo.leave(channel)
   }, [dispatch, sessionId])
+
+  // Once per sign-in, ask the browser where it is so the Owner sees a precise place
+  // (e.g. "Addis Ababa, Bole, Ethiopia"); if the person blocks it, the IP's city is used instead
+  const askDeviceLocation = Boolean(user?.askDeviceLocation)
+  useEffect(() => {
+    if (!askDeviceLocation || !sessionId) return
+    if (readText(STORAGE_KEYS.locationAsked) === sessionId) return
+    writeText(STORAGE_KEYS.locationAsked, sessionId)
+    getPosition()
+      .then((position) => api('/sessions/current/location', { method: 'POST', body: position }))
+      .catch(() => {}) // blocked or unavailable: keep the IP-based city
+  }, [askDeviceLocation, sessionId])
 
   // Real use (clicks, typing, scrolling) drives two things:
   //  - every 2 minutes of use, check in with the API, so the Owner sees accurate "last active"

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-// Staff login accounts (Owner, Pharmacist, Cashier, Purchase Officer), loaded from the API
+// Staff login accounts (Owner, Pharmacist, Cashier, Procurement Officer), loaded from the API
 const accountsSlice = createSlice({
   name: 'accounts',
   initialState: [],

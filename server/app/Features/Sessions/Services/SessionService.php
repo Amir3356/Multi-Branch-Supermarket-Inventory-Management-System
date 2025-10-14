@@ -59,10 +59,15 @@ class SessionService
 
         $token->forceFill(['ip_address' => $ip])->save();
 
+        // The device's own location (more precise) is kept; the IP only fills in when there's none
+        if ($token->location_source === 'device') {
+            return;
+        }
+
         dispatch(function () use ($token, $ip) {
             $location = app(IpLocator::class)->locate($ip);
-            if ($location) {
-                $token->forceFill(['location' => $location])->save();
+            if ($location && $token->fresh()?->location_source !== 'device') {
+                $token->forceFill(['location' => $location, 'location_source' => 'ip'])->save();
                 $this->broadcast('location');
             }
         })->afterResponse();
