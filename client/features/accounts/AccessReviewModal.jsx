@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
-import { ClipboardCheck, FileDown, Power, X } from 'lucide-react'
+import { ClipboardCheck, FileText, X } from 'lucide-react'
 import { useEscapeKey } from '../../hooks'
-import { PERIOD_TYPES, REVIEW_FLAGS, downloadAccessReviewCsv, fetchAccessReview, formatPeriod, markAccessReviewed } from './accessReviews'
+import { PERIOD_TYPES, exportAccessReviewPdf, fetchAccessReview, formatPeriod, localDate } from './accessReviews'
+import { selectSettings } from '../policy/settingsSlice'
 
-// One access review: who has access, their last sign-in, and what needs attention
-export default function AccessReviewModal({ reviewId, accounts, onClose, onReviewed, onDeactivate }) {
+// One access review: who has access, their role and last sign-in, with Export PDF
+export default function AccessReviewModal({ reviewId, accounts, onClose }) {
   const [review, setReview] = useState(null)
   const [error, setError] = useState(null)
-  const [onlyFlagged, setOnlyFlagged] = useState(true)
-  const [note, setNote] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const { pharmacyName } = useSelector(selectSettings)
 
   useEscapeKey(onClose)
 
@@ -20,8 +21,6 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
       .then((data) => {
         if (ignore) return
         setReview(data)
-        setNote(data.reviewNote || '')
-        setOnlyFlagged(data.summary.needsAttention > 0)
       })
       .catch((e) => !ignore && setError(e.message))
     return () => {
@@ -29,22 +28,20 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
     }
   }, [reviewId])
 
-  const markReviewed = async () => {
-    setIsSaving(true)
+  const exportPdf = async () => {
+    setIsExporting(true)
     try {
-      const { review: updated } = await markAccessReviewed(review.id, note.trim() || null)
-      setReview((prev) => ({ ...prev, ...updated, rows: prev.rows }))
-      onReviewed(updated)
+      await exportAccessReviewPdf(review, pharmacyName)
     } catch (e) {
-      setError(e.message)
+      setError(`The PDF couldn't be created: ${e.message}`)
     } finally {
-      setIsSaving(false)
+      setIsExporting(false)
     }
   }
 
   // The report is a snapshot; this is the account as it is now (it may have been changed since)
   const liveAccount = (row) => accounts.find((a) => a.id === row.userId)
-  const rows = review ? review.rows.filter((r) => !onlyFlagged || r.flags.length) : []
+  const rows = review ? review.rows : []
   const s = review?.summary
 
   // Rendered at the top of the page so it centres on the screen, not inside the page card
@@ -86,13 +83,9 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
                 <span className="stat-chip neutral">Deactivated on file: {s.deactivated}</span>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <label className="inline-check">
-                  <input type="checkbox" checked={onlyFlagged} onChange={(e) => setOnlyFlagged(e.target.checked)} />
-                  Show only accounts that need attention ({s.needsAttention})
-                </label>
-                <button type="button" className="secondary-action-btn" onClick={() => downloadAccessReviewCsv(review)}>
-                  <FileDown size={16} /> Download CSV
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="button" className="secondary-action-btn" onClick={exportPdf} disabled={isExporting}>
+                  <FileText size={16} /> {isExporting ? 'Preparing PDF…' : 'Export PDF'}
                 </button>
               </div>
 
@@ -105,14 +98,11 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
                       <th>Branch</th>
                       <th>Status</th>
                       <th>Last sign-in</th>
-                      <th>Flags</th>
-                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => {
                       const live = liveAccount(r)
-                      const canDeactivate = live && live.status === 'Active' && live.role !== 'owner' && (r.flags.includes('dormant') || r.flags.includes('role_changed'))
                       return (
                         <tr key={r.userId}>
                           <td>
@@ -122,7 +112,7 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
                           <td className="nowrap">
                             {r.roleLabel}
                             {r.roleChanges.map((c) => (
-                              <div key={c.at} className="field-hint">{c.from} → {c.to} on {c.at.slice(0, 10)}</div>
+                              <div key={c.at} className="field-hint">{c.from} → {c.to} on {localDate(c.at)}</div>
                             ))}
                           </td>
                           <td className="nowrap">{r.branchName || '—'}</td>
@@ -135,67 +125,19 @@ export default function AccessReviewModal({ reviewId, accounts, onClose, onRevie
                             {r.lastLoginAt ? new Date(r.lastLoginAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Never'}
                             {r.daysSinceLogin !== null && <div className="field-hint">{r.daysSinceLogin} days ago</div>}
                           </td>
-                          <td>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                              {r.flags.length
-                                ? r.flags.map((f) => (
-                                  <span key={f} className={`status-tag ${REVIEW_FLAGS[f]?.tone || 'inactive'}`} title={REVIEW_FLAGS[f]?.hint}>
-                                    {REVIEW_FLAGS[f]?.label || f}
-                                  </span>
-                                ))
-                                : <span className="not-set">OK</span>}
-                            </div>
-                          </td>
-                          <td>
-                            {canDeactivate
-                              ? (
-                                <button type="button" className="link-btn danger-link" onClick={() => onDeactivate(live)}>
-                                  <Power size={14} /> Deactivate
-                                </button>
-                              )
-                              : <span className="not-set">—</span>}
-                          </td>
                         </tr>
                       )
                     })}
                     {rows.length === 0 && (
                       <tr>
-                        <td colSpan={7} style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
-                          Nothing needs attention in this period.
+                        <td colSpan={5} style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
+                          No accounts in this period.
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-
-              {review.reviewedAt ? (
-                <p className="page-desc">
-                  Reviewed by {review.reviewedBy} on {new Date(review.reviewedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
-                  {review.reviewNote ? `: “${review.reviewNote}”` : '.'}
-                </p>
-              ) : (
-                <>
-                  <div className="form-group">
-                    <textarea
-                      id="review-note"
-                      aria-label="Review note (optional)"
-                      className="input-field"
-                      rows={3}
-                      placeholder="e.g. Deactivated 2 dormant accounts; confirmed the Pharmacist promotion is needed."
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      style={{ resize: 'vertical', minHeight: '4.5rem', paddingTop: '0.6rem' }}
-                    />
-                  </div>
-                  <div className="modal-actions">
-                    <button type="button" className="secondary-action-btn" onClick={onClose}>Close</button>
-                    <button type="button" className="primary-action-btn" onClick={markReviewed} disabled={isSaving}>
-                      <ClipboardCheck size={16} /> {isSaving ? 'Saving…' : 'Mark as reviewed'}
-                    </button>
-                  </div>
-                </>
-              )}
             </>
           )}
         </div>

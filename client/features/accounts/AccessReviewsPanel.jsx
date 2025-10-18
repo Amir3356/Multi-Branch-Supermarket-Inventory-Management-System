@@ -1,25 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CalendarClock, CheckCircle2, ClipboardCheck, Eye, RefreshCw } from 'lucide-react'
+import { CalendarClock, ClipboardCheck, Eye, RefreshCw, Trash2 } from 'lucide-react'
 import { EmptyRow } from '../../components'
-import { PERIOD_TYPES, fetchAccessReviews, formatPeriod, generateAccessReview } from './accessReviews'
+import { PERIOD_TYPES, deleteAccessReview, fetchAccessReviews, formatPeriod, reportStatus } from './accessReviews'
 import AccessReviewModal from './AccessReviewModal'
+import GenerateReviewDialog from './GenerateReviewDialog'
 
-const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD in local time
+// Tabs that filter the list; All is the default so no report is hidden
+const TABS = [['all', 'All'], ...Object.entries(PERIOD_TYPES).map(([value, { label }]) => [value, label])]
 
 /**
- * Access reviews: for a period (daily, weekly, quarterly, yearly or a custom range) the system lists all
- * users with their role and last login, flagging dormant accounts and role changes (privilege creep)
- * for the Owner to act on and sign off. Reports are made when the Owner generates one.
+ * Access reviews: for a period (daily, weekly, monthly, quarterly, yearly or a custom range) the system
+ * lists all users with their role and last login, flagging dormant accounts and role changes (privilege
+ * creep). Tabs filter the list; Generate report opens a dialog to make a new one.
  */
-export default function AccessReviewsPanel({ accounts, onDeactivate, onNotice }) {
+export default function AccessReviewsPanel({ accounts, onNotice }) {
   const [reviews, setReviews] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isGenerating, setIsGenerating] = useState(false)
   const [openId, setOpenId] = useState(null)
-  const [period, setPeriod] = useState('quarterly')
-  const [range, setRange] = useState({ from: '', to: today() })
-  const [rangeError, setRangeError] = useState(null)
-  const [typeFilter, setTypeFilter] = useState('all')
+  const [tab, setTab] = useState('all')
+  const [showGenerate, setShowGenerate] = useState(false)
 
   const load = useCallback(() => fetchAccessReviews()
     .then(setReviews)
@@ -30,75 +29,49 @@ export default function AccessReviewsPanel({ accounts, onDeactivate, onNotice })
     load()
   }, [load])
 
-  const generate = async () => {
-    if (period === 'custom') {
-      if (!range.from || !range.to) return setRangeError('Choose both dates.')
-      if (range.from > range.to) return setRangeError('The end date must be on or after the start date.')
-    }
-    setRangeError(null)
-    setIsGenerating(true)
+  // A new report (or a fresh copy of the same period, which replaces the old one) opens straight away
+  const handleGenerated = ({ review, replacedIds = [] }) => {
+    setReviews((prev) => [review, ...prev.filter((r) => !replacedIds.includes(r.id))])
+    setShowGenerate(false)
+    setTab('all')
+    setOpenId(review.id)
+  }
+
+  const shown = tab === 'all' ? reviews : reviews.filter((r) => r.periodType === tab)
+  const countOf = (key) => (key === 'all' ? reviews.length : reviews.filter((r) => r.periodType === key).length)
+
+  const remove = async (review) => {
+    if (!window.confirm(`Delete the ${PERIOD_TYPES[review.periodType]?.label.toLowerCase() || ''} access review for ${formatPeriod(review)}? This cannot be undone.`)) return
     try {
-      const { review } = await generateAccessReview(period, range.from, range.to)
-      setReviews((prev) => [review, ...prev])
-      setOpenId(review.id)
+      await deleteAccessReview(review.id)
+      setReviews((prev) => prev.filter((r) => r.id !== review.id))
+      onNotice({ type: 'success', text: `Access review for ${formatPeriod(review)} deleted.` })
     } catch (error) {
-      const fieldMessage = Object.values(error.fieldErrors || {})[0]
-      if (fieldMessage) setRangeError(fieldMessage)
-      else onNotice({ type: 'error', text: error.message })
-    } finally {
-      setIsGenerating(false)
+      onNotice({ type: 'error', text: error.message })
     }
   }
 
-  const shown = reviews.filter((r) => typeFilter === 'all' || r.periodType === typeFilter)
-
-  const replaceReview = (updated) => setReviews((prev) => prev.map((r) => (r.id === updated.id ? { ...r, ...updated, rows: undefined } : r)))
-
   return (
     <div className="sessions-section">
-      <div className="section-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' }}>
-        <h3><ClipboardCheck size={18} /> Access Reviews</h3>
-        <p className="page-desc" style={{ maxWidth: '820px' }}>
+      <div className="section-header" style={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '0.25rem' }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}><ClipboardCheck size={18} /> Access Reviews</h3>
+        <p className="page-desc" style={{ maxWidth: '820px', textAlign: 'center' }}>
           Lists every user with their role and last sign-in for a period, and flags dormant accounts and role changes so you can remove access that's no longer needed.
         </p>
       </div>
 
-      {/* Generate a report for any period */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
-        <div className="form-group" style={{ minWidth: '220px', marginBottom: 0 }}>
-          <label htmlFor="review-period">Report period</label>
-          <select id="review-period" className="input-field" value={period} onChange={(e) => { setPeriod(e.target.value); setRangeError(null) }}>
-            {Object.entries(PERIOD_TYPES).map(([value, { generate }]) => (
-              <option key={value} value={value}>{generate}</option>
-            ))}
-          </select>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginTop: '1rem' }}>
+        <div className="view-toggle" role="tablist" aria-label="Filter access reviews by period" style={{ flexWrap: 'wrap' }}>
+          {TABS.map(([key, label]) => (
+            <button key={key} type="button" role="tab" aria-selected={tab === key} className={tab === key ? 'active' : ''} onClick={() => setTab(key)}>
+              {label} <span className="filter-count">{countOf(key)}</span>
+            </button>
+          ))}
         </div>
-        {period === 'custom' && (
-          <>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label htmlFor="review-from">From</label>
-              <input id="review-from" type="date" className="input-field" max={range.to || today()} value={range.from} onChange={(e) => setRange({ ...range, from: e.target.value })} />
-            </div>
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label htmlFor="review-to">To</label>
-              <input id="review-to" type="date" className="input-field" min={range.from || undefined} max={today()} value={range.to} onChange={(e) => setRange({ ...range, to: e.target.value })} />
-            </div>
-          </>
-        )}
-        <button type="button" className="primary-action-btn" onClick={generate} disabled={isGenerating}>
-          <RefreshCw size={16} /> {isGenerating ? 'Generating…' : 'Generate report'}
+        <button type="button" className="primary-action-btn" onClick={() => setShowGenerate(true)}>
+          <RefreshCw size={16} /> Generate report
         </button>
-        <div className="form-group" style={{ marginLeft: 'auto', minWidth: '180px', marginBottom: 0 }}>
-          <label htmlFor="review-filter">Show</label>
-          <select id="review-filter" className="input-field" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-            <option value="all">All reports</option>
-            {Object.entries(PERIOD_TYPES).map(([value, { label }]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </div>
       </div>
-      {rangeError && <span className="error-msg">{rangeError}</span>}
 
       <div className="table-responsive" style={{ marginTop: '1rem' }}>
         <table className="data-table">
@@ -109,8 +82,7 @@ export default function AccessReviewsPanel({ accounts, onDeactivate, onNotice })
               <th>Users</th>
               <th>Dormant</th>
               <th>Role changes</th>
-              <th>Needs attention</th>
-              <th>Review</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -128,43 +100,49 @@ export default function AccessReviewsPanel({ accounts, onDeactivate, onNotice })
                 <td>{r.summary.dormant}</td>
                 <td>{r.summary.roleChanged}</td>
                 <td>
-                  <span className={`status-tag ${r.summary.needsAttention ? 'low-stock' : 'in-stock'}`}>
-                    {r.summary.needsAttention ? `${r.summary.needsAttention} account${r.summary.needsAttention === 1 ? '' : 's'}` : 'None'}
-                  </span>
-                </td>
-                <td className="nowrap">
-                  {r.reviewedAt
-                    ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }} title={r.reviewNote || ''}><CheckCircle2 size={14} /> Reviewed by {r.reviewedBy}</span>
-                    : <span className="status-tag low-stock">Pending review</span>}
+                  {reportStatus(r) === 'Complete'
+                    ? <span className="status-tag in-stock" title="Made after the period ended: covers the whole period">Complete</span>
+                    : (
+                      <span
+                        className="status-tag low-stock"
+                        title={`Made while the period was still running: covers up to ${new Date(r.generatedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}. Generate it again later for up-to-date data.`}
+                      >
+                        Partial
+                      </span>
+                    )}
                 </td>
                 <td>
-                  <button type="button" className="link-btn" onClick={() => setOpenId(r.id)}>
-                    <Eye size={14} /> Open
-                  </button>
+                  <div className="row-actions" style={{ justifyContent: 'flex-start', gap: '0.5rem' }}>
+                    <button type="button" className="link-btn" onClick={() => setOpenId(r.id)}>
+                      <Eye size={14} /> Open
+                    </button>
+                    <button type="button" className="icon-danger-btn" onClick={() => remove(r)} title="Delete report" aria-label={`Delete access review for ${formatPeriod(r)}`}>
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
             {shown.length === 0 && (
-              <EmptyRow colSpan={8}>
+              <EmptyRow colSpan={7}>
                 {isLoading
                   ? 'Loading access reviews…'
-                  : reviews.length ? 'No reports of this type yet.' : 'No access reviews yet. Choose a period above and click Generate report.'}
+                  : tab === 'all'
+                    ? 'No access reviews yet. Click Generate report to make one.'
+                    : `No ${PERIOD_TYPES[tab].label.toLowerCase()} reports yet. Click Generate report to make one.`}
               </EmptyRow>
             )}
           </tbody>
         </table>
       </div>
 
+      {showGenerate && <GenerateReviewDialog onClose={() => setShowGenerate(false)} onGenerated={handleGenerated} />}
+
       {openId && (
         <AccessReviewModal
           reviewId={openId}
           accounts={accounts}
           onClose={() => setOpenId(null)}
-          onReviewed={(updated) => {
-            replaceReview(updated)
-            onNotice({ type: 'success', text: `Access review for ${formatPeriod(updated)} marked as reviewed.` })
-          }}
-          onDeactivate={onDeactivate}
         />
       )}
     </div>

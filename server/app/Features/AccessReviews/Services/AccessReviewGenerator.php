@@ -10,7 +10,7 @@ use App\Shared\Enums\Role;
 use Carbon\CarbonImmutable;
 
 /**
- * Access review for a period the Owner picks (today, this week, this quarter, this year or a custom range): a snapshot of every account with its role and last login, flagging what
+ * Access review for a period the Owner picks (today, this week, this month, this quarter, this year or a custom range): a snapshot of every account with its role and last login, flagging what
  * management should look at:
  *  - dormant            active, but no sign-in for ACCESS_REVIEW_DORMANT_DAYS (default 90)
  *  - role_changed       role changed during the period (possible privilege creep)
@@ -19,31 +19,65 @@ use Carbon\CarbonImmutable;
  */
 class AccessReviewGenerator
 {
-    public const PERIODS = ['daily', 'weekly', 'quarterly', 'yearly'];
+    public const PERIODS = ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
 
-    /** The current period up to now, for "Generate": today, this week, this quarter or this year. */
+    /** Now in the pharmacy's local time (PHARMACY_TIMEZONE), so "today" matches the clock on the wall. */
+    public static function localNow(): CarbonImmutable
+    {
+        return CarbonImmutable::now(config('pharmacy.timezone'));
+    }
+
+    /** The current period up to now, for "Generate": today, this week, this month, this quarter or this year. */
     public function currentPeriodToDate(string $type): array
     {
-        $now = CarbonImmutable::now();
+        $now = self::localNow();
 
         return [match ($type) {
             'daily' => $now->startOfDay(),
             'weekly' => $now->startOfWeek(),
+            'monthly' => $now->startOfMonth(),
             'quarterly' => $now->firstOfQuarter(),
             'yearly' => $now->startOfYear(),
         }, $now];
     }
 
+    /**
+     * The last finished period, which gives a Complete report: yesterday, last week (Mon–Sun),
+     * last month, last quarter or last year.
+     */
+    public function previousPeriod(string $type): array
+    {
+        $now = self::localNow();
+        $start = match ($type) {
+            'daily' => $now->subDay()->startOfDay(),
+            'weekly' => $now->startOfWeek()->subWeek(),
+            'monthly' => $now->startOfMonth()->subMonthNoOverflow(),
+            'quarterly' => $now->firstOfQuarter()->subQuarter(),
+            'yearly' => $now->startOfYear()->subYear(),
+        };
+
+        return [$start, match ($type) {
+            'daily' => $start->endOfDay(),
+            'weekly' => $start->endOfWeek(),
+            'monthly' => $start->endOfMonth(),
+            'quarterly' => $start->lastOfQuarter()->endOfDay(),
+            'yearly' => $start->endOfYear(),
+        }];
+    }
+
     public function generate(CarbonImmutable $start, CarbonImmutable $end, string $type, ?User $by = null, bool $scheduled = false): AccessReview
     {
-        $asOf = $end->min(CarbonImmutable::now());
+        $asOf = $end->min(self::localNow());
+        // Periods are in the pharmacy's local time; stored timestamps are in the app timezone (UTC)
+        $dbTimezone = config('app.timezone');
+        [$fromDb, $asOfDb] = [$start->setTimezone($dbTimezone), $asOf->setTimezone($dbTimezone)];
         $dormantDays = (int) config('pharmacy.access_review_dormant_days');
         $staleDays = (int) config('pharmacy.access_review_stale_invitation_days');
 
-        $changes = RoleChange::whereBetween('changed_at', [$start, $asOf])->orderBy('changed_at')->get()->groupBy('user_id');
+        $changes = RoleChange::whereBetween('changed_at', [$fromDb, $asOfDb])->orderBy('changed_at')->get()->groupBy('user_id');
 
         $rows = User::with('branch')
-            ->where('created_at', '<=', $asOf)
+            ->where('created_at', '<=', $asOfDb)
             ->orderBy('id')
             ->get()
             ->map(function (User $user) use ($asOf, $dormantDays, $staleDays, $changes) {
@@ -77,7 +111,7 @@ class AccessReviewGenerator
                     'roleLabel' => $user->role->label(),
                     'branchName' => $user->isOwner() ? 'All Branches' : $user->branch?->name,
                     'status' => $user->status->label(),
-                    'createdAt' => $user->created_at->toDateString(),
+                    'createdAt' => $user->created_at->copy()->setTimezone(config('pharmacy.timezone'))->toDateString(),
                     'lastLoginAt' => $lastLogin?->toIso8601String(),
                     'daysSinceLogin' => $daysSinceLogin,
                     'roleChanges' => $roleChanges,

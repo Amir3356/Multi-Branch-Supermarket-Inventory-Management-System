@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // RBAC: ->middleware('role:owner') or 'role:pharmacist,cashier'
         $middleware->alias(['role' => EnsureRole::class]);
+        // Check the role before looking up {record} in the URL, so a role without access gets 403 for every
+        // id, and can't learn which ids exist from 404s
+        $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureRole::class);
         // There's no server-rendered login page: guests get a JSON 401, never a redirect
         $middleware->redirectGuestsTo(fn () => null);
     })

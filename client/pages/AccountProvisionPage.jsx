@@ -101,12 +101,6 @@ export default function AccountProvisionPage() {
     setEditingAccount(null)
   }
 
-  // From an access review: remove access that's no longer needed
-  const handleReviewDeactivate = (account) => {
-    if (!window.confirm(`Deactivate ${account.fullName}? They will be signed out and can no longer sign in.`)) return
-    run(account, toggleAccountStatus(account))
-  }
-
   const handleDelete = (account) => {
     if (!window.confirm(`Delete the account for ${account.fullName}? They will no longer be able to sign in.`)) return
     run(account, deleteAccount(account))
@@ -236,7 +230,7 @@ export default function AccountProvisionPage() {
         </table>
       </div>
 
-      <AccessReviewsPanel accounts={accounts} onDeactivate={handleReviewDeactivate} onNotice={setNotice} />
+      <AccessReviewsPanel accounts={accounts} onNotice={setNotice} />
 
       <SessionsPanel sessions={sessions} idleAfterMinutes={idleAfterMinutes} signOutAfterMinutes={signOutAfterMinutes} isLive={isLive} branchById={branchById} now={now} onEnd={handleEndSession} onDelete={handleDeleteSession} onSignOut={signOut} />
 

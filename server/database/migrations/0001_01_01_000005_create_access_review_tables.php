@@ -24,7 +24,7 @@ return new class extends Migration
             $table->id();
             $table->date('period_start');
             $table->date('period_end');
-            $table->string('period_type', 20)->default('quarterly'); // daily | weekly | quarterly | yearly | custom
+            $table->string('period_type', 20)->default('quarterly'); // daily | weekly | monthly | quarterly | yearly | custom
             $table->boolean('scheduled')->default(false); // made by the former automatic schedule (kept for old reports)
             $table->foreignId('generated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->json('summary');

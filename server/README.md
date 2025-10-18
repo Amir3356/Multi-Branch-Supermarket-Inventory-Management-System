@@ -30,7 +30,7 @@ app/
     Auth/        login, logout, current user, forgot/reset password
     Accounts/    Owner's Account Provision: invite, edit, (de)activate, delete; accept invitation
     Branches/    Owner's Branches page: add, edit, (de)activate, delete; branch list for everyone
-    AccessReviews/  Owner's access review reports for a chosen period: users, roles, last login, flags; sign-off
+    AccessReviews/  Owner's access review reports for a chosen period: users, roles, last login, flags; PDF export
     Sessions/    Owner's Session Monitoring: every sign-in (one Sanctum token) with device, IP, last activity; end or remove
     <Feature>/
       Controllers/  Requests/  Resources/  Models/  Services/  Mail/  Console/  views/
@@ -79,9 +79,8 @@ The Owner can resend an invitation, change name, role and branch, deactivate (si
 | GET | `/api/sessions` | Owner (sign-ins from the last 7 days) |
 | POST | `/api/sessions/{id}/end` | Owner (signs that device out) |
 | DELETE | `/api/sessions/{id}` | Owner (signs out and removes from the list) |
-| GET / POST | `/api/access-reviews` | Owner (list; generate for `period` daily, weekly, quarterly, yearly, or custom with `from`/`to`) |
-| GET | `/api/access-reviews/{id}` | Owner (full report) |
-| POST | `/api/access-reviews/{id}/review` | Owner (mark as reviewed, with a note) |
+| GET / POST | `/api/access-reviews` | Owner (list; generate for `period` daily, weekly, monthly, quarterly, yearly with `scope` current or previous, or custom with `from`/`to`) |
+| GET / DELETE | `/api/access-reviews/{id}` | Owner (full report; delete) |
 | GET / POST | `/api/accounts` | Owner |
 | PATCH / DELETE | `/api/accounts/{id}` | Owner |
 | POST | `/api/accounts/{id}/resend-invitation` | Owner |
@@ -96,11 +95,11 @@ When deployed behind a reverse proxy or load balancer, set `TRUSTED_PROXIES` in 
 
 ## Access reviews
 
-The Owner generates an access review on Account Provision by choosing a **Report period** (today, this week, this quarter so far, this year so far, or a custom date range) and clicking **Generate report**. The report snapshots every account: role, branch, status, last login, and role changes during the period. It flags:
+On Account Provision, tabs (All, Daily, Weekly, Monthly, Quarterly, Yearly, Custom) filter the list of reports. The Owner clicks **Generate report** and, in the dialog, chooses a **Report period** and either the last finished period (Yesterday, Last week/month/quarter/year — a **Complete** report) or the current one so far (a **Partial** report) (Daily, Weekly, Monthly, Quarterly, Yearly, or a custom date range) and confirms. Generating the same period again replaces its earlier report with fresh data; reports can also be deleted. The report snapshots every account: role, branch, status, last login, and role changes during the period. It flags:
 
 - **Dormant:** active, but no sign-in for `ACCESS_REVIEW_DORMANT_DAYS` (default 90)
 - **Role changed:** possible privilege creep; every role change is recorded in `account_role_changes`
 - **Invitation not accepted:** after `ACCESS_REVIEW_STALE_INVITATION_DAYS` (default 30)
 - **Deactivated:** still on file
 
-From a report the Owner deactivates flagged accounts, downloads it as CSV, and marks it as reviewed with a note.
+The Owner opens a report and exports it as a PDF, which ends with blank Reviewed by / Signature / Date lines for signing a printed copy. Periods ("today", "this month"…) and custom ranges use the pharmacy's local time, `PHARMACY_TIMEZONE` (default `Africa/Addis_Ababa`); the database stays in UTC.

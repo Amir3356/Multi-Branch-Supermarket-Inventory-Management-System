@@ -12,6 +12,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.13.0",
     "@tanstack/react-table": "^9.2.6",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "laravel-echo": "^2.5.0",
     "lucide-react": "^1.50.0",
     "pusher-js": "^8.6.0",

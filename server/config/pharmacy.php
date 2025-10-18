@@ -6,6 +6,9 @@ return [
 
     'invitation_expire_hours' => (int) env('INVITATION_EXPIRE_HOURS', 72),
 
+    // The pharmacy's local time: "today", "this month" etc. in reports follow it (the database stays in UTC)
+    'timezone' => env('PHARMACY_TIMEZONE', 'Africa/Addis_Ababa'),
+
     // Behind a reverse proxy or load balancer: its IPs (comma-separated) or "*", so Session Monitoring shows real visitor IPs
     'trusted_proxies' => env('TRUSTED_PROXIES'),
 
