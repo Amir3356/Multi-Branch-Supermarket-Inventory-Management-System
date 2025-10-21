@@ -11,6 +11,7 @@ import { api } from '../api/http'
 import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
 import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/authThunks'
 import { loadBranches } from '../features/branches/branchesThunks'
+import { loadProcurements } from '../features/purchases/purchasesThunks'
 import { selectSettings } from '../features/policy/settingsSlice'
 import { selectInventory } from '../features/inventory/selectors'
 
@@ -29,10 +30,12 @@ export default function DashboardLayout() {
     [user]
   )
 
-  // Pick up role or branch changes the Owner made since this user signed in, and the branch list every page labels with
+  // Pick up role or branch changes the Owner made since this user signed in, the branch list every page labels with,
+  // and paid procurements, whose stock every branch's inventory includes
   useEffect(() => {
     dispatch(refreshCurrentUser()).catch(() => {})
     dispatch(loadBranches()).catch(() => {})
+    dispatch(loadProcurements()).catch(() => {})
   }, [dispatch])
 
   // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),

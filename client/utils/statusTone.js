@@ -17,5 +17,6 @@ export const STATUS_TONE = {
   'Returned': 'out-of-stock',
   'Partially Returned': 'low-stock',
   'Inactive': 'inactive',
-  'Pending': 'low-stock'
+  'Pending': 'low-stock',
+  'Failed': 'out-of-stock'
 }

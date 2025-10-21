@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use App\Features\Procurements\Services\ChapaClient;
+use App\Features\Procurements\Services\FakeChapaClient;
 use App\Features\Sessions\Models\SessionToken;
 use App\Features\Sessions\Services\SessionService;
 use Laravel\Sanctum\Events\TokenAuthenticated;
@@ -21,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request, so several session changes in a request send a single live update
         $this->app->scoped(SessionService::class);
+
+        // CHAPA_MODE=fake: a pretend checkout on this server, for local development without working Chapa keys
+        $this->app->bind(ChapaClient::class, fn () => config('services.chapa.mode') === 'fake' ? new FakeChapaClient : new ChapaClient);
     }
 
     /**

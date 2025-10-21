@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  CreditCard,
   PackageCheck,
   X
 } from 'lucide-react'
@@ -15,6 +16,8 @@ const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', categoryChoice: '', ne
 export default function NewPurchaseModal({ branches, inventory, products, categories, suppliers, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_PURCHASE_FORM)
   const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const activeBranches = branches.filter((b) => b.status === 'Active')
 
   useEscapeKey(onClose)
@@ -51,8 +54,9 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    if (submitting) return
     const newErrors = {}
     if (!form.branchId) newErrors.branchId = 'Select the branch receiving the stock'
     if (!form.supplier.trim()) newErrors.supplier = 'Supplier is required'
@@ -72,16 +76,24 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
     if (form.purchasePrice === '' || Number.isNaN(purchasePrice) || purchasePrice <= 0) newErrors.purchasePrice = 'Enter a price greater than 0'
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
-    onSave({
-      branchId: form.branchId,
-      supplier: form.supplier.trim(),
-      category,
-      product: productName,
-      medId: existingProduct?.id || null,
-      purchasePrice: Math.round(purchasePrice * 100) / 100,
-      qty,
-      total: Math.round(total * 100) / 100
-    })
+    setSubmitting(true)
+    setSubmitError('')
+    try {
+      // On success the page leaves for Chapa's checkout, so the modal stays in its submitting state
+      await onSave({
+        branchId: form.branchId,
+        supplier: form.supplier.trim(),
+        category,
+        product: productName,
+        medId: existingProduct?.id || null,
+        purchasePrice: Math.round(purchasePrice * 100) / 100,
+        qty
+      })
+    } catch (error) {
+      setSubmitting(false)
+      setSubmitError(error.message)
+      setErrors(error.fieldErrors || {})
+    }
   }
 
   const field = (name, label, props = {}) => (
@@ -102,7 +114,7 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
             </div>
             <div>
               <h2 id="new-purchase-title">Create Procurement</h2>
-              <p className="page-desc">Buy stock from a supplier and receive it into a branch.</p>
+              <p className="page-desc">Buy stock from a supplier and pay through Chapa. Stock is received into the branch once the payment is confirmed.</p>
             </div>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
@@ -171,12 +183,14 @@ export default function NewPurchaseModal({ branches, inventory, products, catego
             <div><small>Total Cost</small><strong className="sale-total">{formatMoney(total)}</strong></div>
           </div>
 
+          {submitError && <span className="error-msg" role="alert">{submitError}</span>}
+
           <div className="modal-actions">
-            <button type="button" className="secondary-action-btn" onClick={onClose}>
+            <button type="button" className="secondary-action-btn" onClick={onClose} disabled={submitting}>
               Cancel
             </button>
-            <button type="submit" className="primary-action-btn">
-              <PackageCheck size={16} /> Create Procurement
+            <button type="submit" className="primary-action-btn" disabled={submitting}>
+              <CreditCard size={16} /> {submitting ? 'Opening Chapa…' : 'Create & Pay with Chapa'}
             </button>
           </div>
         </form>

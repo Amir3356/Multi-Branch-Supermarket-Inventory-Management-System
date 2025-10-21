@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Plus } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { CreditCard, Plus } from 'lucide-react'
 import { BranchTag, Notice, PageHeader, StatusTag } from '../components'
 import { useBranchScope, useFormatMoney } from '../hooks'
 import { selectPurchases, selectSupplierPayments } from '../features/purchases/purchasesSlice'
 import { selectSupplierReturns } from '../features/supplierReturns/supplierReturnsSlice'
 import { selectInventory } from '../features/inventory/selectors'
 import { selectCategories, selectProducts } from '../features/inventory/productsSlice'
-import { createPurchase } from '../features/purchases/purchasesThunks'
+import { startProcurement, verifyProcurement } from '../features/purchases/purchasesThunks'
 import NewPurchaseModal from '../features/purchases/NewPurchaseModal'
 import './PurchasePage.css'
 
@@ -23,7 +24,18 @@ export default function PurchasePage() {
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
   const [showNewPurchase, setShowNewPurchase] = useState(false)
-  const [notice, setNotice] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const returnedFrom = searchParams.get('procurement')
+  const [notice, setNotice] = useState(() => (returnedFrom ? { type: 'info', text: `Checking the Chapa payment for ${returnedFrom}…` } : null))
+
+  // Chapa sends the officer back here with ?procurement=PO-…; confirm the payment, then tidy the URL
+  useEffect(() => {
+    if (!returnedFrom) return
+    dispatch(verifyProcurement(returnedFrom))
+      .then(setNotice)
+      .catch((error) => setNotice({ type: 'error', text: error.message }))
+    setSearchParams({}, { replace: true })
+  }, [dispatch, returnedFrom, setSearchParams])
 
   // Purchases with stock sent back show how much was returned instead of just "Paid"
   const purchaseStatus = (po) => {
@@ -32,9 +44,11 @@ export default function PurchasePage() {
     return returned >= po.qty ? 'Returned' : 'Partially Returned'
   }
 
-  const handleCreatePurchase = (data) => {
-    setNotice({ type: 'success', text: dispatch(createPurchase(data)).message })
-    setShowNewPurchase(false)
+  // Saved as Pending on the server, then off to Chapa's checkout; stock arrives once the payment is verified.
+  // Errors are thrown back to the modal so it can show them next to the form.
+  const handleCreatePurchase = async (data) => {
+    const checkoutUrl = await dispatch(startProcurement(data))
+    window.location.assign(checkoutUrl)
   }
 
   return (
@@ -71,7 +85,14 @@ export default function PurchasePage() {
                 <td>{po.qty.toLocaleString()} units</td>
                 <td className="fw-600">{formatMoney(po.total)}</td>
                 <td>{po.date}</td>
-                <td><StatusTag status={purchaseStatus(po)} /></td>
+                <td>
+                  <StatusTag status={purchaseStatus(po)} />
+                  {po.status === 'Pending' && po.checkoutUrl && (
+                    <a className="secondary-action-btn" style={{ marginLeft: '0.5rem' }} href={po.checkoutUrl}>
+                      <CreditCard size={14} /> Complete payment
+                    </a>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

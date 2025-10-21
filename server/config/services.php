@@ -28,6 +28,15 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Procurement payments. The secret key never leaves the server; test vs live is decided by which keys are set.
+    // CHAPA_MODE=fake swaps Chapa for a pretend checkout on this server (local development only, no keys needed).
+    'chapa' => [
+        'mode' => env('CHAPA_MODE', 'test'),
+        'public_key' => env('CHAPA_PUBLIC_KEY'),
+        'secret_key' => env('CHAPA_SECRET_KEY'),
+        'base_url' => env('CHAPA_BASE_URL', 'https://api.chapa.co/v1'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
