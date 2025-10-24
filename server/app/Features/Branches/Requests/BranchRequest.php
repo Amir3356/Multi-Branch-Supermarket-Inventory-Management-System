@@ -3,6 +3,7 @@
 namespace App\Features\Branches\Requests;
 
 use App\Features\Branches\Models\Branch;
+use App\Features\Branches\Repositories\BranchRepository;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,15 +35,11 @@ class BranchRequest extends FormRequest
         ];
     }
 
-    // PostgreSQL compares text case-sensitively, so "Bole Branch" and "bole branch" need an explicit check
+    // Case-insensitive, since PostgreSQL compares text case-sensitively
     private function uniqueIgnoringCase(?Branch $branch): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) use ($branch) {
-            $taken = Branch::whereRaw('lower(name) = ?', [mb_strtolower((string) $value)])
-                ->when($branch, fn ($query) => $query->whereKeyNot($branch->getKey()))
-                ->exists();
-
-            if ($taken) {
+            if (app(BranchRepository::class)->nameTaken((string) $value, $branch)) {
                 $fail('A branch with this name already exists.');
             }
         };

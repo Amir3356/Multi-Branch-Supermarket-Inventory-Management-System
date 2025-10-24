@@ -3,28 +3,28 @@
     "id": "EXP-1",
     "name": "Rent",
     "frequency": "Monthly",
-    "amount": 3000,
+    "amount": 483000,
     "status": "Active"
   },
   {
     "id": "EXP-2",
     "name": "Utilities",
     "frequency": "Monthly",
-    "amount": 450,
+    "amount": 72450,
     "status": "Active"
   },
   {
     "id": "EXP-3",
     "name": "Maintenance",
     "frequency": "Quarterly",
-    "amount": 800,
+    "amount": 128800,
     "status": "Active"
   },
   {
     "id": "EXP-4",
     "name": "Transportation",
     "frequency": "Weekly",
-    "amount": 150,
+    "amount": 24150,
     "status": "Active"
   }
 ]

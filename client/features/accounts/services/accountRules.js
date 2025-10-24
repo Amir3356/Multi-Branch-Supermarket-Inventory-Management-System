@@ -1,0 +1,10 @@
+// Field errors for the Add/Edit Account form; empty when it can be saved. `email` is already trimmed and lower-cased.
+export function validateAccount(form, email) {
+  const errors = {}
+  if (!form.role) errors.role = 'Select a role'
+  if (!form.fullName.trim()) errors.fullName = 'Full name is required'
+  if (!email) errors.email = 'Email is required'
+  else if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Enter a valid email address'
+  if (!form.branchId) errors.branchId = 'Assign a branch'
+  return errors
+}

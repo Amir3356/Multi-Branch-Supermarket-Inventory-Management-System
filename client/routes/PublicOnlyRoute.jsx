@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { selectCurrentUser, selectIsLoggedIn } from '../features/auth/authSlice'
+import { selectCurrentUser, selectIsLoggedIn } from '../features/auth/store/authSlice'
 import { homePathFor } from './paths'
 
 // Sign-in pages are only for signed-out users; once signed in, return to the page they asked for

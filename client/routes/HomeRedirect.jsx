@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
-import { selectCurrentUser } from '../features/auth/authSlice'
+import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { homePathFor } from './paths'
 
 // "/" opens the signed-in role's home page (Owner: Account Provision, Cashier: Sales, …)

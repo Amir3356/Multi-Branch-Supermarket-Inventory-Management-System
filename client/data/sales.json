@@ -6,7 +6,7 @@
     "category": "Medicines",
     "product": "Amoxicillin 500mg",
     "qty": 2,
-    "total": 42,
+    "total": 6762,
     "date": "2026-10-02",
     "status": "Paid"
   },
@@ -17,7 +17,7 @@
     "category": "Medicines",
     "product": "Paracetamol 650mg",
     "qty": 1,
-    "total": 18.5,
+    "total": 2978.5,
     "date": "2026-10-02",
     "status": "Paid"
   },
@@ -28,7 +28,7 @@
     "category": "Medicines",
     "product": "Omeprazole 20mg",
     "qty": 3,
-    "total": 64,
+    "total": 10304,
     "date": "2026-10-01",
     "status": "Paid"
   },
@@ -39,7 +39,7 @@
     "category": "Medicines",
     "product": "Paracetamol 650mg",
     "qty": 4,
-    "total": 38,
+    "total": 6118,
     "date": "2026-10-01",
     "status": "Paid"
   },
@@ -50,7 +50,7 @@
     "category": "Medicines",
     "product": "Atorvastatin 20mg",
     "qty": 2,
-    "total": 57,
+    "total": 9177,
     "date": "2026-09-30",
     "status": "Paid"
   },
@@ -61,7 +61,7 @@
     "category": "Medicines",
     "product": "Paracetamol 650mg",
     "qty": 4,
-    "total": 38,
+    "total": 6118,
     "date": "2026-10-05",
     "status": "Paid"
   },
@@ -72,7 +72,7 @@
     "category": "Medicines",
     "product": "Amoxicillin 500mg",
     "qty": 2,
-    "total": 42,
+    "total": 6762,
     "date": "2026-10-05",
     "status": "Paid"
   },
@@ -83,7 +83,7 @@
     "category": "Vitamins & Supplements",
     "product": "Vitamin C 1000mg (60 Tablets)",
     "qty": 3,
-    "total": 34.5,
+    "total": 5554.5,
     "date": "2026-10-05",
     "status": "Paid"
   },
@@ -94,7 +94,7 @@
     "category": "Baby & Mother Care",
     "product": "Baby Diapers Size 3",
     "qty": 2,
-    "total": 32,
+    "total": 5152,
     "date": "2026-10-05",
     "status": "Paid"
   },
@@ -105,7 +105,7 @@
     "category": "Personal Care & Hygiene",
     "product": "Hand Sanitizer 500ml",
     "qty": 5,
-    "total": 31.25,
+    "total": 5031.25,
     "date": "2026-10-05",
     "status": "Paid"
   },
@@ -116,7 +116,7 @@
     "category": "Medicines",
     "product": "Omeprazole 20mg",
     "qty": 2,
-    "total": 36,
+    "total": 5796,
     "date": "2026-10-05",
     "status": "Paid"
   }

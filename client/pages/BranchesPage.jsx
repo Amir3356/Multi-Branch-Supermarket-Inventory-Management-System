@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux'
 import { Plus } from 'lucide-react'
 import { Notice, PageHeader } from '../components'
 import { useBranchScope } from '../hooks'
-import { addBranch, deleteBranch, toggleBranchStatus, updateBranch } from '../features/branches/branchesThunks'
-import BranchesTable from '../features/branches/BranchesTable'
-import BranchModal from '../features/branches/BranchModal'
+import { addBranch, deleteBranch, toggleBranchStatus, updateBranch } from '../features/branches/store/branchesThunks'
+import BranchesTable from '../features/branches/components/BranchesTable'
+import BranchModal from '../features/branches/components/BranchModal'
 import './BranchesPage.css'
 
 export default function BranchesPage() {

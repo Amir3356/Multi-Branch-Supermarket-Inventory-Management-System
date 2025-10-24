@@ -4,12 +4,12 @@ import { Clock, Package, Plus, Receipt, ShoppingCart, TrendingUp } from 'lucide-
 import { BranchTag, Notice, PageHeader, StatCard, StatusTag } from '../components'
 import { useBranchScope, useFormatMoney } from '../hooks'
 import { todayKey } from '../utils'
-import { selectSales } from '../features/sales/salesSlice'
-import { selectCustomerReturns } from '../features/customerReturns/customerReturnsSlice'
-import { selectInventory } from '../features/inventory/selectors'
-import { selectCategories } from '../features/inventory/productsSlice'
-import { recordSale } from '../features/sales/salesThunks'
-import NewSaleModal from '../features/sales/NewSaleModal'
+import { selectSales } from '../features/sales/store/salesSlice'
+import { selectCustomerReturns } from '../features/customerReturns/store/customerReturnsSlice'
+import { selectInventory } from '../features/inventory/store/selectors'
+import { selectCategories } from '../features/inventory/store/productsSlice'
+import { recordSale } from '../features/sales/store/salesThunks'
+import NewSaleModal from '../features/sales/components/NewSaleModal'
 import './SalesPage.css'
 
 export default function SalesPage() {

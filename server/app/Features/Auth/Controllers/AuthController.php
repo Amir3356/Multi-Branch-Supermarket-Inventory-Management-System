@@ -2,7 +2,7 @@
 
 namespace App\Features\Auth\Controllers;
 
-use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Features\Auth\Requests\LoginRequest;
 use App\Features\Auth\Resources\AuthUserResource;
 use App\Features\Auth\Services\TokenIssuer;
@@ -15,13 +15,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController
 {
-    public function __construct(private TokenIssuer $tokens, private SessionService $sessions) {}
+    public function __construct(private TokenIssuer $tokens, private SessionService $sessions, private UserRepository $users) {}
 
     public function login(LoginRequest $request): JsonResponse
     {
         $request->ensureIsNotRateLimited();
 
-        $user = User::where('email', $request->validated('email'))->first();
+        $user = $this->users->findByEmail($request->validated('email'));
 
         // Invited accounts have no password yet, so they fail here too
         if (! $user?->password || ! Hash::check($request->validated('password'), $user->password)) {
@@ -34,14 +34,14 @@ class AuthController
         }
 
         $request->clearFailures();
-        $user->forceFill(['last_login_at' => now()])->save();
+        $this->users->recordLogin($user);
 
         return response()->json($this->tokens->issue($user, $request));
     }
 
     public function me(Request $request): AuthUserResource
     {
-        return new AuthUserResource($request->user()->load('branch'));
+        return new AuthUserResource($this->users->withBranch($request->user()));
     }
 
     public function logout(Request $request): JsonResponse

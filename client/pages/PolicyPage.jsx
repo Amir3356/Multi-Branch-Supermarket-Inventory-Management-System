@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { selectSettings } from '../features/policy/settingsSlice'
-import { saveMinStockLevel } from '../features/policy/policyThunks'
-import MinStockLevelForm from '../features/policy/MinStockLevelForm'
+import { selectSettings } from '../features/policy/store/settingsSlice'
+import { saveMinStockLevel } from '../features/policy/store/policyThunks'
+import MinStockLevelForm from '../features/policy/components/MinStockLevelForm'
 import './PolicyPage.css'
 
 export default function PolicyPage() {

@@ -18,6 +18,7 @@ php artisan migrate --seed      # tables + the Owner account (OwnerSeeder)
 # php artisan owner:create      # alternative: type the Owner details in instead of seeding them
 php artisan serve               # http://localhost:8000
 php artisan reverb:start        # WebSockets on :8080 (live Session Monitoring), in a second terminal
+php artisan schedule:work       # background jobs (Jobs/ folders, scheduled in Routes/console.php), in a third terminal
 ```
 
 The client defaults to `http://localhost:8000/api`. Set `VITE_API_URL` in `client/.env` to change it.
@@ -31,10 +32,19 @@ app/
     Accounts/    Owner's Account Provision: invite, edit, (de)activate, delete; accept invitation
     Branches/    Owner's Branches page: add, edit, (de)activate, delete; branch list for everyone
     AccessReviews/  Owner's access review reports for a chosen period: users, roles, last login, flags; PDF export
+    ReturnRequests/  Inventory Officer asks to send a paid batch back to its supplier; the branch's Procurement Officer approves (records the return) or rejects
     Sessions/    Owner's Session Monitoring: every sign-in (one Sanctum token) with device, IP, last activity; end or remove
     <Feature>/
-      Controllers/  Requests/  Resources/  Models/  Services/  Mail/  Console/  views/
-      routes.php    loaded automatically by routes/api.php
+      Routes/        API endpoints mapped to controllers (api.php), WebSocket channels (channels.php),
+                     scheduled jobs (console.php); loaded by routes/api.php, channels.php, console.php
+      Controllers/   handle the request, return the response
+      Requests/  Resources/
+      Services/      business logic
+      Repositories/  every database read and write (controllers and services never query models directly)
+      Models/        Eloquent models: the data schema
+      Jobs/          background and scheduled tasks
+      views/  Utils/  Middleware/  Mail/  Console/  Events/   (only in features that need them;
+                     shared middleware and enums are in Shared/)
   Shared/
     Enums/Role.php            roles + which sections each role may open (RBAC)
     Enums/AccountStatus.php   invited | active | inactive
@@ -89,7 +99,7 @@ The Owner can resend an invitation, change name, role and branch, deactivate (si
 
 Session Monitoring is live over WebSockets (Laravel Reverb). Sign-ins, sign-outs, ended sessions, activity (at most once a minute per session) and location updates are pushed to the private `sessions` channel, which only the Owner can join. The page then reloads its list. When a session is ended (by the Owner, deactivation, deletion or a password reset), a `session.ended` message also goes to the private `session.{id}` channel, which only the browser holding that session can join. That browser signs out at once and shows the reason. If Reverb isn't running, signing in still works: the missed update is logged as a warning, and the page shows "Reconnecting…" and refreshes every minute.
 
-Each sign-in creates one Sanctum token, which is one session. Ending a session (Sign Out, the Owner, deactivation, password reset) stamps `ended_at` instead of deleting the row, and Sanctum rejects ended tokens. Each request updates the session's last activity and IP address. The Location column comes from ipwho.is: each public IP is looked up once, after the response is sent, and cached for 30 days. Local and private addresses show "Local network" and are never sent out. Set `IP_LOCATION_LOOKUP=false` to turn the lookup off. For a precise place, each browser is asked once per sign-in for its location (`DEVICE_LOCATION=true`). If the person allows it, the position is named with OpenStreetMap (e.g. "Addis Ababa, Bole, Ethiopia"), cached per ~100 m spot for 30 days, and shown with a map-pin. If they block it, the IP-based city stays. The browser's location prompt only works on `localhost` or over HTTPS. Rows older than 30 days are deleted whenever the Owner opens the session list, so no scheduler is needed.
+Each sign-in creates one Sanctum token, which is one session. Ending a session (Sign Out, the Owner, deactivation, password reset) stamps `ended_at` instead of deleting the row, and Sanctum rejects ended tokens. Each request updates the session's last activity and IP address. The Location column comes from ipwho.is: each public IP is looked up once, after the response is sent, and cached for 30 days. Local and private addresses show "Local network" and are never sent out. Set `IP_LOCATION_LOOKUP=false` to turn the lookup off. For a precise place, each browser is asked once per sign-in for its location (`DEVICE_LOCATION=true`). If the person allows it, the position is named with OpenStreetMap (e.g. "Addis Ababa, Bole, Ethiopia"), cached per ~100 m spot for 30 days, and shown with a map-pin. If they block it, the IP-based city stays. The browser's location prompt only works on `localhost` or over HTTPS. Rows older than 30 days are deleted whenever the Owner opens the session list, and nightly by the scheduler.
 
 When deployed behind a reverse proxy or load balancer, set `TRUSTED_PROXIES` in `.env` (the proxy's IP addresses, comma-separated, or `*`) so sessions show the visitor's real IP instead of the proxy's.
 

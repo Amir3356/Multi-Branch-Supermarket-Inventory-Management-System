@@ -1,22 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { onUnauthorized, setAuthToken } from '../api/http'
 import { STORAGE_KEYS, writeJson, writeText } from '../utils'
-import authReducer, { sessionEnded } from '../features/auth/authSlice'
-import uiReducer from '../features/ui/uiSlice'
-import settingsReducer from '../features/policy/settingsSlice'
-import branchesReducer from '../features/branches/branchesSlice'
-import productsReducer from '../features/inventory/productsSlice'
-import stockReducer from '../features/inventory/stockSlice'
-import salesReducer from '../features/sales/salesSlice'
-import customerReturnsReducer from '../features/customerReturns/customerReturnsSlice'
-import purchasesReducer from '../features/purchases/purchasesSlice'
-import supplierReturnsReducer from '../features/supplierReturns/supplierReturnsSlice'
-import transfersReducer from '../features/transfers/transfersSlice'
-import damagedReducer from '../features/damaged/damagedSlice'
-import accountsReducer from '../features/accounts/accountsSlice'
-import sessionsReducer from '../features/accounts/sessionsSlice'
-import auditLogsReducer from '../features/auditLogs/auditLogsSlice'
-import notificationsReducer from '../features/notifications/notificationsSlice'
+import authReducer, { sessionEnded } from '../features/auth/store/authSlice'
+import uiReducer from '../features/ui/store/uiSlice'
+import settingsReducer from '../features/policy/store/settingsSlice'
+import branchesReducer from '../features/branches/store/branchesSlice'
+import productsReducer from '../features/inventory/store/productsSlice'
+import stockReducer from '../features/inventory/store/stockSlice'
+import salesReducer from '../features/sales/store/salesSlice'
+import customerReturnsReducer from '../features/customerReturns/store/customerReturnsSlice'
+import purchasesReducer from '../features/purchases/store/purchasesSlice'
+import supplierReturnsReducer from '../features/supplierReturns/store/supplierReturnsSlice'
+import returnRequestsReducer from '../features/supplierReturns/store/returnRequestsSlice'
+import transfersReducer from '../features/transfers/store/transfersSlice'
+import damagedReducer from '../features/damaged/store/damagedSlice'
+import accountsReducer from '../features/accounts/store/accountsSlice'
+import sessionsReducer from '../features/accounts/store/sessionsSlice'
+import auditLogsReducer from '../features/auditLogs/store/auditLogsSlice'
+import notificationsReducer from '../features/notifications/store/notificationsSlice'
 
 // One store for all shared app data. Mock JSON seeds each slice; the backend will replace it later.
 export const store = configureStore({
@@ -31,6 +32,7 @@ export const store = configureStore({
     customerReturns: customerReturnsReducer,
     purchases: purchasesReducer,
     supplierReturns: supplierReturnsReducer,
+    returnRequests: returnRequestsReducer,
     transfers: transfersReducer,
     damaged: damagedReducer,
     accounts: accountsReducer,

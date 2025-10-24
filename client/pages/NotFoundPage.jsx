@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { ArrowRight, SearchX } from 'lucide-react'
 import { homePathFor } from '../routes/paths'
-import { selectCurrentUser } from '../features/auth/authSlice'
+import { selectCurrentUser } from '../features/auth/store/authSlice'
 
 export default function NotFoundPage() {
   const user = useSelector(selectCurrentUser)

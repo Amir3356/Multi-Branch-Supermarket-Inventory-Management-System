@@ -3,6 +3,7 @@
 namespace App\Features\AccessReviews\Controllers;
 
 use App\Features\AccessReviews\Models\AccessReview;
+use App\Features\AccessReviews\Repositories\AccessReviewRepository;
 use App\Features\AccessReviews\Resources\AccessReviewResource;
 use App\Features\AccessReviews\Services\AccessReviewGenerator;
 use Carbon\CarbonImmutable;
@@ -15,13 +16,11 @@ use Illuminate\Validation\Rule;
 // Owner only: access review reports on the Account Provision page
 class AccessReviewController
 {
-    public function __construct(private AccessReviewGenerator $generator) {}
+    public function __construct(private AccessReviewGenerator $generator, private AccessReviewRepository $reviews) {}
 
     public function index(): AnonymousResourceCollection
     {
-        return AccessReviewResource::collection(
-            AccessReview::with(['reviewer', 'generator'])->latest('id')->limit(50)->get()
-        );
+        return AccessReviewResource::collection($this->reviews->latest());
     }
 
     /**
@@ -54,19 +53,14 @@ class AccessReviewController
                 : $this->generator->currentPeriodToDate($data['period']));
         // Generating the same period again replaces its earlier report with fresh data, instead of piling up copies
         [$review, $replaced] = DB::transaction(function () use ($start, $end, $data, $request) {
-            $replaced = AccessReview::where('scheduled', false)
-                ->where('period_type', $data['period'])
-                ->whereDate('period_start', $start->toDateString())
-                ->whereDate('period_end', $end->toDateString())
-                ->pluck('id');
-            AccessReview::whereKey($replaced)->delete();
+            $replaced = $this->reviews->deleteManualFor($data['period'], $start, $end);
 
             return [$this->generator->generate($start, $end, $data['period'], $request->user()), $replaced];
         });
 
         return response()->json([
             'message' => $replaced->isEmpty() ? 'Access review generated.' : 'Access review updated with the latest data.',
-            'review' => new AccessReviewResource($review->load(['reviewer', 'generator'])),
+            'review' => new AccessReviewResource($this->reviews->withPeople($review)),
             // Earlier reports for the same period that this one replaces
             'replacedIds' => $replaced->values(),
         ], 201);
@@ -74,13 +68,13 @@ class AccessReviewController
 
     public function destroy(AccessReview $accessReview): JsonResponse
     {
-        $accessReview->delete();
+        $this->reviews->delete($accessReview);
 
         return response()->json(['message' => 'Access review deleted.']);
     }
 
     public function show(AccessReview $accessReview): AccessReviewResource
     {
-        return new AccessReviewResource($accessReview->load(['reviewer', 'generator']));
+        return new AccessReviewResource($this->reviews->withPeople($accessReview));
     }
 }

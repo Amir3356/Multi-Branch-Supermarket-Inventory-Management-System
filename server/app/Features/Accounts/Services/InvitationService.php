@@ -5,6 +5,8 @@ namespace App\Features\Accounts\Services;
 use App\Features\Accounts\Mail\AccountInvitationMail;
 use App\Features\Accounts\Models\AccountInvitation;
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\InvitationRepository;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Shared\Enums\AccountStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -12,6 +14,8 @@ use Illuminate\Support\Str;
 
 class InvitationService
 {
+    public function __construct(private InvitationRepository $invitations, private UserRepository $users) {}
+
     /**
      * Replaces any earlier invitation for the user and emails a fresh link.
      * Runs inside the caller's transaction, so a failed send rolls everything back.
@@ -21,12 +25,7 @@ class InvitationService
         $token = Str::random(64);
         $hours = (int) config('pharmacy.invitation_expire_hours');
 
-        $user->invitations()->delete();
-        $user->invitations()->create([
-            'invited_by' => $invitedBy?->id,
-            'token_hash' => hash('sha256', $token),
-            'expires_at' => now()->addHours($hours),
-        ]);
+        $this->invitations->replaceFor($user, $invitedBy, hash('sha256', $token), now()->addHours($hours));
 
         $link = rtrim(config('pharmacy.frontend_url'), '/').'/accept-invitation?token='.urlencode($token);
 
@@ -36,9 +35,7 @@ class InvitationService
     /** The pending invitation for a raw token from the link, or null if unknown or already used. */
     public function find(string $token): ?AccountInvitation
     {
-        $invitation = AccountInvitation::with('user.branch')
-            ->where('token_hash', hash('sha256', $token))
-            ->first();
+        $invitation = $this->invitations->findByTokenHash(hash('sha256', $token));
 
         return $invitation?->user?->status === AccountStatus::Invited ? $invitation : null;
     }
@@ -48,14 +45,8 @@ class InvitationService
     {
         return DB::transaction(function () use ($invitation, $password) {
             $user = $invitation->user;
-            $user->update([
-                'password' => $password,
-                'status' => AccountStatus::Active,
-                // Opening the emailed link proves they own the address
-                'email_verified_at' => now(),
-                'last_login_at' => now(),
-            ]);
-            $user->invitations()->delete();
+            $this->users->activate($user, $password);
+            $this->invitations->deleteFor($user);
 
             return $user;
         });

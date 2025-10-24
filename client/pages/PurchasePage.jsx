@@ -1,16 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 import { CreditCard, Plus } from 'lucide-react'
-import { BranchTag, Notice, PageHeader, StatusTag } from '../components'
+import { BranchTag, EmptyRow, Notice, PageHeader, StatusTag } from '../components'
 import { useBranchScope, useFormatMoney } from '../hooks'
-import { selectPurchases, selectSupplierPayments } from '../features/purchases/purchasesSlice'
-import { selectSupplierReturns } from '../features/supplierReturns/supplierReturnsSlice'
-import { selectInventory } from '../features/inventory/selectors'
-import { selectCategories, selectProducts } from '../features/inventory/productsSlice'
-import { startProcurement, verifyProcurement } from '../features/purchases/purchasesThunks'
-import NewPurchaseModal from '../features/purchases/NewPurchaseModal'
+import { selectPurchases, selectSupplierPayments } from '../features/purchases/store/purchasesSlice'
+import { selectSupplierReturns } from '../features/supplierReturns/store/supplierReturnsSlice'
+import { selectInventory } from '../features/inventory/store/selectors'
+import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
+import { selectCurrentUser } from '../features/auth/store/authSlice'
+import { startProcurement, verifyProcurement } from '../features/purchases/store/purchasesThunks'
+import NewPurchaseModal from '../features/purchases/components/NewPurchaseModal'
 import './PurchasePage.css'
+
+const POLL_MS = 3000
+
+// Chapa's checkout opens in a centered popup so the officer never leaves this page
+const openCheckoutPopup = (url = '') => {
+  const width = 520
+  const height = 760
+  const left = Math.max(0, window.screenX + (window.outerWidth - width) / 2)
+  const top = Math.max(0, window.screenY + (window.outerHeight - height) / 2)
+  return window.open(url, 'chapa-checkout', `popup,width=${width},height=${height},left=${left},top=${top}`)
+}
 
 export default function PurchasePage() {
   const dispatch = useDispatch()
@@ -23,10 +35,50 @@ export default function PurchasePage() {
   const inventory = useSelector(selectInventory)
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
+  const user = useSelector(selectCurrentUser)
   const [showNewPurchase, setShowNewPurchase] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const returnedFrom = searchParams.get('procurement')
   const [notice, setNotice] = useState(() => (returnedFrom ? { type: 'info', text: `Checking the Chapa payment for ${returnedFrom}…` } : null))
+  const [awaitingPayment, setAwaitingPayment] = useState(null) // procurement id paid for in the popup
+  const checkoutPopup = useRef(null)
+
+  // While the checkout popup is open, check the payment every few seconds. Paid or failed: close the popup and say so.
+  // The officer closed it: one last check, then report whatever it is (still Pending means not paid).
+  useEffect(() => {
+    if (!awaitingPayment) return undefined
+    let active = true
+    let timer
+    const check = async () => {
+      const popupOpen = Boolean(checkoutPopup.current && !checkoutPopup.current.closed)
+      let result
+      try {
+        result = await dispatch(verifyProcurement(awaitingPayment))
+      } catch (error) {
+        result = { type: 'error', text: error.message, status: null }
+      }
+      if (!active) return
+      if (popupOpen && (result.status === 'Pending' || result.status === null)) {
+        timer = setTimeout(check, POLL_MS)
+        return
+      }
+      if (popupOpen) checkoutPopup.current.close()
+      checkoutPopup.current = null
+      setAwaitingPayment(null)
+      setNotice(result)
+    }
+    timer = setTimeout(check, POLL_MS)
+    return () => {
+      active = false
+      clearTimeout(timer)
+    }
+  }, [awaitingPayment, dispatch])
+
+  const watchPayment = (id, popup) => {
+    checkoutPopup.current = popup
+    setAwaitingPayment(id)
+    setNotice({ type: 'info', text: `Waiting for the payment of ${id}. Complete it in the Chapa window.` })
+  }
 
   // Chapa sends the officer back here with ?procurement=PO-…; confirm the payment, then tidy the URL
   useEffect(() => {
@@ -44,11 +96,33 @@ export default function PurchasePage() {
     return returned >= po.qty ? 'Returned' : 'Partially Returned'
   }
 
-  // Saved as Pending on the server, then off to Chapa's checkout; stock arrives once the payment is verified.
+  // Saved as Pending on the server, then paid in Chapa's checkout popup; stock arrives once the payment is verified.
+  // The popup opens before the API call, while the click still counts, or the browser would block it.
   // Errors are thrown back to the modal so it can show them next to the form.
   const handleCreatePurchase = async (data) => {
-    const checkoutUrl = await dispatch(startProcurement(data))
-    window.location.assign(checkoutUrl)
+    const popup = openCheckoutPopup()
+    if (popup) popup.document.body.textContent = 'Opening Chapa checkout…'
+    let started
+    try {
+      started = await dispatch(startProcurement(data))
+    } catch (error) {
+      popup?.close()
+      throw error
+    }
+    if (!popup || popup.closed) {
+      window.location.assign(started.checkoutUrl) // popups blocked: pay in this tab and come back
+      return
+    }
+    popup.location.href = started.checkoutUrl
+    setShowNewPurchase(false)
+    watchPayment(started.id, popup)
+  }
+
+  const resumePayment = (e, po) => {
+    const popup = openCheckoutPopup(po.checkoutUrl)
+    if (!popup) return // popups blocked: the link opens the checkout in this tab instead
+    e.preventDefault()
+    watchPayment(po.id, popup)
   }
 
   return (
@@ -88,13 +162,14 @@ export default function PurchasePage() {
                 <td>
                   <StatusTag status={purchaseStatus(po)} />
                   {po.status === 'Pending' && po.checkoutUrl && (
-                    <a className="secondary-action-btn" style={{ marginLeft: '0.5rem' }} href={po.checkoutUrl}>
+                    <a className="secondary-action-btn" style={{ marginLeft: '0.5rem' }} href={po.checkoutUrl} onClick={(e) => resumePayment(e, po)}>
                       <CreditCard size={14} /> Complete payment
                     </a>
                   )}
                 </td>
               </tr>
             ))}
+            {purchases.length === 0 && <EmptyRow colSpan={isAllBranches ? 8 : 7}>No procurement records found.</EmptyRow>}
           </tbody>
         </table>
       </div>
@@ -117,15 +192,16 @@ export default function PurchasePage() {
                 <th>Supplier</th>
                 <th>Category</th>
                 <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Total Cost</th>
                 <th>Payment Method</th>
-                <th>Amount Paid</th>
                 <th>Transaction Date</th>
                 <th>Payment Status</th>
               </tr>
             </thead>
             <tbody>
               {payments.map((txn) => {
-                // Category and product come from the purchase this payment settles
+                // Category, product and quantity come from the purchase this payment settles
                 const purchase = allPurchases.find((p) => p.id === txn.purchaseId)
                 return (
                   <tr key={txn.id}>
@@ -134,13 +210,15 @@ export default function PurchasePage() {
                     <td className="fw-600">{txn.supplier}</td>
                     <td>{purchase?.category || '—'}</td>
                     <td className="fw-600">{purchase?.product || '—'}</td>
-                    <td><span className="batch-badge">{txn.method}</span></td>
+                    <td>{purchase ? `${purchase.qty.toLocaleString()} units` : '—'}</td>
                     <td className="fw-600">{formatMoney(txn.amount)}</td>
+                    <td><span className="batch-badge">{txn.method}</span></td>
                     <td>{txn.date}</td>
                     <td><StatusTag status={txn.status} /></td>
                   </tr>
                 )
               })}
+              {payments.length === 0 && <EmptyRow colSpan={isAllBranches ? 10 : 9}>No payment transaction records found.</EmptyRow>}
             </tbody>
           </table>
         </div>
@@ -149,6 +227,7 @@ export default function PurchasePage() {
       {showNewPurchase && (
         <NewPurchaseModal
           branches={branches}
+          assignedBranchId={user?.branchId === 'all' ? null : user?.branchId}
           inventory={inventory}
           products={products}
           categories={categories}

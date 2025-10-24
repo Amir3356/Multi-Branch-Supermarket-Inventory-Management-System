@@ -6,7 +6,7 @@ export const CURRENCIES = {
   EUR: { symbol: '€', label: 'Euro (€)' }
 }
 
-/** "$1,234.50" / "-$12.00" in the given currency */
+/** "Br 1,234.50" / "-Br 12.00" in the given currency */
 export const formatMoneyIn = (currency, value) =>
   `${value < 0 ? '-' : ''}${CURRENCIES[currency]?.symbol || '$'}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 

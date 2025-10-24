@@ -2,6 +2,7 @@
 
 namespace App\Features\Sessions\Controllers;
 
+use App\Features\Sessions\Repositories\SessionRepository;
 use App\Features\Sessions\Services\PlaceNamer;
 use App\Features\Sessions\Services\SessionService;
 use Illuminate\Http\JsonResponse;
@@ -10,7 +11,7 @@ use Illuminate\Http\Request;
 // Any signed-in user: the browser reports where this session is being used (only if the person allowed it)
 class DeviceLocationController
 {
-    public function __invoke(Request $request, PlaceNamer $places, SessionService $sessions): JsonResponse
+    public function __invoke(Request $request, PlaceNamer $places, SessionService $sessions, SessionRepository $repository): JsonResponse
     {
         if (! config('pharmacy.device_location')) {
             abort(404);
@@ -24,7 +25,7 @@ class DeviceLocationController
 
         $location = $places->name((float) $data['latitude'], (float) $data['longitude']);
         if ($location) {
-            $request->user()->currentAccessToken()->forceFill(['location' => $location, 'location_source' => 'device'])->save();
+            $repository->setLocation($request->user()->currentAccessToken(), $location, 'device');
             $sessions->announce('location');
         }
 

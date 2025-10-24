@@ -6,6 +6,7 @@ use App\Features\Accounts\Models\User;
 use App\Features\Sessions\Events\SessionEnded;
 use App\Features\Sessions\Events\SessionsChanged;
 use App\Features\Sessions\Models\SessionToken;
+use App\Features\Sessions\Repositories\SessionRepository;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -20,6 +21,8 @@ class SessionService
 
     // One push per request is enough: the Owner's page reloads the whole list
     private bool $announced = false;
+
+    public function __construct(private SessionRepository $repository) {}
 
     /**
      * Tells the Owner's page (over the WebSocket) that sessions changed. Sent after the response,
@@ -57,7 +60,7 @@ class SessionService
             return;
         }
 
-        $token->forceFill(['ip_address' => $ip])->save();
+        $this->repository->setAddress($token, $ip);
 
         // The device's own location (more precise) is kept; the IP only fills in when there's none
         if ($token->location_source === 'device') {
@@ -66,8 +69,8 @@ class SessionService
 
         dispatch(function () use ($token, $ip) {
             $location = app(IpLocator::class)->locate($ip);
-            if ($location && $token->fresh()?->location_source !== 'device') {
-                $token->forceFill(['location' => $location, 'location_source' => 'ip'])->save();
+            if ($location && $this->repository->locationSource($token) !== 'device') {
+                $this->repository->setLocation($token, $location, 'ip');
                 $this->broadcast('location');
             }
         })->afterResponse();
@@ -100,16 +103,14 @@ class SessionService
             return;
         }
 
-        SessionToken::whereNull('ended_at')
-            ->whereRaw('coalesce(last_used_at, created_at) < ?', [now()->subMinutes($minutes)])
-            ->get()
+        $this->repository->openInactiveFor($minutes)
             ->each(fn (SessionToken $token) => $this->end($token, self::INACTIVITY_REASON));
     }
 
     public function end(SessionToken $token, string $reason): void
     {
         if ($token->ended_at === null) {
-            $token->forceFill(['ended_at' => now(), 'ended_reason' => $reason])->save();
+            $this->repository->markEnded($token, $reason);
             $this->notifyEnded([$token->id], $reason);
             $this->announce('ended');
         }
@@ -118,12 +119,12 @@ class SessionService
     /** Signs the user out on every device; returns how many sessions were open. */
     public function endAllFor(User $user, string $reason): int
     {
-        $open = $user->tokens()->whereNull('ended_at')->pluck('id')->all();
+        $open = $this->repository->openIdsFor($user);
         if (! $open) {
             return 0;
         }
 
-        $user->tokens()->whereKey($open)->update(['ended_at' => now(), 'ended_reason' => $reason]);
+        $this->repository->markManyEnded($user, $open, $reason);
         $this->notifyEnded($open, $reason);
         $this->announce('ended');
 

@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useBranchScope } from '../hooks'
-import { selectAllNotifications } from '../features/notifications/selectors'
-import { allMarkedRead, dismissed, dismissedRestored, markedRead, readToggled, selectNotificationState } from '../features/notifications/notificationsSlice'
-import NotificationsPanel from '../features/notifications/NotificationsPanel'
+import { selectAllNotifications } from '../features/notifications/store/selectors'
+import { allMarkedRead, dismissed, dismissedRestored, markedRead, readToggled, selectNotificationState } from '../features/notifications/store/notificationsSlice'
+import NotificationsPanel from '../features/notifications/components/NotificationsPanel'
 import './NotificationsPage.css'
 
 // Not in the sidebar; reachable at /notifications

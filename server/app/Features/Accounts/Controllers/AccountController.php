@@ -2,12 +2,14 @@
 
 namespace App\Features\Accounts\Controllers;
 
-use App\Features\Accounts\Models\RoleChange;
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\RoleChangeRepository;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Features\Accounts\Requests\StoreAccountRequest;
 use App\Features\Accounts\Requests\UpdateAccountRequest;
 use App\Features\Accounts\Resources\AccountResource;
 use App\Features\Accounts\Services\InvitationService;
+use App\Features\Sessions\Repositories\SessionRepository;
 use App\Features\Sessions\Services\SessionService;
 use App\Shared\Enums\AccountStatus;
 use Illuminate\Http\JsonResponse;
@@ -23,13 +25,14 @@ class AccountController
     public function __construct(
         private InvitationService $invitations,
         private SessionService $sessions,
+        private UserRepository $users,
+        private RoleChangeRepository $roleChanges,
+        private SessionRepository $sessionRecords,
     ) {}
 
     public function index(): AnonymousResourceCollection
     {
-        $accounts = User::with(['branch', 'invitation'])->orderBy('id')->get();
-
-        return AccountResource::collection($accounts);
+        return AccountResource::collection($this->users->allWithDetails());
     }
 
     public function store(StoreAccountRequest $request): JsonResponse
@@ -37,7 +40,7 @@ class AccountController
         $data = $request->validated();
 
         $user = $this->withMail(fn () => DB::transaction(function () use ($data, $request) {
-            $user = User::create([
+            $user = $this->users->create([
                 'full_name' => $data['fullName'],
                 'email' => $data['email'],
                 'role' => $data['role'],
@@ -51,7 +54,7 @@ class AccountController
 
         return response()->json([
             'message' => "Invitation sent to {$user->email}. {$user->full_name} can sign in after setting a password.",
-            'account' => new AccountResource($user->load(['branch', 'invitation'])),
+            'account' => new AccountResource($this->users->withDetails($user)),
         ], 201);
     }
 
@@ -77,22 +80,16 @@ class AccountController
         $reinvite = $emailChanged && $account->status === AccountStatus::Invited;
 
         $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite, $previousRole) {
-            $account->save();
+            $this->users->save($account);
 
             // Kept for access reviews (privilege creep)
             if ($previousRole) {
-                RoleChange::create([
-                    'user_id' => $account->id,
-                    'from_role' => $previousRole,
-                    'to_role' => $account->role,
-                    'changed_by' => $request->user()->id,
-                    'changed_at' => now(),
-                ]);
+                $this->roleChanges->record($account, $previousRole, $request->user());
             }
 
             if ($emailChanged) {
                 // A reset link sent to the old address must stop working
-                DB::table('password_reset_tokens')->where('email', $oldEmail)->delete();
+                $this->users->forgetPasswordResets($oldEmail);
             }
             // The old invitation went to the wrong address: replace it and email the new one
             if ($reinvite) {
@@ -114,7 +111,7 @@ class AccountController
 
         return response()->json([
             'message' => $message,
-            'account' => new AccountResource($account->load(['branch', 'invitation'])),
+            'account' => new AccountResource($this->users->withDetails($account)),
         ]);
     }
 
@@ -122,10 +119,10 @@ class AccountController
     {
         $this->ensureEditable($request, $account);
 
-        $open = $account->tokens()->whereNull('ended_at')->pluck('id')->all();
+        $open = $this->sessionRecords->openIdsFor($account);
         DB::transaction(function () use ($account) {
-            $account->tokens()->delete();
-            $account->delete();
+            $this->sessionRecords->deleteAllFor($account);
+            $this->users->delete($account);
         });
         $this->sessions->notifyEnded($open, 'Account deleted');
         $this->sessions->announce('removed');
@@ -143,7 +140,7 @@ class AccountController
 
         return response()->json([
             'message' => "A new invitation was sent to {$account->email}.",
-            'account' => new AccountResource($account->load(['branch', 'invitation'])),
+            'account' => new AccountResource($this->users->withDetails($account)),
         ]);
     }
 

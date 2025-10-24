@@ -3,51 +3,50 @@
 namespace App\Features\Branches\Controllers;
 
 use App\Features\Branches\Models\Branch;
+use App\Features\Branches\Repositories\BranchRepository;
 use App\Features\Branches\Requests\BranchRequest;
 use App\Features\Branches\Resources\BranchResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\DB;
 
 class BranchController
 {
+    public function __construct(private BranchRepository $branches) {}
+
     public function index(): AnonymousResourceCollection
     {
-        return BranchResource::collection(Branch::withCount('staff')->orderBy('id')->get());
+        return BranchResource::collection($this->branches->allWithStaffCount());
     }
 
     // Owner only, as are update and destroy
     public function store(BranchRequest $request): JsonResponse
     {
-        $branch = DB::transaction(fn () => Branch::create($request->validated() + [
-            'id' => Branch::nextId(),
-            'status' => 'active',
-        ]));
+        $branch = $this->branches->create($request->validated());
 
         return response()->json([
             'message' => "{$branch->name} ({$branch->id}) was added.",
-            'branch' => new BranchResource($branch->loadCount('staff')),
+            'branch' => new BranchResource($this->branches->withStaffCount($branch)),
         ], 201);
     }
 
     public function update(BranchRequest $request, Branch $branch): JsonResponse
     {
-        $branch->update($request->validated());
+        $this->branches->update($branch, $request->validated());
 
         return response()->json([
             'message' => "{$branch->name} was updated.",
-            'branch' => new BranchResource($branch->loadCount('staff')),
+            'branch' => new BranchResource($this->branches->withStaffCount($branch)),
         ]);
     }
 
     // A branch with staff can't be deleted (their accounts would lose their branch); deactivate it instead
     public function destroy(Branch $branch): JsonResponse
     {
-        if ($branch->staff()->exists()) {
+        if ($this->branches->hasStaff($branch)) {
             abort(422, "{$branch->name} can't be deleted because staff accounts are assigned to it. Deactivate it instead.");
         }
 
-        $branch->delete();
+        $this->branches->delete($branch);
 
         return response()->json(['message' => "{$branch->name} was deleted."]);
     }

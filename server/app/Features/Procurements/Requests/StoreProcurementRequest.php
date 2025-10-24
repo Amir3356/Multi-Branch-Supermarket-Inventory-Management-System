@@ -2,6 +2,7 @@
 
 namespace App\Features\Procurements\Requests;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,7 +22,7 @@ class StoreProcurementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'branchId' => ['required', 'string', Rule::exists('branches', 'id')->where('status', 'active')],
+            'branchId' => ['required', 'string', Rule::exists('branches', 'id')->where('status', 'active'), $this->assignedBranchOnly()],
             'supplier' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:120'],
             'product' => ['required', 'string', 'max:255'],
@@ -31,6 +32,19 @@ class StoreProcurementRequest extends FormRequest
             // The currencies Chapa accepts
             'currency' => ['required', Rule::in(['ETB', 'USD'])],
         ];
+    }
+
+    // A Procurement Officer receives stock only into the branch the Owner assigned them in Account Provision
+    private function assignedBranchOnly(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) {
+            $user = $this->user();
+            if (! $user->isOwner() && $user->branch_id !== $value) {
+                $fail($user->branch_id
+                    ? 'You can only receive stock into your assigned branch.'
+                    : 'You have no assigned branch yet. Ask the Owner to assign one in Account Provision.');
+            }
+        };
     }
 
     public function messages(): array

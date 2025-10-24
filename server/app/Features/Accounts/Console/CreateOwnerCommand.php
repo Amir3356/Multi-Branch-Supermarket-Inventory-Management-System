@@ -2,7 +2,7 @@
 
 namespace App\Features\Accounts\Console;
 
-use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Shared\Enums\AccountStatus;
 use App\Shared\Enums\Role;
 use Illuminate\Console\Command;
@@ -17,9 +17,9 @@ class CreateOwnerCommand extends Command
 
     protected $description = 'Create the Owner account that provisions all staff accounts';
 
-    public function handle(): int
+    public function handle(UserRepository $users): int
     {
-        if (User::where('role', Role::Owner)->exists()) {
+        if ($users->ownerExists()) {
             $this->error('An Owner account already exists.');
 
             return self::FAILURE;
@@ -29,7 +29,7 @@ class CreateOwnerCommand extends Command
         $email = strtolower(text('Email', required: true, validate: ['email' => 'email:rfc|unique:users,email']));
         $password = password('Password', required: true);
 
-        User::create([
+        $users->create([
             'full_name' => $name,
             'email' => $email,
             'password' => $password,

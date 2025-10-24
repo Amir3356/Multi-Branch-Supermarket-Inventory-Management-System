@@ -5,15 +5,16 @@ import { LogOut, Pill, User } from 'lucide-react'
 import { useBranchScope } from '../hooks'
 import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
-import { selectAuth, selectCurrentUser, sessionEnded } from '../features/auth/authSlice'
+import { selectAuth, selectCurrentUser, sessionEnded } from '../features/auth/store/authSlice'
 import { realtime } from '../api/realtime'
-import { api } from '../api/http'
+import { reportDeviceLocation } from '../features/accounts/api/sessionsApi'
 import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
-import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/authThunks'
-import { loadBranches } from '../features/branches/branchesThunks'
-import { loadProcurements } from '../features/purchases/purchasesThunks'
-import { selectSettings } from '../features/policy/settingsSlice'
-import { selectInventory } from '../features/inventory/selectors'
+import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/store/authThunks'
+import { loadBranches } from '../features/branches/store/branchesThunks'
+import { loadProcurements } from '../features/purchases/store/purchasesThunks'
+import { loadReturnRequests } from '../features/supplierReturns/store/returnRequestsThunks'
+import { selectSettings } from '../features/policy/store/settingsSlice'
+import { selectInventory } from '../features/inventory/store/selectors'
 
 // Sidebar around every dashboard page
 export default function DashboardLayout() {
@@ -30,12 +31,19 @@ export default function DashboardLayout() {
     [user]
   )
 
-  // Pick up role or branch changes the Owner made since this user signed in, the branch list every page labels with,
-  // and paid procurements, whose stock every branch's inventory includes
+  // Pick up role or branch changes the Owner made since this user signed in, and the branch list every page labels with
   useEffect(() => {
     dispatch(refreshCurrentUser()).catch(() => {})
     dispatch(loadBranches()).catch(() => {})
-    dispatch(loadProcurements()).catch(() => {})
+  }, [dispatch])
+
+  // Paid procurements, whose stock every branch's inventory includes. Return requests hold units out of that stock,
+  // so they load after procurements and refresh every minute: an approval or rejection shows up without a reload
+  useEffect(() => {
+    const loadRequests = () => dispatch(loadReturnRequests()).catch(() => {})
+    dispatch(loadProcurements()).catch(() => {}).finally(loadRequests)
+    const timer = setInterval(loadRequests, 60000)
+    return () => clearInterval(timer)
   }, [dispatch])
 
   // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),
@@ -58,7 +66,7 @@ export default function DashboardLayout() {
     if (readText(STORAGE_KEYS.locationAsked) === sessionId) return
     writeText(STORAGE_KEYS.locationAsked, sessionId)
     getPosition()
-      .then((position) => api('/sessions/current/location', { method: 'POST', body: position }))
+      .then(reportDeviceLocation)
       .catch(() => {}) // blocked or unavailable: keep the IP-based city
   }, [askDeviceLocation, sessionId])
 

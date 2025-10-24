@@ -4,7 +4,7 @@
     "branchId": "BR-01",
     "category": "Rent",
     "description": "October rent",
-    "amount": 3000,
+    "amount": 483000,
     "date": "2026-10-01"
   },
   {
@@ -12,7 +12,7 @@
     "branchId": "BR-02",
     "category": "Rent",
     "description": "October rent",
-    "amount": 2200,
+    "amount": 354200,
     "date": "2026-10-01"
   },
   {
@@ -20,7 +20,7 @@
     "branchId": "BR-01",
     "category": "Utilities",
     "description": "Electricity top-up",
-    "amount": 35,
+    "amount": 5635,
     "date": "2026-10-05"
   },
   {
@@ -28,7 +28,7 @@
     "branchId": "BR-02",
     "category": "Transportation",
     "description": "Delivery to Westside Branch",
-    "amount": 15,
+    "amount": 2415,
     "date": "2026-10-05"
   },
   {
@@ -36,7 +36,7 @@
     "branchId": "BR-03",
     "category": "Maintenance",
     "description": "Refrigerator servicing",
-    "amount": 20,
+    "amount": 3220,
     "date": "2026-10-05"
   },
   {
@@ -44,7 +44,7 @@
     "branchId": "BR-04",
     "category": "Transportation",
     "description": "Courier pickup",
-    "amount": 10,
+    "amount": 1610,
     "date": "2026-10-05"
   }
 ]

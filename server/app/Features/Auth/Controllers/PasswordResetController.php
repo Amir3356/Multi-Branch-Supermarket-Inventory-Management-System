@@ -3,6 +3,7 @@
 namespace App\Features\Auth\Controllers;
 
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Features\Auth\Requests\ForgotPasswordRequest;
 use App\Features\Auth\Requests\ResetPasswordRequest;
 use App\Features\Auth\Services\TokenIssuer;
@@ -16,13 +17,13 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class PasswordResetController
 {
-    public function __construct(private TokenIssuer $tokens) {}
+    public function __construct(private TokenIssuer $tokens, private UserRepository $users) {}
 
     /** Tells the person exactly what happened, so they know whether to check their inbox. */
     public function forgot(ForgotPasswordRequest $request): JsonResponse
     {
         $email = $request->validated('email');
-        $user = User::where('email', $email)->first();
+        $user = $this->users->findByEmail($email);
 
         $problem = match ($user?->status) {
             null => "We couldn't find an account with that email address. Check the spelling, or ask the Owner which email your account uses.",
@@ -60,7 +61,7 @@ class PasswordResetController
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) use (&$resetUser) {
-                $user->forceFill(['password' => $password, 'last_login_at' => now()])->save();
+                $this->users->forceUpdate($user, ['password' => $password, 'last_login_at' => now()]);
                 // Sign out every device that used the old password
                 app(SessionService::class)->endAllFor($user, 'Password reset');
                 $resetUser = $user;

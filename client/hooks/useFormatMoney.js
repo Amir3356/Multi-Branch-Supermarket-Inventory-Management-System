@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { formatMoneyIn } from '../utils'
-import { selectSettings } from '../features/policy/settingsSlice'
+import { selectSettings } from '../features/policy/store/settingsSlice'
 
 // formatMoney(value) in the pharmacy's configured currency
 export function useFormatMoney() {

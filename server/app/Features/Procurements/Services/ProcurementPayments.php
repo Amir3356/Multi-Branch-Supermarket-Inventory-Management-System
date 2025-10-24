@@ -4,12 +4,13 @@ namespace App\Features\Procurements\Services;
 
 use App\Features\Accounts\Models\User;
 use App\Features\Procurements\Models\Procurement;
+use App\Features\Procurements\Repositories\ProcurementRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProcurementPayments
 {
-    public function __construct(private ChapaClient $chapa) {}
+    public function __construct(private ChapaClient $chapa, private ProcurementRepository $procurements) {}
 
     /** Asks Chapa for a checkout page for this procurement and keeps its URL so the payment can be resumed. */
     public function startCheckout(Procurement $procurement, User $payer): string
@@ -25,8 +26,8 @@ class ProcurementPayments
             'tx_ref' => $procurement->tx_ref,
             // Chapa calls this server-to-server; it must be publicly reachable (it won't be on localhost)
             'callback_url' => url('/api/procurements/chapa/callback'),
-            // Where the person lands after paying; the Procurement page verifies from there
-            'return_url' => rtrim(config('pharmacy.frontend_url'), '/').'/purchases?procurement='.$procurement->id,
+            // Where the person lands after paying: a page that closes the checkout popup (or, without one, opens the app)
+            'return_url' => url('/api/procurements/'.rawurlencode($procurement->id).'/payment-return'),
             'customization' => [
                 'title' => 'Procurement', // Chapa allows at most 16 characters
                 // Only letters, numbers, spaces, dots, hyphens and underscores are accepted
@@ -34,7 +35,7 @@ class ProcurementPayments
             ],
         ]);
 
-        $procurement->update(['checkout_url' => $checkoutUrl]);
+        $this->procurements->update($procurement, ['checkout_url' => $checkoutUrl]);
 
         return $checkoutUrl;
     }
@@ -55,7 +56,7 @@ class ProcurementPayments
         }
 
         return DB::transaction(function () use ($procurement, $transaction) {
-            $procurement = Procurement::whereKey($procurement->getKey())->lockForUpdate()->first();
+            $procurement = $this->procurements->lockForUpdate($procurement);
             if (! $procurement->isPending()) {
                 return $procurement;
             }
@@ -65,14 +66,14 @@ class ProcurementPayments
                 && strtoupper($transaction['currency'] ?? '') === $procurement->currency;
 
             if ($status === 'success' && $amountMatches) {
-                $procurement->update([
+                $this->procurements->update($procurement, [
                     'status' => 'paid',
                     'paid_at' => now(),
                     'chapa_reference' => $transaction['reference'] ?? null,
                     'payment_method' => $transaction['method'] ?? $transaction['payment_method'] ?? null,
                 ]);
             } elseif ($status === 'failed' || ($status === 'success' && ! $amountMatches)) {
-                $procurement->update(['status' => 'failed']);
+                $this->procurements->update($procurement, ['status' => 'failed']);
             }
 
             return $procurement;

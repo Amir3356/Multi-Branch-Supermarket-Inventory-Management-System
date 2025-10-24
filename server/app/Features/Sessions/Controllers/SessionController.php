@@ -2,6 +2,8 @@
 
 namespace App\Features\Sessions\Controllers;
 
+use App\Features\Sessions\Jobs\PruneOldSessions;
+use App\Features\Sessions\Repositories\SessionRepository;
 use App\Features\Sessions\Resources\SessionResource;
 use App\Features\Sessions\Services\SessionService;
 use Illuminate\Http\JsonResponse;
@@ -12,24 +14,17 @@ use App\Features\Sessions\Models\SessionToken;
 // Owner only: Session Monitoring & Management on the Account Provision page
 class SessionController
 {
-    public function __construct(private SessionService $sessions) {}
+    public function __construct(private SessionService $sessions, private SessionRepository $repository) {}
 
     /** Every sign-in from the last 7 days (tokens can't live longer): open sessions first, then by latest activity. */
     public function index(): AnonymousResourceCollection
     {
-        // Housekeeping: rows older than 30 days can't sign in (tokens expire after 7) and are never shown
-        SessionToken::where('created_at', '<', now()->subDays(30))->delete();
+        // Housekeeping (also scheduled): rows older than 30 days can't sign in and are never shown
+        $this->repository->pruneOlderThan(PruneOldSessions::KEEP_DAYS);
         // Sessions abandoned without signing out (browser closed) end once they pass the timeout
         $this->sessions->expireInactiveSessions();
 
-        $tokens = SessionToken::with('tokenable.branch')
-            ->where('created_at', '>=', now()->subDays(7))
-            ->orderByRaw('ended_at is not null')
-            ->orderByRaw('coalesce(last_used_at, created_at) desc')
-            ->get()
-            ->filter(fn (SessionToken $token) => $token->tokenable !== null);
-
-        return SessionResource::collection($tokens->values())
+        return SessionResource::collection($this->repository->recent(7))
             ->additional(['meta' => [
                 'idleAfterMinutes' => config('pharmacy.session_idle_minutes'),
                 'signOutAfterMinutes' => config('pharmacy.session_timeout_minutes'),
@@ -43,7 +38,7 @@ class SessionController
 
         return response()->json([
             'message' => "{$session->tokenable->email} was signed out on ".SessionService::describeDevice($session->name).'.',
-            'session' => new SessionResource($session->load('tokenable.branch')),
+            'session' => new SessionResource($this->repository->withUser($session)),
         ]);
     }
 
@@ -53,7 +48,7 @@ class SessionController
         $this->ensureNotCurrent($request, $session);
         $email = $session->tokenable?->email;
         $wasOpen = $session->ended_at === null;
-        $session->delete();
+        $this->repository->delete($session);
         if ($wasOpen) {
             $this->sessions->notifyEnded([$session->id], 'Ended by the Owner');
         }

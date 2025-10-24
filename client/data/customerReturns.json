@@ -11,7 +11,7 @@
     "qty": 1,
     "reason": "Wrong item",
     "condition": "Resellable",
-    "refund": 21,
+    "refund": 3381,
     "date": "2026-10-03"
   },
   {
@@ -26,7 +26,7 @@
     "qty": 2,
     "reason": "Expired or defective",
     "condition": "Damaged",
-    "refund": 19,
+    "refund": 3059,
     "date": "2026-10-02"
   }
 ]

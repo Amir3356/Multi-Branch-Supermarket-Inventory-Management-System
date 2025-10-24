@@ -1,0 +1,27 @@
+import { createSlice } from '@reduxjs/toolkit'
+import AUDIT_LOGS from '../../../data/auditLogs.json'
+import { nextId, timeKey, toDateKey } from '../../../utils'
+
+export const AUDIT_MODULES = ['Accounts', 'Sales', 'Customer Returns', 'Purchase', 'Supplier Returns', 'Stock Transfers', 'Damaged', 'Inventory', 'Branches', 'Policy']
+
+// Read-only history of important actions
+const auditLogsSlice = createSlice({
+  name: 'auditLogs',
+  initialState: AUDIT_LOGS,
+  reducers: {
+    logAdded: {
+      reducer(state, action) {
+        state.unshift({ id: nextId(state, 'LOG', 4), ...action.payload })
+      },
+      // The date and time are stamped when the action happens
+      prepare(action, module, record, description) {
+        const now = new Date()
+        return { payload: { date: toDateKey(now), time: timeKey(now), action, module, record, description } }
+      }
+    }
+  }
+})
+
+export const { logAdded } = auditLogsSlice.actions
+export const selectAuditLogs = (state) => state.auditLogs
+export default auditLogsSlice.reducer

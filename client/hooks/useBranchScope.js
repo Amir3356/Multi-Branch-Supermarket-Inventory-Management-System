@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { selectBranches } from '../features/branches/branchesSlice'
-import { selectSelectedBranch } from '../features/ui/uiSlice'
+import { selectBranches } from '../features/branches/store/branchesSlice'
+import { selectSelectedBranch } from '../features/ui/store/uiSlice'
 
 // Which branch the list pages show ("all" or one branch), with helpers for filtering and labels
 export function useBranchScope() {

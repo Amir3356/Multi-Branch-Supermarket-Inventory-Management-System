@@ -3,8 +3,11 @@
 namespace App\Features\AccessReviews\Services;
 
 use App\Features\AccessReviews\Models\AccessReview;
+use App\Features\AccessReviews\Repositories\AccessReviewRepository;
 use App\Features\Accounts\Models\RoleChange;
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\RoleChangeRepository;
+use App\Features\Accounts\Repositories\UserRepository;
 use App\Shared\Enums\AccountStatus;
 use App\Shared\Enums\Role;
 use Carbon\CarbonImmutable;
@@ -20,6 +23,12 @@ use Carbon\CarbonImmutable;
 class AccessReviewGenerator
 {
     public const PERIODS = ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'];
+
+    public function __construct(
+        private AccessReviewRepository $reviews,
+        private UserRepository $users,
+        private RoleChangeRepository $roleChanges,
+    ) {}
 
     /** Now in the pharmacy's local time (PHARMACY_TIMEZONE), so "today" matches the clock on the wall. */
     public static function localNow(): CarbonImmutable
@@ -74,12 +83,9 @@ class AccessReviewGenerator
         $dormantDays = (int) config('pharmacy.access_review_dormant_days');
         $staleDays = (int) config('pharmacy.access_review_stale_invitation_days');
 
-        $changes = RoleChange::whereBetween('changed_at', [$fromDb, $asOfDb])->orderBy('changed_at')->get()->groupBy('user_id');
+        $changes = $this->roleChanges->betweenByUser($fromDb, $asOfDb);
 
-        $rows = User::with('branch')
-            ->where('created_at', '<=', $asOfDb)
-            ->orderBy('id')
-            ->get()
+        $rows = $this->users->createdBy($asOfDb)
             ->map(function (User $user) use ($asOf, $dormantDays, $staleDays, $changes) {
                 $lastLogin = $user->last_login_at ? CarbonImmutable::parse($user->last_login_at) : null;
                 $daysSinceLogin = $lastLogin ? (int) $lastLogin->diffInDays($asOf) : null;
@@ -132,7 +138,7 @@ class AccessReviewGenerator
             'asOf' => $asOf->toIso8601String(),
         ];
 
-        return AccessReview::create([
+        return $this->reviews->create([
             'period_start' => $start->toDateString(),
             'period_end' => $end->toDateString(),
             'period_type' => $type,
