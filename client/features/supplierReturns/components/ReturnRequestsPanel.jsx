@@ -1,5 +1,6 @@
 import { Check, PackageCheck, X } from 'lucide-react'
 import { BranchTag, EmptyRow, StatusTag } from '../../../components'
+import { isExtraQuantity } from '../model/returnRequest'
 
 const requestedDate = (iso) => new Date(iso).toLocaleDateString('en-CA')
 
@@ -75,7 +76,7 @@ export default function ReturnRequestsPanel({ requests, isAllBranches, branchByI
                         </button>
                       </div>
                     )}
-                    {r.status === 'Approved' && (
+                    {r.status === 'Approved' && !isExtraQuantity(r) && (
                       <div className="row-actions" style={{ justifyContent: 'flex-start' }}>
                         <button type="button" className="icon-btn" onClick={() => onReplace(r)} aria-label={`Receive the supplier's replacement for ${r.product}`} title="Receive replacement">
                           <PackageCheck size={15} />

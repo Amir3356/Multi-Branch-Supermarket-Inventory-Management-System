@@ -3,6 +3,7 @@
 namespace App\Features\ReturnRequests\Requests;
 
 use App\Features\Procurements\Models\Procurement;
+use App\Features\ReturnRequests\Models\ReturnRequest;
 use App\Features\ReturnRequests\Repositories\ReturnRequestRepository;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
@@ -46,7 +47,8 @@ class StoreReturnRequestRequest extends FormRequest
     {
         return function (string $attribute, mixed $value, Closure $fail) {
             $procurement = $this->procurement();
-            if (! $procurement) {
+            // Extra units were never part of the batch, so the batch's quantity doesn't limit them
+            if (! $procurement || $this->input('reason') === ReturnRequest::EXTRA_QUANTITY) {
                 return;
             }
             $left = $procurement->qty - app(ReturnRequestRepository::class)->claimedQty($procurement->id);

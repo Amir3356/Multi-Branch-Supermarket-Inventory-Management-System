@@ -6,12 +6,12 @@ import {
   X
 } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
-import { EMPTY_PURCHASE_FORM, toProcurementPayload } from '../model/procurement'
+import { EMPTY_PURCHASE_FORM, toProcurementPayload, unitPriceFrom } from '../model/procurement'
 import { validatePurchase } from '../services/purchaseRules'
 
 // Category and Product Name are picked from the product catalog. An officer's Receiving Branch is the branch the Owner
 // assigned them in Account Provision, and can't be changed here.
-export default function NewPurchaseModal({ branches, assignedBranchId, inventory, products, categories, suppliers, formatMoney, onClose, onSave }) {
+export default function NewPurchaseModal({ branches, assignedBranchId, products, categories, suppliers, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_PURCHASE_FORM, branchId: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -23,38 +23,35 @@ export default function NewPurchaseModal({ branches, assignedBranchId, inventory
 
   const categoryProducts = products.filter((p) => p.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
   const product = products.find((p) => p.id === form.medId)
-  const currentStock = product ? inventory.find((i) => i.branchId === form.branchId && i.medId === product.id)?.stock ?? 0 : 0
   const qty = Number(form.qty)
-  const purchasePrice = Number(form.purchasePrice)
-  const validQty = Number.isInteger(qty) && qty > 0 ? qty : 0
-  const total = validQty && purchasePrice > 0 ? validQty * purchasePrice : 0
+  const totalCost = Number(form.totalCost)
+  // The officer enters what the whole order costs; the unit price follows from it
+  const unitPrice = unitPriceFrom(totalCost, qty)
 
   const update = (field, value) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value }
-      if (field === 'category') Object.assign(next, { medId: '', purchasePrice: '' })
-      if (field === 'medId') next.purchasePrice = String(products.find((p) => p.id === value)?.purchasePrice ?? '')
+      if (field === 'category') next.medId = ''
       return next
     })
     setErrors((prev) => ({
       ...prev,
       [field]: undefined,
-      ...(field === 'category' ? { medId: undefined } : {}),
-      ...(field === 'medId' ? { purchasePrice: undefined } : {})
+      ...(field === 'category' ? { medId: undefined } : {})
     }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (submitting) return
-    const newErrors = validatePurchase(form, { product, qty, purchasePrice, assignedBranchId, assignedBranch })
+    const newErrors = validatePurchase(form, { product, qty, totalCost, assignedBranchId, assignedBranch })
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
     setSubmitting(true)
     setSubmitError('')
     try {
       // On success the page closes this modal and opens Chapa's checkout, so it stays in its submitting state
-      await onSave(toProcurementPayload(form, product, qty, purchasePrice))
+      await onSave(toProcurementPayload(form, product, qty, totalCost))
     } catch (error) {
       setSubmitting(false)
       setSubmitError(error.message)
@@ -135,13 +132,13 @@ export default function NewPurchaseModal({ branches, assignedBranchId, inventory
 
           <div className="modal-grid">
             {field('qty', 'Quantity *', { type: 'number', min: '1', step: '1', placeholder: 'Units bought' })}
-            {field('purchasePrice', 'Purchase Price (per unit, ETB) *', { type: 'number', min: '0', step: '0.01', placeholder: '0.00' })}
+            {field('totalCost', 'Total Cost (ETB) *', { type: 'number', min: '0', step: '0.01', placeholder: 'What the whole order costs' })}
           </div>
 
-          <div className="sale-summary">
-            <div><small>Current Stock</small><strong>{form.branchId && product ? `${currentStock} units` : '—'}</strong></div>
-            <div><small>Stock After</small><strong>{form.branchId && product ? `${currentStock + validQty} units` : '—'}</strong></div>
-            <div><small>Total Cost</small><strong className="sale-total">{formatMoney(total)}</strong></div>
+          <div className="form-group">
+            <label htmlFor="purchase-unit-price">Unit Purchase Price</label>
+            <input id="purchase-unit-price" className="input-field" value={unitPrice == null ? '—' : formatMoney(unitPrice)} readOnly disabled />
+            <span className="field-hint">Calculated: Total Cost ÷ Quantity</span>
           </div>
 
           {submitError && <span className="error-msg" role="alert">{submitError}</span>}

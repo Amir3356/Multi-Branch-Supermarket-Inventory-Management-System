@@ -32,6 +32,11 @@
  * @typedef {{ qty: number, note?: string }} ReplacementPayload
  */
 
+// More units arrived than were ordered and paid for. They were never counted into stock, so a request for them
+// moves no stock, isn't limited by the batch or stock, owes no credit and can't be replaced (the server agrees).
+export const EXTRA_QUANTITY = 'Extra quantity'
+export const isExtraQuantity = (request) => request?.reason === EXTRA_QUANTITY
+
 export const EMPTY_RETURN_REQUEST_FORM = { procurementId: '', qty: '', reason: '', note: '' }
 
 /** @returns {ReturnRequestPayload} */
@@ -42,6 +47,7 @@ export const toReturnRequestPayload = (form) => ({
   note: form.note.trim() || undefined
 })
 
-/** Units of a procurement asked for or sent back (every request but rejected ones), less what the supplier replaced */
+/** Units of a procurement asked for or sent back (every request but rejected ones), less what the supplier replaced.
+ * Extra units aren't part of the batch, so they don't count. */
 export const claimedQty = (requests, procurementId) =>
-  requests.filter((r) => r.procurementId === procurementId && r.status !== 'Rejected').reduce((sum, r) => sum + r.qty - (r.replacedQty || 0), 0)
+  requests.filter((r) => r.procurementId === procurementId && r.status !== 'Rejected' && !isExtraQuantity(r)).reduce((sum, r) => sum + r.qty - (r.replacedQty || 0), 0)

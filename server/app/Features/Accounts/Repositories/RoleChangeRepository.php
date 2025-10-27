@@ -22,6 +22,17 @@ class RoleChangeRepository
         ]);
     }
 
+    /** The role (Role) each account had at $asOf, for accounts whose role changed after it (the "from" of the first such change). */
+    public function rolesAt(CarbonInterface $asOf): Collection
+    {
+        return RoleChange::where('changed_at', '>', $asOf)
+            ->orderBy('changed_at')
+            ->orderBy('id')
+            ->get()
+            ->unique('user_id')
+            ->pluck('from_role', 'user_id');
+    }
+
     /** Changes made between $from and $to, oldest first, grouped by user id. */
     public function betweenByUser(CarbonInterface $from, CarbonInterface $to): Collection
     {

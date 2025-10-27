@@ -3,7 +3,8 @@ import { procurementBatch } from '../../purchases/model/procurement'
 
 // Why stock goes back to a supplier; used by the Inventory Officer's request and the supplier return
 export const SUPPLIER_RETURN_REASONS = [
-  'Short delivery (missing quantity)',
+  'Missing quantity',
+  'Extra quantity',
   'Expired',
   'Near expiry (short shelf life)',
   'Damaged on arrival',
@@ -20,7 +21,6 @@ export const SUPPLIER_RETURN_REASONS = [
   'Regulatory withdrawal (EFDA)',
   'Unregistered or suspected counterfeit',
   'Quality complaint',
-  'Overstock',
   'Slow-moving stock',
   'Not ordered',
   'Other'
@@ -48,6 +48,6 @@ export const createSupplierReturn = (existingReturns, { requestId, purchase, med
 /** What the supplier still owes: replaced units settle their share of the credit */
 export const creditOwed = (record) => (record.qty ? record.credit * (record.qty - (record.replacedQty || 0)) / record.qty : 0)
 
-/** Credit owed · Partially Replaced · Replaced */
+/** No Credit (extra units, never paid for) · Credit Owed · Partially Replaced · Replaced */
 export const supplierReturnStatus = (record) =>
-  !record.replacedQty ? 'Credit Owed' : record.replacedQty >= record.qty ? 'Replaced' : 'Partially Replaced'
+  !record.credit ? 'No Credit' : !record.replacedQty ? 'Credit Owed' : record.replacedQty >= record.qty ? 'Replaced' : 'Partially Replaced'

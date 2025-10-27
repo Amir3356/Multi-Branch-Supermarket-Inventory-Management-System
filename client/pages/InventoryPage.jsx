@@ -10,6 +10,7 @@ import { selectPurchases } from '../features/purchases/store/purchasesSlice'
 import { selectReturnRequests } from '../features/supplierReturns/store/returnRequestsSlice'
 import { sendReturnRequest } from '../features/supplierReturns/store/returnRequestsThunks'
 import ReturnRequestModal from '../features/supplierReturns/components/ReturnRequestModal'
+import { isExtraQuantity } from '../features/supplierReturns/model/returnRequest'
 import { sameText } from '../utils'
 import { deleteInventoryItem, editInventoryItem, saveMedicinePrices } from '../features/inventory/store/inventoryThunks'
 import InventoryTable from '../features/inventory/components/InventoryTable'
@@ -50,7 +51,8 @@ export default function InventoryPage() {
   // Units each row has on hold for pending supplier return requests (already out of Current Stock)
   const heldByRow = useMemo(() => {
     const held = {}
-    for (const r of returnRequests.filter((request) => request.status === 'Pending')) {
+    // Extra units were never in stock, so they hold nothing
+    for (const r of returnRequests.filter((request) => request.status === 'Pending' && !isExtraQuantity(request))) {
       const medId = products.find((p) => p.id === r.medId || sameText(p.name, r.product))?.id
       const key = `${medId}-${r.branchId}`
       held[key] = (held[key] || 0) + r.qty
@@ -101,7 +103,6 @@ export default function InventoryPage() {
         branches={branches}
         categories={categories}
         showBranch={isAllBranches}
-        formatMoney={formatMoney}
         heldQty={heldQty}
         onEdit={setEditingItem}
         onDelete={handleDelete}
@@ -110,7 +111,7 @@ export default function InventoryPage() {
       />
 
       {editingItem && (
-        <EditInventoryModal item={editingItem} branchName={branchById(editingItem.branchId)?.name} onClose={() => setEditingItem(null)} onSave={handleEdit} />
+        <EditInventoryModal item={editingItem} branchName={branchById(editingItem.branchId)?.name} formatMoney={formatMoney} onClose={() => setEditingItem(null)} onSave={handleEdit} />
       )}
       {returningItem && (
         <ReturnRequestModal

@@ -49,6 +49,12 @@ class BranchRepository
             ->exists();
     }
 
+    /** Branch id => name, for labelling */
+    public function namesById(): Collection
+    {
+        return Branch::pluck('name', 'id');
+    }
+
     public function withStaffCount(Branch $branch): Branch
     {
         return $branch->loadCount('staff');

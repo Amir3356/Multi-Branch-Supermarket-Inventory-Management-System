@@ -8,15 +8,19 @@ import {
 import { useEscapeKey } from '../../../hooks'
 import { validateInventoryItem } from '../services/inventoryRules'
 
-// Edit one Inventory row: stock, batch and expiry belong to this branch; prices belong to the product at every branch
-export default function EditInventoryModal({ item, branchName, onClose, onSave }) {
+// Edit one Inventory row: stock and expiry belong to this branch; the selling price belongs to the product at every
+// branch. The batch number (set when the procurement's stock arrived) and the purchase price are shown read-only.
+export default function EditInventoryModal({ item, branchName, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState({
     stock: String(item.stock),
-    batch: item.batch,
     expiry: item.expiry,
-    purchasePrice: String(item.purchasePrice ?? ''),
     sellingPrice: item.sellingPrice == null ? '' : String(item.sellingPrice)
   })
+  const purchasePrice = item.purchasePrice || 0
+  // Current Stock × Unit Selling Price, following what is typed above
+  const stock = Number(form.stock)
+  const sellingPrice = Number(form.sellingPrice)
+  const totalSellingPrice = Number.isInteger(stock) && stock >= 0 && form.sellingPrice !== '' && sellingPrice > 0 ? stock * sellingPrice : null
   const [errors, setErrors] = useState({})
 
   useEscapeKey(onClose)
@@ -28,16 +32,15 @@ export default function EditInventoryModal({ item, branchName, onClose, onSave }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const purchasePrice = Number(form.purchasePrice)
     const sellingPrice = Number(form.sellingPrice)
-    const newErrors = validateInventoryItem(form, purchasePrice, sellingPrice)
+    const newErrors = validateInventoryItem(form, sellingPrice)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
     onSave({
       stock: Number(form.stock),
-      batch: form.batch.trim().toUpperCase(),
+      batch: item.batch,
       expiry: form.expiry,
-      purchasePrice: Math.round(purchasePrice * 100) / 100,
+      purchasePrice,
       sellingPrice: Math.round(sellingPrice * 100) / 100
     })
   }
@@ -83,16 +86,29 @@ export default function EditInventoryModal({ item, branchName, onClose, onSave }
           <div className="modal-section-title">This branch</div>
           {field('stock', 'Current Stock (units) *', { type: 'number', min: '0', step: '1', autoFocus: true })}
           <div className="modal-grid">
-            {field('batch', 'Batch Number *', { placeholder: 'e.g. BT-9120' })}
+            <div className="form-group">
+              <label htmlFor="edit-inv-batch">Batch Number</label>
+              <input id="edit-inv-batch" className="input-field" value={item.batch} readOnly disabled />
+            </div>
             {field('expiry', 'Expiration Date *', { type: 'date' })}
           </div>
 
-          <div className="modal-section-title">Prices · all branches</div>
+          <div className="modal-section-title">Prices</div>
           <div className="modal-grid">
-            {field('purchasePrice', 'Purchase Price (per unit) *', { type: 'number', min: '0', step: '0.01' })}
-            {field('sellingPrice', 'Selling Price (per unit) *', { type: 'number', min: '0', step: '0.01', placeholder: '0.00' })}
+            <div className="form-group">
+              <label htmlFor="edit-inv-purchase-price">Unit Purchase Price</label>
+              <input id="edit-inv-purchase-price" className="input-field" value={formatMoney(purchasePrice)} readOnly disabled />
+            </div>
+            {field('sellingPrice', 'Unit Selling Price *', { type: 'number', min: '0', step: '0.01', placeholder: '0.00' })}
           </div>
-          <span className="field-hint">Changing a price updates {item.name} at every branch.</span>
+          <div className="form-group">
+            <label htmlFor="edit-inv-total-selling">Total Selling Price</label>
+            <input id="edit-inv-total-selling" className="input-field" value={totalSellingPrice == null ? '—' : formatMoney(totalSellingPrice)} readOnly disabled />
+            <span className="field-hint">
+              {totalSellingPrice == null ? 'Current Stock × Unit Selling Price' : `${stock} units × ${formatMoney(sellingPrice)}`}
+            </span>
+          </div>
+          <span className="field-hint">Changing the selling price updates {item.name} at every branch.</span>
 
           <div className="modal-actions">
             <button type="button" className="secondary-action-btn" onClick={onClose}>

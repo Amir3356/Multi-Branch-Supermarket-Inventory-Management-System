@@ -19,7 +19,7 @@ import {
   Wallet
 } from 'lucide-react'
 import { StatCard, StatusTag } from '../components'
-import { useFormatMoney, useTheme } from '../hooks'
+import { useFormatMoney, useTheme, useMoneyColumns } from '../hooks'
 import { DATE_PRESETS, currencySymbol, formatRangeLabel, getPresetRange, todayKey } from '../utils'
 import { PATHS } from '../routes/paths'
 import { selectBranches } from '../features/branches/store/branchesSlice'
@@ -32,6 +32,7 @@ import './DashboardPage.css'
 
 export default function DashboardPage() {
   const formatMoney = useFormatMoney()
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const { theme } = useTheme()
   const branches = useSelector(selectBranches)
   const settings = useSelector(selectSettings)
@@ -227,9 +228,9 @@ export default function DashboardPage() {
               <thead>
                 <tr>
                   <th>Branch</th>
-                  <th>Revenue</th>
-                  <th>Expenses</th>
-                  <th>Total Profit</th>
+                  <th>{moneyHeader('Revenue')}</th>
+                  <th>{moneyHeader('Expenses')}</th>
+                  <th>{moneyHeader('Total Profit')}</th>
                   <th>Units in Stock</th>
                   <th>Stock Alerts</th>
                   <th></th>
@@ -242,9 +243,9 @@ export default function DashboardPage() {
                   return (
                     <tr key={b.id}>
                       <td className="fw-600">{b.name}</td>
-                      <td>{formatMoney(period.revenue)}</td>
-                      <td>{formatMoney(period.expenses)}</td>
-                      <td className="fw-600" style={{ color: period.profit < 0 ? '#fb7185' : '#34d399' }}>{formatMoney(period.profit)}</td>
+                      <td>{formatAmount(period.revenue)}</td>
+                      <td>{formatAmount(period.expenses)}</td>
+                      <td className="fw-600" style={{ color: period.profit < 0 ? '#fb7185' : '#34d399' }}>{formatAmount(period.profit)}</td>
                       <td>{summary.units.toLocaleString()} units</td>
                       <td>
                         <StatusTag status={summary.alerts ? 'Low Stock' : 'In Stock'} />

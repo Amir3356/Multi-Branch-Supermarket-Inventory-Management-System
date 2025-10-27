@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
 import { procurementBatch } from '../../purchases/model/procurement'
-import { EMPTY_RETURN_REQUEST_FORM, claimedQty, toReturnRequestPayload } from '../model/returnRequest'
+import { EMPTY_RETURN_REQUEST_FORM, EXTRA_QUANTITY, claimedQty, toReturnRequestPayload } from '../model/returnRequest'
 import { SUPPLIER_RETURN_REASONS } from '../model/supplierReturn'
 import { validateReturnRequest } from '../services/returnRequestRules'
 
@@ -26,8 +26,10 @@ export default function ReturnRequestModal({ item, branchName, batches, requests
 
   const batch = batches.find((p) => p.id === form.procurementId)
   const unrequested = batch ? batch.qty - claimedQty(requests, batch.id) : 0
-  // Can't ask for more than is left on the batch, nor more than the branch holds
-  const maxQty = Math.max(0, Math.min(unrequested, item.stock))
+  // Can't ask for more than is left on the batch, nor more than the branch holds. Extra units were never counted in
+  // either, so only the officer's count limits them.
+  const isExtra = form.reason === EXTRA_QUANTITY
+  const maxQty = isExtra ? Infinity : Math.max(0, Math.min(unrequested, item.stock))
   const qty = Number(form.qty)
 
   const update = (field, value) => {
@@ -92,7 +94,7 @@ export default function ReturnRequestModal({ item, branchName, batches, requests
               ))}
             </select>
             {errors.procurementId && <span className="error-msg">{errors.procurementId}</span>}
-            {batch && <span className="field-hint">{item.stock} in stock at {branchName} · up to {maxQty} can be requested</span>}
+            {batch && !isExtra && <span className="field-hint">{item.stock} in stock at {branchName} · up to {maxQty} can be requested</span>}
           </div>
 
           <div className="modal-grid">
@@ -102,8 +104,8 @@ export default function ReturnRequestModal({ item, branchName, batches, requests
 
           <div className="modal-grid">
             <div className="form-group">
-              <label htmlFor="rr-qty">Quantity *</label>
-              <input id="rr-qty" type="number" min="1" max={maxQty || undefined} step="1" placeholder="Units to send back" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!batch} />
+              <label htmlFor="rr-qty">{isExtra ? 'Extra Units Counted *' : 'Quantity Returned *'}</label>
+              <input id="rr-qty" type="number" min="1" max={isExtra ? undefined : maxQty || undefined} step="1" placeholder={isExtra ? 'Units more than ordered' : 'Units to send back'} className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!batch} />
               {errors.qty && <span className="error-msg">{errors.qty}</span>}
             </div>
             <div className="form-group">
@@ -117,6 +119,13 @@ export default function ReturnRequestModal({ item, branchName, batches, requests
               {errors.reason && <span className="error-msg">{errors.reason}</span>}
             </div>
           </div>
+
+          {isExtra && (
+            <span className="field-hint">
+              Extra units were never counted into stock or paid for: stock stays as it is and the supplier owes no credit.
+              If the supplier lets you keep them, add them to stock with Edit after the request is rejected.
+            </span>
+          )}
 
           <div className="form-group">
             <label htmlFor="rr-note">Note {form.reason === 'Other' ? '*' : '(optional)'}</label>

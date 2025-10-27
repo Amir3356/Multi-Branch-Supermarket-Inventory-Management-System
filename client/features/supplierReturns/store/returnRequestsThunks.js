@@ -4,13 +4,15 @@ import { stockAdjusted } from '../../inventory/store/stockSlice'
 import { approveReturnRequestRequest, createReturnRequest, fetchReturnRequests, rejectReturnRequestRequest, replaceReturnRequestRequest } from '../api/returnRequestsApi'
 import { replacementStocked, returnRequestSaved, returnRequestsLoaded, returnStockHeld, returnStockReleased } from './returnRequestsSlice'
 import { supplierReturnReplaced } from './supplierReturnsSlice'
+import { isExtraQuantity } from '../model/returnRequest'
 import { recordSupplierReturn } from './supplierReturnsThunks'
 
 // Return request thunks call the API and return the confirmation message; failures throw ApiError
 
 // Stock follows each request once: Pending holds its units out of sellable stock, Approved keeps them out
 // (they went back to the supplier), Rejected puts them back. A supplier replacement puts the replaced units back into
-// the same batch, once. Unit prices don't change.
+// the same batch, once. Extra units (more than were ordered) were never in stock, so they move nothing.
+// Unit prices don't change.
 const syncReturnStock = () => (dispatch, getState) => {
   const { returnRequests, products, stock } = getState()
   for (const request of returnRequests.items) {
@@ -19,7 +21,7 @@ const syncReturnStock = () => (dispatch, getState) => {
     if (!stock.some((row) => row.medId === medId && row.branchId === request.branchId)) continue
 
     const held = returnRequests.heldIds.includes(request.id)
-    const shouldHold = request.status !== 'Rejected'
+    const shouldHold = request.status !== 'Rejected' && !isExtraQuantity(request)
     if (held !== shouldHold) {
       dispatch(stockAdjusted({ medId, branchId: request.branchId, delta: shouldHold ? -request.qty : request.qty }))
       dispatch(shouldHold ? returnStockHeld(request.id) : returnStockReleased(request.id))
@@ -31,6 +33,12 @@ const syncReturnStock = () => (dispatch, getState) => {
       dispatch(supplierReturnReplaced({ requestId: request.id, replacedQty: request.replacedQty }))
     }
   }
+}
+
+// A change pushed over the WebSocket (sent, approved, rejected or replaced on another screen): applied at once
+export const returnRequestPushed = (request) => (dispatch) => {
+  dispatch(returnRequestSaved(request))
+  dispatch(syncReturnStock())
 }
 
 export const loadReturnRequests = () => async (dispatch) => {

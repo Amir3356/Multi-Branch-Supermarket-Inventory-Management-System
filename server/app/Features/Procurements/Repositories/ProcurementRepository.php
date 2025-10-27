@@ -21,7 +21,8 @@ class ProcurementRepository
     {
         return DB::transaction(function () use ($data, $createdBy) {
             $id = Procurement::nextId();
-            $unitPrice = round($data['purchasePrice'], 2);
+            // The officer enters the order's Total Cost; Chapa charges exactly that, and the unit price is derived from it
+            $total = round($data['totalCost'], 2);
 
             return Procurement::create([
                 'id' => $id,
@@ -32,8 +33,8 @@ class ProcurementRepository
                 'product' => $data['product'],
                 'med_id' => $data['medId'] ?? null,
                 'qty' => $data['qty'],
-                'unit_price' => $unitPrice,
-                'total' => round($data['qty'] * $unitPrice, 2),
+                'unit_price' => round($total / $data['qty'], 2),
+                'total' => $total,
                 'currency' => $data['currency'],
                 'status' => 'pending',
                 'tx_ref' => $id.'-'.Str::lower(Str::random(12)),

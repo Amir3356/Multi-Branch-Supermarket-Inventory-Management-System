@@ -7,6 +7,7 @@ import {
 import { useEscapeKey } from '../../../hooks'
 import { procurementBatch } from '../../purchases/model/procurement'
 import { SUPPLIER_RETURN_REASONS } from '../model/supplierReturn'
+import { isExtraQuantity } from '../model/returnRequest'
 import { validateSupplierReturn } from '../services/supplierReturnRules'
 
 const EMPTY_SUPPLIER_RETURN_FORM = { category: '', product: '', purchaseId: '', qty: '', reason: '' }
@@ -30,7 +31,8 @@ export default function SupplierReturnModal({ request, heldQty = 0, purchases, r
   const returnCategories = [...new Set(returnable.map((p) => p.category))].sort()
   const categoryProducts = [...new Set(returnable.filter((p) => p.category === form.category).map((p) => p.product))].sort()
   const productPurchases = returnable.filter((p) => p.category === form.category && p.product === form.product)
-  const purchase = productPurchases.find((p) => p.id === form.purchaseId)
+  // From a request, its batch is used as is (the server already checked it)
+  const purchase = locked ? purchases.find((p) => p.id === request.procurementId) : productPurchases.find((p) => p.id === form.purchaseId)
 
   const medId = purchase ? products.find((m) => m.name === purchase.product)?.id : null
   const branchStock = purchase ? inventory.find((i) => i.branchId === purchase.branchId && i.medId === medId)?.stock ?? 0 : 0
@@ -38,11 +40,13 @@ export default function SupplierReturnModal({ request, heldQty = 0, purchases, r
   const available = branchStock + heldQty
   const unreturned = purchase ? purchase.qty - returnedQty(purchase.id) : 0
   // Can't send back more than was bought on this purchase, nor more than the branch still holds
-  const maxReturn = Math.min(unreturned, available)
+  // Extra units (more than were ordered) were never in stock or paid for: no stock limit, no credit
+  const isExtra = locked && isExtraQuantity(request)
+  const maxReturn = isExtra ? Infinity : Math.min(unreturned, available)
   const unitCost = purchase ? purchase.total / purchase.qty : 0
   const qty = Number(form.qty)
   const validQty = purchase && Number.isInteger(qty) && qty > 0 && qty <= maxReturn ? qty : 0
-  const credit = validQty * unitCost
+  const credit = isExtra ? 0 : validQty * unitCost
 
   const update = (field, value) => {
     setForm((prev) => ({
@@ -171,7 +175,7 @@ export default function SupplierReturnModal({ request, heldQty = 0, purchases, r
 
           <div className="sale-summary">
             <div><small>Unit Cost</small><strong>{purchase ? formatMoney(unitCost) : '—'}</strong></div>
-            <div><small>Stock After</small><strong>{purchase ? `${available - validQty} units` : '—'}</strong></div>
+            <div><small>Stock After</small><strong>{purchase ? `${isExtra ? available : available - validQty} units` : '—'}</strong></div>
             <div><small>Supplier Credit</small><strong className="sale-total">{formatMoney(credit)}</strong></div>
           </div>
 

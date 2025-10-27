@@ -10,7 +10,7 @@ return new class extends Migration
     {
         // An Inventory Officer asking the branch's Procurement Officer to send stock from one batch (one paid
         // procurement) back to its supplier: missing units, damage, expiry, … A supplier return is only recorded
-        // by approving one of these.
+        // by approving one of these, and the supplier can later send replacement units for it.
         Schema::create('return_requests', function (Blueprint $table) {
             $table->id();
             $table->string('procurement_id', 20);
@@ -25,6 +25,12 @@ return new class extends Migration
             $table->foreignId('handled_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('handled_at')->nullable();
             $table->text('response_note')->nullable();
+            // The supplier sent good units in place of an approved return: they go back into the same batch,
+            // with no new payment, and settle that much of the supplier's credit
+            $table->unsignedInteger('replaced_qty')->nullable();
+            $table->foreignId('replaced_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('replaced_at')->nullable();
+            $table->text('replacement_note')->nullable();
             $table->timestamps();
             $table->index(['branch_id', 'status']);
         });

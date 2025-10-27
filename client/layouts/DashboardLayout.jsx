@@ -6,13 +6,13 @@ import { useBranchScope } from '../hooks'
 import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
 import { selectAuth, selectCurrentUser, sessionEnded } from '../features/auth/store/authSlice'
-import { realtime } from '../api/realtime'
+import { realtime, watchConnection } from '../api/realtime'
 import { reportDeviceLocation } from '../features/accounts/api/sessionsApi'
 import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
 import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/store/authThunks'
 import { loadBranches } from '../features/branches/store/branchesThunks'
 import { loadProcurements } from '../features/purchases/store/purchasesThunks'
-import { loadReturnRequests } from '../features/supplierReturns/store/returnRequestsThunks'
+import { loadReturnRequests, returnRequestPushed } from '../features/supplierReturns/store/returnRequestsThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 
@@ -38,13 +38,32 @@ export default function DashboardLayout() {
   }, [dispatch])
 
   // Paid procurements, whose stock every branch's inventory includes. Return requests hold units out of that stock,
-  // so they load after procurements and refresh every minute: an approval or rejection shows up without a reload
+  // so they load after procurements; after that, changes arrive over the WebSocket (below)
   useEffect(() => {
-    const loadRequests = () => dispatch(loadReturnRequests()).catch(() => {})
-    dispatch(loadProcurements()).catch(() => {}).finally(loadRequests)
-    const timer = setInterval(loadRequests, 60000)
-    return () => clearInterval(timer)
+    dispatch(loadProcurements()).catch(() => {}).finally(() => dispatch(loadReturnRequests()).catch(() => {}))
   }, [dispatch])
+
+  // Live return requests: sent, approved, rejected or replaced on another screen updates this one's stock and lists
+  // at once. Staff listen to their own branch, the Owner to every branch. After a dropped connection, catch up once.
+  const returnChannels = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId])
+    .filter(Boolean)
+    .map((id) => `branch.${id}.return-requests`)
+    .join(' ')
+  useEffect(() => {
+    const echo = realtime()
+    if (!echo || !returnChannels) return undefined
+    const channels = returnChannels.split(' ')
+    channels.forEach((channel) => echo.private(channel).listen('.return-request.changed', (event) => dispatch(returnRequestPushed(event.request))))
+    let wasConnected = null
+    const stopWatching = watchConnection((connected) => {
+      if (connected && wasConnected === false) dispatch(loadReturnRequests()).catch(() => {})
+      wasConnected = connected
+    })
+    return () => {
+      channels.forEach((channel) => echo.leave(channel))
+      stopWatching()
+    }
+  }, [returnChannels, dispatch])
 
   // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),
   // pushed over the WebSocket; the token's id is the part before "|"

@@ -38,20 +38,23 @@
  * @property {string} product
  * @property {string} [medId]
  * @property {number} qty
- * @property {number} purchasePrice
+ * @property {number} totalCost          the whole order; the server derives the unit price (totalCost ÷ qty)
  * @property {'ETB' | 'USD'} currency
  */
 
-export const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', category: '', medId: '', qty: '', purchasePrice: '' }
+export const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', category: '', medId: '', qty: '', totalCost: '' }
+
+/** The unit purchase price a Total Cost works out to, or null until both numbers are valid */
+export const unitPriceFrom = (totalCost, qty) => (Number.isInteger(qty) && qty > 0 && totalCost > 0 ? Math.round((totalCost / qty) * 100) / 100 : null)
 
 /** @returns {Omit<ProcurementPayload, 'currency'>} the order from the form; the currency is added from settings */
-export const toProcurementPayload = (form, product, qty, purchasePrice) => ({
+export const toProcurementPayload = (form, product, qty, totalCost) => ({
   branchId: form.branchId,
   supplier: form.supplier.trim(),
   category: product.category,
   product: product.name,
   medId: product.id,
-  purchasePrice: Math.round(purchasePrice * 100) / 100,
+  totalCost: Math.round(totalCost * 100) / 100,
   qty
 })
 

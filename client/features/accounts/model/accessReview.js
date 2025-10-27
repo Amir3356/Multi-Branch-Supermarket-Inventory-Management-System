@@ -23,8 +23,9 @@
  * @property {string | null} branchName
  * @property {string} status
  * @property {string} createdAt                 YYYY-MM-DD
- * @property {string | null} lastLoginAt        ISO timestamp
- * @property {number | null} daysSinceLogin
+ * @property {string | null} lastLoginAt        last sign-in on or before the period's end (ISO timestamp)
+ * @property {number | null} daysSinceLogin   counted to the end of the period (or to when the report was made)
+ * @property {boolean} [lastLoginKnown]       false: signed in at some point, but the history doesn't show whether by then
  * @property {{ from: string, to: string, at: string }[]} roleChanges
  * @property {('dormant' | 'role_changed' | 'stale_invitation' | 'deactivated')[]} flags
  *

@@ -20,10 +20,13 @@ class ReturnRequestRepository
             ->get();
     }
 
-    /** Units of a procurement asked for or sent back (pending + approved requests), less what the supplier replaced. */
+    /** Units of a procurement asked for or sent back (pending + approved requests), less what the supplier replaced.
+     * Extra units (more than were ordered) aren't part of the batch, so they don't count. */
     public function claimedQty(string $procurementId): int
     {
-        $requests = ReturnRequest::where('procurement_id', $procurementId)->whereIn('status', ['pending', 'approved']);
+        $requests = ReturnRequest::where('procurement_id', $procurementId)
+            ->whereIn('status', ['pending', 'approved'])
+            ->where('reason', '!=', ReturnRequest::EXTRA_QUANTITY);
 
         return (int) $requests->clone()->sum('qty') - (int) $requests->clone()->sum('replaced_qty');
     }

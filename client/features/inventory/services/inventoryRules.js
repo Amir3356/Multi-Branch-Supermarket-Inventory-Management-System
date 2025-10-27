@@ -16,12 +16,10 @@ export function validateMedicinePrices(form, procurement, product, sellingPrice)
 }
 
 // Field errors for editing one branch's inventory row
-export function validateInventoryItem(form, purchasePrice, sellingPrice) {
+export function validateInventoryItem(form, sellingPrice) {
   const errors = {}
   if (!isWholeNumber(form.stock, 0)) errors.stock = 'Enter a whole number of 0 or more'
-  if (!form.batch.trim()) errors.batch = 'Batch number is required'
   if (!form.expiry) errors.expiry = 'Expiration date is required'
-  if (!isPositivePrice(form.purchasePrice, purchasePrice)) errors.purchasePrice = 'Enter a price greater than 0'
   if (!isPositivePrice(form.sellingPrice, sellingPrice)) errors.sellingPrice = 'Enter a price greater than 0'
   return errors
 }

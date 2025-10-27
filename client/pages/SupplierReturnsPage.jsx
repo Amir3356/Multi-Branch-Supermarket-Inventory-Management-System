@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DollarSign, Package, PackageMinus } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatCard, StatusTag } from '../components'
-import { useBranchScope, useFormatMoney } from '../hooks'
+import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectPurchases } from '../features/purchases/store/purchasesSlice'
 import { selectSupplierReturns } from '../features/supplierReturns/store/supplierReturnsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
@@ -11,6 +11,7 @@ import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { selectHeldReturnIds, selectReturnRequests } from '../features/supplierReturns/store/returnRequestsSlice'
 import { approveReturnRequest, receiveReplacement, rejectReturnRequest } from '../features/supplierReturns/store/returnRequestsThunks'
 import { creditOwed, supplierReturnStatus } from '../features/supplierReturns/model/supplierReturn'
+import { EXTRA_QUANTITY } from '../features/supplierReturns/model/returnRequest'
 import ReceiveReplacementModal from '../features/supplierReturns/components/ReceiveReplacementModal'
 import ReturnRequestsPanel from '../features/supplierReturns/components/ReturnRequestsPanel'
 import SupplierReturnModal from '../features/supplierReturns/components/SupplierReturnModal'
@@ -19,6 +20,7 @@ import './SupplierReturnsPage.css'
 export default function SupplierReturnsPage() {
   const dispatch = useDispatch()
   const formatMoney = useFormatMoney()
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const purchases = useSelector(selectPurchases)
   const allReturns = useSelector(selectSupplierReturns)
@@ -35,7 +37,8 @@ export default function SupplierReturnsPage() {
   const [notice, setNotice] = useState(null)
 
 
-  const returnedQtyForPurchase = (purchaseId) => allReturns.filter((r) => r.purchaseId === purchaseId).reduce((sum, r) => sum + r.qty, 0)
+  // Extra units (more than were ordered) aren't part of the batch
+  const returnedQtyForPurchase = (purchaseId) => allReturns.filter((r) => r.purchaseId === purchaseId && r.reason !== EXTRA_QUANTITY).reduce((sum, r) => sum + r.qty, 0)
 
   // Approving records the supplier return; the modal shows any error
   const handleApprove = async (data) => {
@@ -101,7 +104,7 @@ export default function SupplierReturnsPage() {
               <th>Quantity</th>
               <th>Reason</th>
               <th>Status</th>
-              <th>Credit Owed</th>
+              <th>{moneyHeader('Credit Owed')}</th>
             </tr>
           </thead>
           <tbody>
@@ -120,7 +123,7 @@ export default function SupplierReturnsPage() {
                   <StatusTag status={supplierReturnStatus(r)} />
                   {r.replacedQty > 0 && <div className="page-desc" style={{ margin: 0 }}>{r.replacedQty} replaced</div>}
                 </td>
-                <td className="fw-600" style={{ color: '#34d399' }}>{formatMoney(creditOwed(r))}</td>
+                <td className="fw-600" style={{ color: '#34d399' }}>{formatAmount(creditOwed(r))}</td>
               </tr>
             ))}
             {returns.length === 0 && <EmptyRow colSpan={isAllBranches ? 11 : 10}>No supplier returns recorded.</EmptyRow>}

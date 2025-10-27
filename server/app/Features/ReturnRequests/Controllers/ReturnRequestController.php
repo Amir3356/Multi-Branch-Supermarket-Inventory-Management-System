@@ -6,6 +6,7 @@ use App\Features\ReturnRequests\Models\ReturnRequest;
 use App\Features\ReturnRequests\Repositories\ReturnRequestRepository;
 use App\Features\ReturnRequests\Requests\StoreReturnRequestRequest;
 use App\Features\ReturnRequests\Resources\ReturnRequestResource;
+use App\Features\ReturnRequests\Services\ReturnRequestBroadcaster;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 // Inventory Officer → Procurement Officer requests to send stock back to the supplier
 class ReturnRequestController
 {
-    public function __construct(private ReturnRequestRepository $requests) {}
+    public function __construct(private ReturnRequestRepository $requests, private ReturnRequestBroadcaster $live) {}
 
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -34,6 +35,7 @@ class ReturnRequestController
             'note' => $request->validated('note'),
             'status' => 'pending',
         ]);
+        $this->live->changed($this->requests->withDetails($returnRequest));
 
         return response()->json([
             'message' => "Return request sent: {$returnRequest->qty} × {$procurement->product} (batch {$procurement->id}). The Procurement Officer will review it.",
@@ -81,13 +83,16 @@ class ReturnRequestController
         $replaced = DB::transaction(function () use ($request, $returnRequest, $data) {
             $locked = $this->requests->lockForUpdate($returnRequest);
             if (! $locked->awaitsReplacement()) {
-                abort(422, $locked->replaced_qty !== null
-                    ? 'A replacement was already received for this return.'
-                    : 'Only an approved return can be replaced.');
+                abort(422, match (true) {
+                    $locked->replaced_qty !== null => 'A replacement was already received for this return.',
+                    $locked->isExtraQuantity() => "Extra units were never ordered, so they aren't replaced.",
+                    default => 'Only an approved return can be replaced.',
+                });
             }
 
             return $this->requests->withDetails($this->requests->markReplaced($locked, (int) $data['qty'], $request->user(), $data['note'] ?? null));
         });
+        $this->live->changed($replaced);
 
         return response()->json([
             'message' => "{$replaced->replaced_qty} × {$replaced->procurement?->product} received from {$replaced->procurement?->supplier} back into batch {$replaced->procurement_id}.",
@@ -106,7 +111,7 @@ class ReturnRequestController
     {
         $this->ensureSameBranch($request, $returnRequest);
 
-        return DB::transaction(function () use ($request, $returnRequest, $status, $note) {
+        $handled = DB::transaction(function () use ($request, $returnRequest, $status, $note) {
             $locked = $this->requests->lockForUpdate($returnRequest);
             if (! $locked->isPending()) {
                 abort(422, 'This request has already been handled.');
@@ -114,5 +119,8 @@ class ReturnRequestController
 
             return $this->requests->withDetails($this->requests->markHandled($locked, $status, $request->user(), $note));
         });
+        $this->live->changed($handled);
+
+        return $handled;
     }
 }

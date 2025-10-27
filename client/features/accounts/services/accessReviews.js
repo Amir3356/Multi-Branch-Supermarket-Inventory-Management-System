@@ -56,6 +56,11 @@ export const formatPeriod = (review) => {
 // A timestamp's date in this computer's local time, e.g. 2026-10-08
 export const localDate = (iso) => new Date(iso).toLocaleDateString('en-CA')
 
+// Last sign-in as of the report: a date, "Never", or "No record" when the account signed in at some point but the
+// sign-in history doesn't reach back to this period
+export const lastSignInText = (row, formatDate = localDate) =>
+  row.lastLoginAt ? formatDate(row.lastLoginAt) : row.lastLoginKnown === false ? 'No record' : 'Never'
+
 const pdfDate = (iso) => new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
 
 // Printable, read-only copy of a report for management sign-off and auditors (landscape A4)
@@ -95,7 +100,7 @@ export async function exportAccessReviewPdf(review, pharmacyName = 'PharmaCare')
       r.branchName || '-',
       r.status,
       r.createdAt,
-      r.lastLoginAt ? localDate(r.lastLoginAt) : 'Never',
+      lastSignInText(r),
       r.daysSinceLogin ?? '-',
       r.roleChanges.map((c) => `${c.from} -> ${c.to} (${localDate(c.at)})`).join('\n') || '-'
     ]),
@@ -104,20 +109,6 @@ export async function exportAccessReviewPdf(review, pharmacyName = 'PharmaCare')
     headStyles: { fillColor: [8, 145, 178] }
   })
 
-  // Review record, or blank lines to sign a printed copy
-  let y = doc.lastAutoTable.finalY + 28
-  if (y > doc.internal.pageSize.getHeight() - 80) {
-    doc.addPage()
-    y = 50
-  }
-  doc.setFont('helvetica', 'bold').setFontSize(11).text('Review', 40, y)
-  doc.setFont('helvetica', 'normal').setFontSize(10)
-  if (review.reviewedAt) {
-    doc.text(`Reviewed by ${review.reviewedBy} on ${pdfDate(review.reviewedAt)}`, 40, y + 18)
-    if (review.reviewNote) doc.text(doc.splitTextToSize(`Note: ${review.reviewNote}`, pageWidth - 80), 40, y + 34)
-  } else {
-    doc.text('Reviewed by: ______________________     Signature: ______________________     Date: ______________', 40, y + 22)
-  }
 
   // Page numbers
   const pages = doc.getNumberOfPages()

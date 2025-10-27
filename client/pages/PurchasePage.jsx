@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
 import { CreditCard, Plus } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatusTag } from '../components'
-import { useBranchScope, useFormatMoney } from '../hooks'
+import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectPurchases, selectSupplierPayments } from '../features/purchases/store/purchasesSlice'
 import { selectSupplierReturns } from '../features/supplierReturns/store/supplierReturnsSlice'
-import { selectInventory } from '../features/inventory/store/selectors'
 import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { startProcurement, verifyProcurement } from '../features/purchases/store/purchasesThunks'
@@ -27,12 +26,12 @@ const openCheckoutPopup = (url = '') => {
 export default function PurchasePage() {
   const dispatch = useDispatch()
   const formatMoney = useFormatMoney()
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branches, branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const allPurchases = useSelector(selectPurchases)
   const purchases = allPurchases.filter((p) => inScope(p.branchId))
   const payments = useSelector(selectSupplierPayments).filter((p) => inScope(p.branchId))
   const supplierReturns = useSelector(selectSupplierReturns)
-  const inventory = useSelector(selectInventory)
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
   const user = useSelector(selectCurrentUser)
@@ -144,7 +143,8 @@ export default function PurchasePage() {
               <th>Category</th>
               <th>Product Name</th>
               <th>Quantity</th>
-              <th>Total Cost</th>
+              <th>{moneyHeader('Unit Purchase Price')}</th>
+              <th>{moneyHeader('Total Cost')}</th>
               <th>Purchased On</th>
               <th>Status</th>
             </tr>
@@ -157,7 +157,8 @@ export default function PurchasePage() {
                 <td>{po.category}</td>
                 <td className="fw-600">{po.product}</td>
                 <td>{po.qty.toLocaleString()} units</td>
-                <td className="fw-600">{formatMoney(po.total)}</td>
+                <td>{formatAmount(po.purchasePrice)}</td>
+                <td className="fw-600">{formatAmount(po.total)}</td>
                 <td>{po.date}</td>
                 <td>
                   <StatusTag status={purchaseStatus(po)} />
@@ -169,7 +170,7 @@ export default function PurchasePage() {
                 </td>
               </tr>
             ))}
-            {purchases.length === 0 && <EmptyRow colSpan={isAllBranches ? 8 : 7}>No procurement records found.</EmptyRow>}
+            {purchases.length === 0 && <EmptyRow colSpan={isAllBranches ? 9 : 8}>No procurement records found.</EmptyRow>}
           </tbody>
         </table>
       </div>
@@ -193,7 +194,8 @@ export default function PurchasePage() {
                 <th>Category</th>
                 <th>Product Name</th>
                 <th>Quantity</th>
-                <th>Total Cost</th>
+                <th>{moneyHeader('Unit Purchase Price')}</th>
+                <th>{moneyHeader('Total Cost')}</th>
                 <th>Payment Method</th>
                 <th>Transaction Date</th>
                 <th>Payment Status</th>
@@ -211,14 +213,15 @@ export default function PurchasePage() {
                     <td>{purchase?.category || '—'}</td>
                     <td className="fw-600">{purchase?.product || '—'}</td>
                     <td>{purchase ? `${purchase.qty.toLocaleString()} units` : '—'}</td>
-                    <td className="fw-600">{formatMoney(txn.amount)}</td>
+                    <td>{purchase ? formatAmount(purchase.purchasePrice) : '—'}</td>
+                    <td className="fw-600">{formatAmount(txn.amount)}</td>
                     <td><span className="batch-badge">{txn.method}</span></td>
                     <td>{txn.date}</td>
                     <td><StatusTag status={txn.status} /></td>
                   </tr>
                 )
               })}
-              {payments.length === 0 && <EmptyRow colSpan={isAllBranches ? 10 : 9}>No payment transaction records found.</EmptyRow>}
+              {payments.length === 0 && <EmptyRow colSpan={isAllBranches ? 11 : 10}>No payment transaction records found.</EmptyRow>}
             </tbody>
           </table>
         </div>
@@ -228,7 +231,6 @@ export default function PurchasePage() {
         <NewPurchaseModal
           branches={branches}
           assignedBranchId={user?.branchId === 'all' ? null : user?.branchId}
-          inventory={inventory}
           products={products}
           categories={categories}
           suppliers={[...new Set(allPurchases.map((p) => p.supplier))].sort()}

@@ -28,7 +28,8 @@ class StoreProcurementRequest extends FormRequest
             'product' => ['required', 'string', 'max:255'],
             'medId' => ['nullable', 'string', 'max:20'],
             'qty' => ['required', 'integer', 'min:1', 'max:1000000'],
-            'purchasePrice' => ['required', 'numeric', 'gt:0', 'max:10000000'],
+            // What the whole order costs; the unit price is worked out from it (Total Cost ÷ Quantity)
+            'totalCost' => ['required', 'numeric', 'gt:0', 'max:10000000000'],
             // The currencies Chapa accepts
             'currency' => ['required', Rule::in(['ETB', 'USD'])],
         ];

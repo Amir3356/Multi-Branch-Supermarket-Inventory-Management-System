@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DollarSign, Package, Plus, Undo2 } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatCard, StatusTag } from '../components'
-import { useBranchScope, useFormatMoney } from '../hooks'
+import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectSales } from '../features/sales/store/salesSlice'
 import { selectCustomerReturns } from '../features/customerReturns/store/customerReturnsSlice'
 import { recordCustomerReturn } from '../features/customerReturns/store/customerReturnsThunks'
@@ -12,6 +12,7 @@ import './CustomerReturnsPage.css'
 export default function CustomerReturnsPage() {
   const dispatch = useDispatch()
   const formatMoney = useFormatMoney()
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const sales = useSelector(selectSales)
   const allReturns = useSelector(selectCustomerReturns)
@@ -57,7 +58,7 @@ export default function CustomerReturnsPage() {
               <th>Quantity</th>
               <th>Reason</th>
               <th>Stock</th>
-              <th>Refund</th>
+              <th>{moneyHeader('Refund')}</th>
             </tr>
           </thead>
           <tbody>
@@ -73,7 +74,7 @@ export default function CustomerReturnsPage() {
                 <td>{r.qty} {r.qty === 1 ? 'unit' : 'units'}</td>
                 <td>{r.reason}</td>
                 <td><StatusTag status={r.condition === 'Resellable' ? 'Restocked' : 'Written Off'} /></td>
-                <td className="fw-600 negative-text">{formatMoney(r.refund)}</td>
+                <td className="fw-600 negative-text">{formatAmount(r.refund)}</td>
               </tr>
             ))}
             {returns.length === 0 && <EmptyRow colSpan={isAllBranches ? 11 : 10}>No customer returns recorded.</EmptyRow>}

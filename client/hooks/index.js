@@ -1,5 +1,5 @@
 export { useEscapeKey } from './useEscapeKey'
 export { useNow } from './useNow'
 export { useTheme } from './useTheme'
-export { useFormatMoney } from './useFormatMoney'
+export { useFormatMoney, useMoneyColumns } from './useFormatMoney'
 export { useBranchScope } from './useBranchScope'

@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReturnRequest extends Model
 {
+    // More units arrived than were ordered and paid for. They were never counted into stock, so a request for them
+    // moves no stock, isn't limited by the batch, owes no credit and can't be replaced.
+    public const EXTRA_QUANTITY = 'Extra quantity';
+
     protected $fillable = ['procurement_id', 'branch_id', 'requested_by', 'qty', 'reason', 'note', 'status', 'handled_by', 'handled_at', 'response_note', 'replaced_qty', 'replaced_by', 'replaced_at', 'replacement_note'];
 
     protected function casts(): array
@@ -25,7 +29,12 @@ class ReturnRequest extends Model
     /** Approved, and the supplier hasn't sent replacement units for it yet */
     public function awaitsReplacement(): bool
     {
-        return $this->status === 'approved' && $this->replaced_qty === null;
+        return $this->status === 'approved' && $this->replaced_qty === null && ! $this->isExtraQuantity();
+    }
+
+    public function isExtraQuantity(): bool
+    {
+        return $this->reason === self::EXTRA_QUANTITY;
     }
 
     public function procurement(): BelongsTo

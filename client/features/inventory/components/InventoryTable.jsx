@@ -9,6 +9,7 @@ import {
   Pencil,
   Undo2
 } from 'lucide-react'
+import { useMoneyColumns } from '../../../hooks'
 import { listTableFeatures } from '../../../utils'
 import { StatusTag, BranchTag, SortableHeader } from '../../../components'
 
@@ -35,7 +36,8 @@ const inventorySearchFn = (row, _columnId, value) => {
 
 // heldQty(item): units held out of stock by pending return requests, shown under Current Stock.
 // onRequestReturn: the Inventory Officer's "send back to supplier" button, on rows at returnBranchId (left out for other roles)
-export default function InventoryTable({ data, branches, categories, showBranch, formatMoney, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId }) {
+export default function InventoryTable({ data, branches, categories, showBranch, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId }) {
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
   const [sorting, setSorting] = useState(INVENTORY_DEFAULT_SORTING)
@@ -68,8 +70,12 @@ export default function InventoryTable({ data, branches, categories, showBranch,
           )
         }
       },
-      { accessorKey: 'purchasePrice', header: 'Purchase Price', sortFn: 'basic', cell: (info) => formatMoney(info.getValue()) },
-      { accessorKey: 'sellingPrice', header: 'Sells Price', sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatMoney(info.getValue())) },
+      { accessorKey: 'purchasePrice', header: moneyHeader('Unit Purchase Price'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
+      // The whole quantity's purchase cost: Current Stock × unit purchase price
+      { id: 'totalCost', accessorFn: (row) => row.stock * (row.purchasePrice || 0), header: moneyHeader('Total Cost'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
+      { accessorKey: 'sellingPrice', header: moneyHeader('Unit Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
+      // What the row's whole stock would sell for: Current Stock × Unit Selling Price (Not set until it has a price)
+      { id: 'totalSellingPrice', accessorFn: (row) => (row.sellingPrice == null ? undefined : row.stock * row.sellingPrice), header: moneyHeader('Total Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
       { accessorKey: 'batch', header: 'Batch Number', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
       {
         accessorKey: 'expiry',
@@ -109,7 +115,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
         }
       }
     ]
-  }, [branches, showBranch, formatMoney, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId])
+  }, [branches, showBranch, moneyHeader, formatAmount, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId])
 
   // The branch filter only applies while the Branch column is shown
   const activeColumnFilters = showBranch ? columnFilters : columnFilters.filter((f) => f.id !== 'branchId')

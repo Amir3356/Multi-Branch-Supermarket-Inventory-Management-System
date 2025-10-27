@@ -20,7 +20,6 @@ export default function AddMedicineModal({ procurements, products, branchName, f
   const product = findProcurementProduct(products, procurement)
   const purchasePrice = procurement?.purchasePrice ?? 0
   const sellingPrice = Number(form.sellingPrice)
-  const margin = purchasePrice > 0 && sellingPrice > 0 ? ((sellingPrice - purchasePrice) / sellingPrice) * 100 : null
 
   const update = (field, value) => {
     setForm((prev) => {
@@ -94,21 +93,16 @@ export default function AddMedicineModal({ procurements, products, branchName, f
           {readOnlyField('medicine-product', 'Product Name', procurement?.product ?? '—')}
           <div className="modal-grid">
             {readOnlyField('medicine-qty', 'Quantity', procurement ? `${procurement.qty} units` : '—')}
-            {readOnlyField('medicine-purchase-price', 'Purchase Price (per unit)', procurement ? formatMoney(purchasePrice) : '—')}
-          </div>
-          <div className="modal-grid">
             {readOnlyField('medicine-total', 'Total Cost', procurement ? formatMoney(procurement.total) : '—')}
-            <div className="form-group">
-              <label htmlFor="medicine-selling-price">Selling Price (per unit) *</label>
-              <input id="medicine-selling-price" type="number" min="0" step="0.01" placeholder="0.00" className={`input-field ${errors.sellingPrice ? 'error' : ''}`} value={form.sellingPrice} onChange={(e) => update('sellingPrice', e.target.value)} disabled={!procurement} />
-              {errors.sellingPrice && <span className="error-msg">{errors.sellingPrice}</span>}
-            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="medicine-selling-price">Unit Selling Price *</label>
+            <input id="medicine-selling-price" type="number" min="0" step="0.01" placeholder="0.00" className={`input-field ${errors.sellingPrice ? 'error' : ''}`} value={form.sellingPrice} onChange={(e) => update('sellingPrice', e.target.value)} disabled={!procurement} />
+            {errors.sellingPrice && <span className="error-msg">{errors.sellingPrice}</span>}
           </div>
 
           <div className="sale-summary">
-            <div><small>Profit per Unit</small><strong>{purchasePrice > 0 && sellingPrice > 0 ? formatMoney(sellingPrice - purchasePrice) : '—'}</strong></div>
-            <div><small>Selling Price</small><strong>{procurement && sellingPrice > 0 ? formatMoney(sellingPrice) : '—'}</strong></div>
-            <div><small>Margin</small><strong className={margin != null && margin < 0 ? 'negative-text' : 'sale-total'}>{margin == null ? '—' : `${margin.toFixed(1)}%`}</strong></div>
+            <div><small>Unit Selling Price</small><strong>{procurement && sellingPrice > 0 ? formatMoney(sellingPrice) : '—'}</strong></div>
           </div>
 
           <div className="modal-actions">

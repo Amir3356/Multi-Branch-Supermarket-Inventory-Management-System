@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Clock, Package, Plus, Receipt, ShoppingCart, TrendingUp } from 'lucide-react'
 import { BranchTag, Notice, PageHeader, StatCard, StatusTag } from '../components'
-import { useBranchScope, useFormatMoney } from '../hooks'
+import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { todayKey } from '../utils'
 import { selectSales } from '../features/sales/store/salesSlice'
 import { selectCustomerReturns } from '../features/customerReturns/store/customerReturnsSlice'
@@ -15,6 +15,7 @@ import './SalesPage.css'
 export default function SalesPage() {
   const dispatch = useDispatch()
   const formatMoney = useFormatMoney()
+  const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branches, branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const sales = useSelector(selectSales).filter((s) => inScope(s.branchId))
   const customerReturns = useSelector(selectCustomerReturns)
@@ -67,7 +68,7 @@ export default function SalesPage() {
               <th>Category</th>
               <th>Product Name</th>
               <th>Items Purchased</th>
-              <th>Total Amount</th>
+              <th>{moneyHeader('Total Amount')}</th>
               <th>Date Sold</th>
               <th>Status</th>
             </tr>
@@ -80,7 +81,7 @@ export default function SalesPage() {
                 <td>{sale.category}</td>
                 <td className="fw-600">{sale.product}</td>
                 <td>{sale.qty} {sale.qty === 1 ? 'unit' : 'units'}</td>
-                <td className="fw-600">{formatMoney(sale.total)}</td>
+                <td className="fw-600">{formatAmount(sale.total)}</td>
                 <td>{sale.date}</td>
                 <td><StatusTag status={saleStatus(sale)} /></td>
               </tr>

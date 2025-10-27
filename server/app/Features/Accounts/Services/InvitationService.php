@@ -5,6 +5,7 @@ namespace App\Features\Accounts\Services;
 use App\Features\Accounts\Mail\AccountInvitationMail;
 use App\Features\Accounts\Models\AccountInvitation;
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\AccountChangeRepository;
 use App\Features\Accounts\Repositories\InvitationRepository;
 use App\Features\Accounts\Repositories\UserRepository;
 use App\Shared\Enums\AccountStatus;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 class InvitationService
 {
-    public function __construct(private InvitationRepository $invitations, private UserRepository $users) {}
+    public function __construct(private InvitationRepository $invitations, private UserRepository $users, private AccountChangeRepository $accountChanges) {}
 
     /**
      * Replaces any earlier invitation for the user and emails a fresh link.
@@ -46,6 +47,8 @@ class InvitationService
         return DB::transaction(function () use ($invitation, $password) {
             $user = $invitation->user;
             $this->users->activate($user, $password);
+            // Pending → Active, kept for access reviews of past periods
+            $this->accountChanges->record($user, 'status', AccountStatus::Invited->value, AccountStatus::Active->value, $user);
             $this->invitations->deleteFor($user);
 
             return $user;

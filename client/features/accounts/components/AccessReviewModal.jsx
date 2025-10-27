@@ -5,7 +5,7 @@ import { ClipboardCheck, FileText, X } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
 import { fetchAccessReview } from '../api/accessReviewsApi'
 import { PERIOD_TYPES } from '../model/accessReview'
-import { exportAccessReviewPdf, formatPeriod, localDate } from '../services/accessReviews'
+import { exportAccessReviewPdf, formatPeriod, lastSignInText, localDate } from '../services/accessReviews'
 import { selectSettings } from '../../policy/store/settingsSlice'
 
 // One access review: who has access, their role and last sign-in, with Export PDF
@@ -124,8 +124,8 @@ export default function AccessReviewModal({ reviewId, accounts, onClose }) {
                             {!live && <div className="field-hint">Since deleted</div>}
                           </td>
                           <td className="nowrap">
-                            {r.lastLoginAt ? new Date(r.lastLoginAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Never'}
-                            {r.daysSinceLogin !== null && <div className="field-hint">{r.daysSinceLogin} days ago</div>}
+                            {lastSignInText(r, (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))}
+                            {r.daysSinceLogin !== null && <div className="field-hint">{r.daysSinceLogin} days before {review.periodEnd}</div>}
                           </td>
                         </tr>
                       )

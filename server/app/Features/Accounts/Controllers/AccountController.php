@@ -3,6 +3,7 @@
 namespace App\Features\Accounts\Controllers;
 
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\AccountChangeRepository;
 use App\Features\Accounts\Repositories\RoleChangeRepository;
 use App\Features\Accounts\Repositories\UserRepository;
 use App\Features\Accounts\Requests\StoreAccountRequest;
@@ -28,6 +29,7 @@ class AccountController
         private UserRepository $users,
         private RoleChangeRepository $roleChanges,
         private SessionRepository $sessionRecords,
+        private AccountChangeRepository $accountChanges,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -77,14 +79,23 @@ class AccountController
         ]));
         $emailChanged = $account->isDirty('email');
         $previousRole = $account->isDirty('role') ? $account->getOriginal('role') : null;
+        // Kept for access reviews of past periods, like role changes
+        $previousStatus = $account->isDirty('status') ? $account->getOriginal('status') : null;
+        $previousBranch = $account->isDirty('branch_id') ? [$account->getOriginal('branch_id')] : null;
         $reinvite = $emailChanged && $account->status === AccountStatus::Invited;
 
-        $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite, $previousRole) {
+        $this->withMail(fn () => DB::transaction(function () use ($account, $request, $oldEmail, $emailChanged, $reinvite, $previousRole, $previousStatus, $previousBranch) {
             $this->users->save($account);
 
             // Kept for access reviews (privilege creep)
             if ($previousRole) {
                 $this->roleChanges->record($account, $previousRole, $request->user());
+            }
+            if ($previousStatus) {
+                $this->accountChanges->record($account, 'status', $previousStatus->value, $account->status->value, $request->user());
+            }
+            if ($previousBranch) {
+                $this->accountChanges->record($account, 'branch', $previousBranch[0], $account->branch_id, $request->user());
             }
 
             if ($emailChanged) {

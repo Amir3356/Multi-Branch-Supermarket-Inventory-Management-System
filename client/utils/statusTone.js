@@ -23,5 +23,6 @@ export const STATUS_TONE = {
   'Replaced': 'in-stock',
   'Partially Replaced': 'low-stock',
   'Credit Owed': 'low-stock',
+  'No Credit': 'inactive',
   'Failed': 'out-of-stock'
 }

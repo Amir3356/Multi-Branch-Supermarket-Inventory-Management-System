@@ -6,8 +6,11 @@ use App\Features\AccessReviews\Models\AccessReview;
 use App\Features\AccessReviews\Repositories\AccessReviewRepository;
 use App\Features\Accounts\Models\RoleChange;
 use App\Features\Accounts\Models\User;
+use App\Features\Accounts\Repositories\AccountChangeRepository;
 use App\Features\Accounts\Repositories\RoleChangeRepository;
+use App\Features\Accounts\Repositories\SignInRepository;
 use App\Features\Accounts\Repositories\UserRepository;
+use App\Features\Branches\Repositories\BranchRepository;
 use App\Shared\Enums\AccountStatus;
 use App\Shared\Enums\Role;
 use Carbon\CarbonImmutable;
@@ -19,6 +22,9 @@ use Carbon\CarbonImmutable;
  *  - role_changed       role changed during the period (possible privilege creep)
  *  - stale_invitation   invited ACCESS_REVIEW_STALE_INVITATION_DAYS ago (default 30), never accepted
  *  - deactivated        blocked but still on file
+ *
+ * Each account is shown as it was at the end of the period (or now, for the current period): its last sign-in on
+ * or before then, and its role, status and branch then, from the sign-in and change logs.
  */
 class AccessReviewGenerator
 {
@@ -28,6 +34,9 @@ class AccessReviewGenerator
         private AccessReviewRepository $reviews,
         private UserRepository $users,
         private RoleChangeRepository $roleChanges,
+        private SignInRepository $signIns,
+        private AccountChangeRepository $accountChanges,
+        private BranchRepository $branches,
     ) {}
 
     /** Now in the pharmacy's local time (PHARMACY_TIMEZONE), so "today" matches the clock on the wall. */
@@ -85,9 +94,27 @@ class AccessReviewGenerator
 
         $changes = $this->roleChanges->betweenByUser($fromDb, $asOfDb);
 
+        // How each account stood at $asOf: changes made after it are undone
+        $lastSignIns = $this->signIns->lastAtOrBefore($asOfDb);
+        $historyStart = $this->signIns->historyStart();
+        $rolesThen = $this->roleChanges->rolesAt($asOfDb);
+        $statusesThen = $this->accountChanges->valuesAt('status', $asOfDb);
+        $branchesThen = $this->accountChanges->valuesAt('branch', $asOfDb);
+        $branchNames = $this->branches->namesById();
+
         $rows = $this->users->createdBy($asOfDb)
-            ->map(function (User $user) use ($asOf, $dormantDays, $staleDays, $changes) {
-                $lastLogin = $user->last_login_at ? CarbonImmutable::parse($user->last_login_at) : null;
+            ->map(function (User $user) use ($asOf, $dormantDays, $staleDays, $changes, $lastSignIns, $historyStart, $rolesThen, $statusesThen, $branchesThen, $branchNames) {
+                $role = $rolesThen[$user->id] ?? $user->role;
+                $status = $statusesThen->has($user->id) ? AccountStatus::from($statusesThen[$user->id]) : $user->status;
+                $branchId = $branchesThen->has($user->id) ? $branchesThen[$user->id] : $user->branch_id;
+
+                // The log's last sign-in by then; the account's own latest sign-in is just as exact when it falls by then
+                // (it covers accounts whose sign-ins weren't logged, e.g. seeded ones)
+                $latest = $user->last_login_at ? CarbonImmutable::parse($user->last_login_at) : null;
+                $lastLogin = $lastSignIns[$user->id] ?? ($latest && $latest->lte($asOf) ? $latest : null);
+                // No sign-in on record by then, though the account has signed in since: before the sign-in history
+                // began only each account's latest sign-in is known, so whether it signed in by then can't be told
+                $lastLoginKnown = $lastLogin !== null || ! $user->last_login_at || ($historyStart && $historyStart->lte($asOf));
                 $daysSinceLogin = $lastLogin ? (int) $lastLogin->diffInDays($asOf) : null;
                 $roleChanges = ($changes[$user->id] ?? collect())->map(fn (RoleChange $c) => [
                     'from' => $c->from_role->label(),
@@ -96,16 +123,16 @@ class AccessReviewGenerator
                 ])->values()->all();
 
                 $flags = [];
-                if ($user->status === AccountStatus::Active && ($daysSinceLogin === null || $daysSinceLogin >= $dormantDays)) {
+                if ($status === AccountStatus::Active && $lastLoginKnown && ($daysSinceLogin === null || $daysSinceLogin >= $dormantDays)) {
                     $flags[] = 'dormant';
                 }
                 if ($roleChanges) {
                     $flags[] = 'role_changed';
                 }
-                if ($user->status === AccountStatus::Invited && CarbonImmutable::parse($user->created_at)->diffInDays($asOf) >= $staleDays) {
+                if ($status === AccountStatus::Invited && CarbonImmutable::parse($user->created_at)->diffInDays($asOf) >= $staleDays) {
                     $flags[] = 'stale_invitation';
                 }
-                if ($user->status === AccountStatus::Inactive) {
+                if ($status === AccountStatus::Inactive) {
                     $flags[] = 'deactivated';
                 }
 
@@ -113,13 +140,15 @@ class AccessReviewGenerator
                     'userId' => $user->id,
                     'fullName' => $user->full_name,
                     'email' => $user->email,
-                    'role' => $user->role->value,
-                    'roleLabel' => $user->role->label(),
-                    'branchName' => $user->isOwner() ? 'All Branches' : $user->branch?->name,
-                    'status' => $user->status->label(),
+                    'role' => $role->value,
+                    'roleLabel' => $role->label(),
+                    'branchName' => $role === Role::Owner ? 'All Branches' : ($branchNames[$branchId] ?? null),
+                    'status' => $status->label(),
                     'createdAt' => $user->created_at->copy()->setTimezone(config('pharmacy.timezone'))->toDateString(),
                     'lastLoginAt' => $lastLogin?->toIso8601String(),
                     'daysSinceLogin' => $daysSinceLogin,
+                    // false: signed in at some point, but no record of whether it was by the end of the period
+                    'lastLoginKnown' => $lastLoginKnown,
                     'roleChanges' => $roleChanges,
                     'flags' => $flags,
                 ];

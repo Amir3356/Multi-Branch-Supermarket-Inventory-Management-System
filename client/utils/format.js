@@ -2,13 +2,17 @@
 
 export const CURRENCIES = {
   USD: { symbol: '$', label: 'US Dollar ($)' },
-  ETB: { symbol: 'Br ', label: 'Ethiopian Birr (Br)' },
+  ETB: { symbol: 'ETB ', label: 'Ethiopian Birr (ETB)' },
   EUR: { symbol: '€', label: 'Euro (€)' }
 }
 
-/** "Br 1,234.50" / "-Br 12.00" in the given currency */
+/** "ETB 1,234.50" / "-ETB 12.00" in the given currency */
 export const formatMoneyIn = (currency, value) =>
   `${value < 0 ? '-' : ''}${CURRENCIES[currency]?.symbol || '$'}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+/** 1234.5 → "1,234.50": the amount alone, for table cells whose column header names the currency */
+export const formatAmount = (value) =>
+  `${value < 0 ? '-' : ''}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export const currencySymbol = (currency) => (CURRENCIES[currency]?.symbol || '$').trim()
 

@@ -23,8 +23,9 @@ return [
     'access_review_dormant_days' => (int) env('ACCESS_REVIEW_DORMANT_DAYS', 90),
     // ...and an invitation not accepted after this many days as stale
     'access_review_stale_invitation_days' => (int) env('ACCESS_REVIEW_STALE_INVITATION_DAYS', 30),
-    // A report made automatically for each finished period: daily | weekly | monthly | quarterly | yearly; empty = off
-    'access_review_schedule' => env('ACCESS_REVIEW_SCHEDULE', 'monthly'),
+    // Off by default: the Owner generates reports. Set daily | weekly | monthly | quarterly | yearly to also make one
+    // automatically after each finished period.
+    'access_review_schedule' => env('ACCESS_REVIEW_SCHEDULE', ''),
 
     // Session Monitoring: a session with no activity for this many minutes shows as Idle.
     // At least 5, because staff browsers check in every 2 minutes while in use.
