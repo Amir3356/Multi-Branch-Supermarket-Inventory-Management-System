@@ -10,10 +10,9 @@ import {
   Undo2
 } from 'lucide-react'
 import { useMoneyColumns } from '../../../hooks'
-import { listTableFeatures } from '../../../utils'
+import { listTableFeatures, INVENTORY_STATUSES } from '../../../utils'
 import { StatusTag, BranchTag, SortableHeader } from '../../../components'
 
-const INVENTORY_STATUSES = ['In Stock', 'Low Stock', 'Out of Stock']
 
 const INVENTORY_SORTS = {
   'name-asc': { label: 'Name (A–Z)', sorting: [{ id: 'name', desc: false }] },
@@ -90,7 +89,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
             info.getValue()
           )
       },
-      { accessorKey: 'status', header: 'Status', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <StatusTag status={info.getValue()} /> },
+      { id: 'status', accessorKey: 'inventoryStatus', header: 'Status', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <StatusTag status={info.getValue()} /> },
       {
         id: 'actions',
         header: 'Actions',

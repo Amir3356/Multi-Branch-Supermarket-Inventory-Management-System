@@ -6,43 +6,6 @@ export const toDateKey = (date) =>
 
 export const todayKey = () => toDateKey(new Date())
 
-/** Dashboard date filter presets; weeks start on Monday */
-export const DATE_PRESETS = {
-  today: 'Today',
-  week: 'This Week',
-  month: 'This Month',
-  quarter: 'This Quarter',
-  year: 'This Year',
-  custom: 'Custom Date Range'
-}
-
-/** First and last day (inclusive) of a preset period, ending today */
-export const getPresetRange = (preset) => {
-  const today = new Date()
-  const key = toDateKey(today)
-  if (preset === 'week') {
-    const monday = new Date(today)
-    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
-    return [toDateKey(monday), key]
-  }
-  if (preset === 'month') return [`${key.slice(0, 7)}-01`, key]
-  if (preset === 'quarter') {
-    // Calendar quarters: Q1 Jan–Mar, Q2 Apr–Jun, Q3 Jul–Sep, Q4 Oct–Dec
-    const quarterStartMonth = Math.floor(today.getMonth() / 3) * 3 + 1
-    return [`${key.slice(0, 4)}-${String(quarterStartMonth).padStart(2, '0')}-01`, key]
-  }
-  if (preset === 'year') return [`${key.slice(0, 4)}-01-01`, key]
-  return [key, key]
-}
-
-export const formatRangeLabel = (from, to) => {
-  const fmt = (key) => new Date(`${key}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  return from === to ? fmt(from) : `${fmt(from)} – ${fmt(to)}`
-}
-
-/** "Oct 5" from a YYYY-MM-DD key */
-export const shortDate = (key) => new Date(`${key}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-
 export const startOfToday = () => {
   const d = new Date()
   d.setHours(0, 0, 0, 0)

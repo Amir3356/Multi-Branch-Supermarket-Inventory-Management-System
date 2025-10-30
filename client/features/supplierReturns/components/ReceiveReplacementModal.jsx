@@ -18,6 +18,7 @@ export default function ReceiveReplacementModal({ request, branchName, unitCost,
   const qty = Number(form.qty)
   const validQty = Number.isInteger(qty) && qty >= 1 && qty <= request.qty ? qty : 0
 
+
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }))

@@ -77,7 +77,7 @@ export default function DamagedPage() {
       </div>
 
       {showRecordDamage && (
-        <RecordDamageModal branches={branches} inventory={inventory} categories={categories} formatMoney={formatMoney} onClose={() => setShowRecordDamage(false)} onSave={handleRecordDamage} />
+        <RecordDamageModal inventory={inventory.filter((i) => inScope(i.branchId))} categories={categories} formatMoney={formatMoney} onClose={() => setShowRecordDamage(false)} onSave={handleRecordDamage} />
       )}
     </div>
   )

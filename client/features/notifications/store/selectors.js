@@ -45,7 +45,7 @@ export const selectAllNotifications = createSelector(
             type: 'expiring',
             path: PATHS.inventory,
             branch: branchById(i.branchId),
-            title: `Expiring soon: ${i.name}`,
+            title: i.expired ? `Expired: ${i.name}` : `Expiring soon: ${i.name}`,
             message: `${i.stock} units in batch ${i.batch} ${days < 0 ? `expired ${-days} days ago` : days === 0 ? 'expire today' : `expire in ${days} ${days === 1 ? 'day' : 'days'}`}.`,
             meta: `Expires ${formatDate(new Date(i.expiry))}`,
             sort: 0

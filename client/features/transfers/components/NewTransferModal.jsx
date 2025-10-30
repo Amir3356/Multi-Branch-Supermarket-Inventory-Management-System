@@ -5,12 +5,15 @@ import {
   X
 } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
+import { procurementBatch } from '../../purchases/model/procurement'
+import { sameText } from '../../../utils'
 import { validateTransfer } from '../services/transferRules'
 
-const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', qty: '' }
+const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', batch: '', qty: '' }
 
-export default function NewTransferModal({ branches, inventory, categories, maxQty, onClose, onSave }) {
-  const [form, setForm] = useState(EMPTY_TRANSFER_FORM)
+// assignedBranchId: staff always send from their own branch (shown read-only); the Owner (null) picks any branch
+export default function NewTransferModal({ branches, assignedBranchId, inventory, purchases, categories, maxQty, onClose, onSave }) {
+  const [form, setForm] = useState({ ...EMPTY_TRANSFER_FORM, from: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
   const activeBranches = branches.filter((b) => b.status === 'Active')
 
@@ -22,6 +25,15 @@ export default function NewTransferModal({ branches, inventory, categories, maxQ
   const sourceProducts = sourceStock.filter((i) => i.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
   const product = sourceProducts.find((i) => i.key === form.key)
   const destinationEntry = product && inventory.find((i) => i.branchId === form.to && i.medId === product.medId)
+  // The batches this product arrived in at the sending branch (one per paid procurement), plus the row's own batch
+  const batches = product
+    ? [...new Set([
+        product.batch,
+        ...purchases
+          .filter((p) => p.status === 'Paid' && p.branchId === form.from && (p.medId === product.medId || sameText(p.product, product.name)))
+          .map(procurementBatch)
+      ].filter(Boolean))]
+    : []
   const qty = Number(form.qty)
   const validQty = product && Number.isInteger(qty) && qty > 0 && qty <= product.stock ? qty : 0
 
@@ -31,13 +43,16 @@ export default function NewTransferModal({ branches, inventory, categories, maxQ
       [field]: value,
       // Changing the sending branch or category resets the product picked from its stock
       ...(field === 'from' ? { category: '', key: '', qty: '' } : {}),
-      ...(field === 'category' ? { key: '', qty: '' } : {})
+      ...(field === 'category' ? { key: '', qty: '' } : {}),
+      // A product starts on its stock row's batch
+      ...(field === 'key' ? { batch: inventory.find((i) => i.key === value)?.batch || '', qty: '' } : {})
     }))
     setErrors((prev) => ({
       ...prev,
       [field]: undefined,
       ...(field === 'from' ? { to: undefined, category: undefined, key: undefined, qty: undefined } : {}),
-      ...(field === 'category' ? { key: undefined, qty: undefined } : {})
+      ...(field === 'category' ? { key: undefined, qty: undefined } : {}),
+      ...(field === 'key' ? { batch: undefined } : {})
     }))
   }
 
@@ -51,7 +66,7 @@ export default function NewTransferModal({ branches, inventory, categories, maxQ
       to: form.to,
       product: product.name,
       medId: product.medId,
-      batch: product.batch,
+      batch: form.batch,
       expiry: product.expiry,
       qty
     })
@@ -79,18 +94,22 @@ export default function NewTransferModal({ branches, inventory, categories, maxQ
           <div className="modal-section-title">Branches</div>
           <div className="modal-grid">
             <div className="form-group">
-              <label htmlFor="transfer-from">From Branch *</label>
-              <select id="transfer-from" autoFocus className={`input-field ${errors.from ? 'error' : ''}`} value={form.from} onChange={(e) => update('from', e.target.value)}>
-                <option value="">Select branch…</option>
-                {activeBranches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+              <label htmlFor="transfer-from">From Branch {assignedBranchId ? '' : '*'}</label>
+              {assignedBranchId ? (
+                <input id="transfer-from" className="input-field" value={branches.find((b) => b.id === assignedBranchId)?.name || assignedBranchId} readOnly disabled title="Your assigned branch (set by the Owner in Account Provision)" />
+              ) : (
+                <select id="transfer-from" autoFocus className={`input-field ${errors.from ? 'error' : ''}`} value={form.from} onChange={(e) => update('from', e.target.value)}>
+                  <option value="">Select branch…</option>
+                  {activeBranches.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              )}
               {errors.from && <span className="error-msg">{errors.from}</span>}
             </div>
             <div className="form-group">
               <label htmlFor="transfer-to">To Branch *</label>
-              <select id="transfer-to" className={`input-field ${errors.to ? 'error' : ''}`} value={form.to} onChange={(e) => update('to', e.target.value)}>
+              <select id="transfer-to" autoFocus={Boolean(assignedBranchId)} className={`input-field ${errors.to ? 'error' : ''}`} value={form.to} onChange={(e) => update('to', e.target.value)}>
                 <option value="">Select branch…</option>
                 {activeBranches.map((b) => (
                   <option key={b.id} value={b.id} disabled={b.id === form.from}>{b.name}</option>
@@ -123,11 +142,22 @@ export default function NewTransferModal({ branches, inventory, categories, maxQ
               <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
               {sourceProducts.map((i) => (
                 <option key={i.key} value={i.key}>
-                  {i.name} · batch {i.batch} · {i.stock} available
+                  {i.name} · {i.stock} available
                 </option>
               ))}
             </select>
             {errors.key && <span className="error-msg">{errors.key}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="transfer-batch">Batch Number *</label>
+            <select id="transfer-batch" className={`input-field ${errors.batch ? 'error' : ''}`} value={form.batch} onChange={(e) => update('batch', e.target.value)} disabled={!product}>
+              <option value="">{product ? 'Select batch…' : 'Select a product first'}</option>
+              {batches.map((b) => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            {errors.batch && <span className="error-msg">{errors.batch}</span>}
           </div>
 
           <div className="form-group">

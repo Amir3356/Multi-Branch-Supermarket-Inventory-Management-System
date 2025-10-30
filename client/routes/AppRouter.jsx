@@ -10,7 +10,6 @@ import LoginPage from '../pages/LoginPage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage'
 import ResetPasswordPage from '../pages/ResetPasswordPage'
 import AcceptInvitationPage from '../pages/AcceptInvitationPage'
-import DashboardPage from '../pages/DashboardPage'
 import AccountProvisionPage from '../pages/AccountProvisionPage'
 import InventoryPage from '../pages/InventoryPage'
 import SalesPage from '../pages/SalesPage'
@@ -28,7 +27,6 @@ import NotFoundPage from '../pages/NotFoundPage'
 
 // Dashboard pages by section key; each one is only open to the roles the API allows
 const SECTION_PAGES = {
-  dashboard: DashboardPage,
   accounts: AccountProvisionPage,
   inventory: InventoryPage,
   sales: SalesPage,

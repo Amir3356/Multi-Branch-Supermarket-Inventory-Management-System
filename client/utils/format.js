@@ -14,11 +14,6 @@ export const formatMoneyIn = (currency, value) =>
 export const formatAmount = (value) =>
   `${value < 0 ? '-' : ''}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-export const currencySymbol = (currency) => (CURRENCIES[currency]?.symbol || '$').trim()
-
-/** 1,200 → "1.2K" for chart axes */
-export const compactNumber = (value) => (Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}K` : String(Math.round(value)))
-
 /** Case-insensitive comparison of two names */
 export const sameText = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 

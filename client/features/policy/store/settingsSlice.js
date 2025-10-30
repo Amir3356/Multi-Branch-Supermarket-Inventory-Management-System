@@ -61,10 +61,13 @@ const settingsSlice = createSlice({
   reducers: {
     minStockLevelChanged(state, action) {
       state.defaultMinStock = action.payload
+    },
+    expiryWarningDaysChanged(state, action) {
+      state.expiryWarningDays = action.payload
     }
   }
 })
 
-export const { minStockLevelChanged } = settingsSlice.actions
+export const { minStockLevelChanged, expiryWarningDaysChanged } = settingsSlice.actions
 export const selectSettings = (state) => state.settings
 export default settingsSlice.reducer

@@ -4,7 +4,6 @@ export const PATHS = {
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
   acceptInvitation: '/accept-invitation',
-  dashboard: '/dashboard',
   accounts: '/account-provision',
   inventory: '/inventory',
   sales: '/sales',

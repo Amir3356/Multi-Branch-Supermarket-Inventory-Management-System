@@ -1,28 +1,39 @@
 import { createPortal } from 'react-dom'
 import { useState } from 'react'
-import {
-  X,
-  PackageX
-} from 'lucide-react'
+import { PackageX, X } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
 import { validateDamage } from '../services/damageRules'
 
-const DAMAGE_REASONS = ['Broken / crushed packaging', 'Water damage', 'Contaminated', 'Temperature damage (cold chain)', 'Defective item', 'Other']
+const DAMAGE_REASONS = [
+  'Broken / crushed packaging',
+  'Water damage',
+  'Contaminated',
+  'Temperature damage (cold chain)',
+  'Defective item',
+  'Other'
+]
 
-const EMPTY_DAMAGE_FORM = { branchId: '', category: '', key: '', qty: '', reason: '' }
+const EMPTY_DAMAGE_FORM = { category: '', productName: '', batchKey: '', qty: '', reason: '' }
 
 // Records stock that was physically damaged and takes it out of the branch's sellable stock
-export default function RecordDamageModal({ branches, inventory, categories, formatMoney, onClose, onSave }) {
+export default function RecordDamageModal({ inventory, categories, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_DAMAGE_FORM)
   const [errors, setErrors] = useState({})
-  const activeBranches = branches.filter((b) => b.status === 'Active')
 
   useEscapeKey(onClose)
 
-  const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0)
-  const categoryCount = (category) => branchStock.filter((i) => i.category === category).length
-  const branchProducts = branchStock.filter((i) => i.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
-  const product = branchProducts.find((i) => i.key === form.key)
+  // Filter inventory with stock > 0
+  const availableStock = inventory.filter((i) => i.stock > 0)
+  const categoryCount = (cat) => availableStock.filter((i) => i.category === cat).length
+
+  // Products under chosen category
+  const categoryItems = availableStock.filter((i) => i.category === form.category)
+  const productNames = [...new Set(categoryItems.map((i) => i.name))].sort((a, b) => a.localeCompare(b))
+
+  // Batches available for chosen product
+  const availableBatches = categoryItems.filter((i) => i.name === form.productName)
+  const product = availableBatches.find((i) => i.key === form.batchKey)
+
   const qty = Number(form.qty)
   const validQty = product && Number.isInteger(qty) && qty > 0 && qty <= product.stock ? qty : 0
   const lossValue = product ? validQty * product.purchasePrice : 0
@@ -31,14 +42,16 @@ export default function RecordDamageModal({ branches, inventory, categories, for
     setForm((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === 'branchId' ? { category: '', key: '', qty: '' } : {}),
-      ...(field === 'category' ? { key: '', qty: '' } : {})
+      ...(field === 'category' ? { productName: '', batchKey: '', qty: '' } : {}),
+      ...(field === 'productName' ? { batchKey: '', qty: '' } : {}),
+      ...(field === 'batchKey' ? { qty: '' } : {})
     }))
     setErrors((prev) => ({
       ...prev,
       [field]: undefined,
-      ...(field === 'branchId' ? { category: undefined, key: undefined, qty: undefined } : {}),
-      ...(field === 'category' ? { key: undefined, qty: undefined } : {})
+      ...(field === 'category' ? { productName: undefined, batchKey: undefined, qty: undefined } : {}),
+      ...(field === 'productName' ? { batchKey: undefined, qty: undefined } : {}),
+      ...(field === 'batchKey' ? { qty: undefined } : {})
     }))
   }
 
@@ -47,8 +60,9 @@ export default function RecordDamageModal({ branches, inventory, categories, for
     const newErrors = validateDamage(form, product, qty)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
+
     onSave({
-      branchId: form.branchId,
+      branchId: product.branchId,
       medId: product.medId,
       product: product.name,
       category: product.category,
@@ -78,27 +92,23 @@ export default function RecordDamageModal({ branches, inventory, categories, for
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label htmlFor="damage-branch">Branch *</label>
-            <select id="damage-branch" autoFocus className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={(e) => update('branchId', e.target.value)}>
-              <option value="">Select branch…</option>
-              {activeBranches.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-            {errors.branchId && <span className="error-msg">{errors.branchId}</span>}
-          </div>
-
-          <div className="modal-section-title">Product</div>
+          <div className="modal-section-title">Product & Batch</div>
+          
           <div className="form-group">
             <label htmlFor="damage-category">Category *</label>
-            <select id="damage-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.branchId}>
-              <option value="">{form.branchId ? 'Select category…' : 'Select a branch first'}</option>
+            <select
+              id="damage-category"
+              autoFocus
+              className={`input-field ${errors.category ? 'error' : ''}`}
+              value={form.category}
+              onChange={(e) => update('category', e.target.value)}
+            >
+              <option value="">Select category…</option>
               {categories.map((c) => {
                 const count = categoryCount(c)
                 return (
                   <option key={c} value={c} disabled={!count}>
-                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(none in stock)'}
+                    {c} {count ? `(${count} in stock)` : '(none in stock)'}
                   </option>
                 )
               })}
@@ -108,26 +118,68 @@ export default function RecordDamageModal({ branches, inventory, categories, for
 
           <div className="form-group">
             <label htmlFor="damage-product">Product Name *</label>
-            <select id="damage-product" className={`input-field ${errors.key ? 'error' : ''}`} value={form.key} onChange={(e) => update('key', e.target.value)} disabled={!form.category}>
+            <select
+              id="damage-product"
+              className={`input-field ${errors.productName ? 'error' : ''}`}
+              value={form.productName}
+              onChange={(e) => update('productName', e.target.value)}
+              disabled={!form.category}
+            >
               <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
-              {branchProducts.map((i) => (
-                <option key={i.key} value={i.key}>
-                  {i.name} · batch {i.batch} · {i.stock} in stock
+              {productNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
                 </option>
               ))}
             </select>
-            {errors.key && <span className="error-msg">{errors.key}</span>}
+            {errors.productName && <span className="error-msg">{errors.productName}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="damage-batch">Batch Number *</label>
+            <select
+              id="damage-batch"
+              className={`input-field ${errors.batchKey ? 'error' : ''}`}
+              value={form.batchKey}
+              onChange={(e) => update('batchKey', e.target.value)}
+              disabled={!form.productName}
+            >
+              <option value="">{form.productName ? 'Select batch number…' : 'Select a product name first'}</option>
+              {availableBatches.map((b) => (
+                <option key={b.key} value={b.key}>
+                  Batch {b.batch} · {b.stock} {b.stock === 1 ? 'unit' : 'units'} in stock
+                </option>
+              ))}
+            </select>
+            {errors.batchKey && <span className="error-msg">{errors.batchKey}</span>}
           </div>
 
           <div className="modal-grid">
             <div className="form-group">
               <label htmlFor="damage-qty">Damaged Quantity *</label>
-              <input id="damage-qty" type="number" min="1" max={product?.stock} step="1" placeholder="Units damaged" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
+              <input
+                id="damage-qty"
+                type="number"
+                min="1"
+                max={product?.stock}
+                step="1"
+                placeholder="Units damaged"
+                className={`input-field ${errors.qty ? 'error' : ''}`}
+                value={form.qty}
+                onChange={(e) => update('qty', e.target.value)}
+                disabled={!product}
+              />
               {errors.qty && <span className="error-msg">{errors.qty}</span>}
             </div>
+
             <div className="form-group">
               <label htmlFor="damage-reason">Reason *</label>
-              <select id="damage-reason" className={`input-field ${errors.reason ? 'error' : ''}`} value={form.reason} onChange={(e) => update('reason', e.target.value)}>
+              <select
+                id="damage-reason"
+                className={`input-field ${errors.reason ? 'error' : ''}`}
+                value={form.reason}
+                onChange={(e) => update('reason', e.target.value)}
+              >
                 <option value="">Select reason…</option>
                 {DAMAGE_REASONS.map((r) => (
                   <option key={r} value={r}>{r}</option>

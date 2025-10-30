@@ -10,6 +10,7 @@ import { selectPurchases } from '../features/purchases/store/purchasesSlice'
 import { selectReturnRequests } from '../features/supplierReturns/store/returnRequestsSlice'
 import { sendReturnRequest } from '../features/supplierReturns/store/returnRequestsThunks'
 import ReturnRequestModal from '../features/supplierReturns/components/ReturnRequestModal'
+import ReturnRequestsPanel from '../features/supplierReturns/components/ReturnRequestsPanel'
 import { isExtraQuantity } from '../features/supplierReturns/model/returnRequest'
 import { sameText } from '../utils'
 import { deleteInventoryItem, editInventoryItem, saveMedicinePrices } from '../features/inventory/store/inventoryThunks'
@@ -109,6 +110,17 @@ export default function InventoryPage() {
         onRequestReturn={canRequestReturn ? setReturningItem : undefined}
         returnBranchId={staffBranchId}
       />
+
+      {/* The Inventory Officer follows their requests: Pending until the Procurement Officer approves or rejects */}
+      {canRequestReturn && (
+        <ReturnRequestsPanel
+          requests={returnRequests.filter((r) => r.branchId === staffBranchId)}
+          isAllBranches={false}
+          branchById={branchById}
+          canHandle={false}
+          description="Your branch's requests to send stock back to suppliers. Pending units are held out of stock; Approved ones went back, Rejected ones returned to stock."
+        />
+      )}
 
       {editingItem && (
         <EditInventoryModal item={editingItem} branchName={branchById(editingItem.branchId)?.name} formatMoney={formatMoney} onClose={() => setEditingItem(null)} onSave={handleEdit} />

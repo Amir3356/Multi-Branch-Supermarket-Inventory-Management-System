@@ -6,8 +6,8 @@ const requestedDate = (iso) => new Date(iso).toLocaleDateString('en-CA')
 
 // Inventory Officers' requests to send stock back to suppliers. The Procurement Officer approves
 // (which records the supplier return) or rejects them, and receives the supplier's replacement for approved ones;
-// others only follow along.
-export default function ReturnRequestsPanel({ requests, isAllBranches, branchById, canHandle, onApprove, onReject, onReplace }) {
+// others only follow along (description: a different line under the heading).
+export default function ReturnRequestsPanel({ requests, isAllBranches, branchById, canHandle, description, onApprove, onReject, onReplace }) {
   const colSpan = 9 + (isAllBranches ? 1 : 0) + (canHandle ? 1 : 0)
 
   return (
@@ -16,9 +16,9 @@ export default function ReturnRequestsPanel({ requests, isAllBranches, branchByI
         <div>
           <h3>Return Requests</h3>
           <p className="page-desc">
-            {canHandle
+            {description || (canHandle
               ? 'Inventory Officers ask for stock to go back to the supplier. Approve a request to record the return.'
-              : 'Requests from Inventory Officers to send stock back to suppliers.'}
+              : 'Requests from Inventory Officers to send stock back to suppliers.')}
           </p>
         </div>
       </div>

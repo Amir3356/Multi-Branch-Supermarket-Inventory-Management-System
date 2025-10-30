@@ -7,6 +7,8 @@ import { selectTransfers } from '../features/transfers/store/transfersSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
 import { selectSettings } from '../features/policy/store/settingsSlice'
+import { selectCurrentUser } from '../features/auth/store/authSlice'
+import { selectPurchases } from '../features/purchases/store/purchasesSlice'
 import { recordTransfer } from '../features/transfers/store/transfersThunks'
 import NewTransferModal from '../features/transfers/components/NewTransferModal'
 import './StockTransfersPage.css'
@@ -19,6 +21,10 @@ export default function StockTransfersPage() {
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
   const { maxTransferQty } = useSelector(selectSettings)
+  const user = useSelector(selectCurrentUser)
+  const purchases = useSelector(selectPurchases)
+  // Staff send from their own branch; the Owner (branch "all") picks any
+  const assignedBranchId = user?.branchId && user.branchId !== 'all' ? user.branchId : null
   const [showNewTransfer, setShowNewTransfer] = useState(false)
   const [notice, setNotice] = useState(null)
 
@@ -76,7 +82,7 @@ export default function StockTransfersPage() {
       </div>
 
       {showNewTransfer && (
-        <NewTransferModal branches={branches} inventory={inventory} categories={categories} maxQty={maxTransferQty} onClose={() => setShowNewTransfer(false)} onSave={handleTransfer} />
+        <NewTransferModal branches={branches} assignedBranchId={assignedBranchId} inventory={inventory} purchases={purchases} categories={categories} maxQty={maxTransferQty} onClose={() => setShowNewTransfer(false)} onSave={handleTransfer} />
       )}
     </div>
   )

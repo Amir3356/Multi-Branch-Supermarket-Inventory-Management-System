@@ -6,6 +6,7 @@ export function validateTransfer(form, product, qty, maxQty) {
   else if (form.to === form.from) errors.to = 'Choose a different branch from the sending branch'
   if (!form.category) errors.category = form.from ? 'Select a category' : 'Select the sending branch first'
   if (!product) errors.key = form.category ? 'Select a product' : 'Select a category first'
+  else if (!form.batch) errors.batch = 'Select the batch number'
   if (!Number.isInteger(qty) || qty < 1) errors.qty = 'Enter a whole number of at least 1'
   else if (product && qty > product.stock) errors.qty = `Only ${product.stock} units available at the sending branch`
   else if (qty > maxQty) errors.qty = `A single transfer can move at most ${maxQty} units`

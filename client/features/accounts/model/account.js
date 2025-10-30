@@ -29,7 +29,7 @@
 // Roles the Owner can give to staff accounts, with what each may open; each works at one branch.
 // The Owner account itself is not created here: it covers all branches and manages these accounts.
 export const ACCOUNT_ROLES = {
-  pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Dashboard, inventory, stock transfers, damaged items, policy and reports' },
+  pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Inventory, stock transfers, damaged items, policy and reports' },
   cashier: { label: 'Cashier', hint: 'Sales, customer returns and reports' },
   purchase_officer: { label: 'Procurement Officer', hint: 'Procurement, supplier returns and reports' }
 }

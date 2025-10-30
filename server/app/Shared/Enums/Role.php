@@ -30,7 +30,7 @@ enum Role: string
     {
         return match ($this) {
             self::Owner => ['accounts', 'branches', 'auditLogs', 'reports'],
-            self::Pharmacist => ['dashboard', 'inventory', 'transfers', 'damaged', 'policy', 'reports', 'notifications'],
+            self::Pharmacist => ['inventory', 'transfers', 'damaged', 'policy', 'reports', 'notifications'],
             self::Cashier => ['sales', 'customerReturns', 'reports'],
             self::PurchaseOfficer => ['purchases', 'supplierReturns', 'reports'],
         };
