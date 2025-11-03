@@ -40,7 +40,7 @@ class StoreProcurementRequest extends FormRequest
     {
         return function (string $attribute, mixed $value, Closure $fail) {
             $user = $this->user();
-            if (! $user->isOwner() && $user->branch_id !== $value) {
+            if (! $user->coversAllBranches() && $user->branch_id !== $value) {
                 $fail($user->branch_id
                     ? 'You can only receive stock into your assigned branch.'
                     : 'You have no assigned branch yet. Ask the Owner to assign one in Account Provision.');

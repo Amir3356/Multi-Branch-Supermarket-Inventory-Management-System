@@ -5,15 +5,15 @@ import {
   Save
 } from 'lucide-react'
 import { isWholeNumber } from '../../../utils'
+import { MAX_WARNING_DAYS } from '../model/policy'
 
-// The longest expiry warning that still makes sense (two years)
-const MAX_WARNING_DAYS = 730
-
-// Policy for every product at every branch: the Minimum Stock Level and the Expiring Soon window, saved together
+// Policy for every product at every branch: the Minimum Stock Level and the Expiring Soon window, saved together on
+// the server so every user gets them
 export default function PolicyForm({ settings, onSave }) {
   const [form, setForm] = useState({ minStock: String(settings.defaultMinStock), expiryDays: String(settings.expiryWarningDays) })
   const [errors, setErrors] = useState({})
   const [notice, setNotice] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
   const isDirty = form.minStock !== String(settings.defaultMinStock) || form.expiryDays !== String(settings.expiryWarningDays)
 
   const update = (field) => (e) => {
@@ -22,7 +22,7 @@ export default function PolicyForm({ settings, onSave }) {
     setNotice(null)
   }
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault()
     const newErrors = {}
     if (!isWholeNumber(form.minStock, 0)) newErrors.minStock = 'Enter a whole number of 0 or more'
@@ -32,7 +32,15 @@ export default function PolicyForm({ settings, onSave }) {
 
     const minStock = Number(form.minStock)
     const expiryDays = Number(form.expiryDays)
-    onSave({ minStock, expiryDays })
+    setIsSaving(true)
+    try {
+      await onSave({ minStock, expiryDays })
+    } catch (error) {
+      setErrors({ minStock: error.fieldErrors?.defaultMinStock, expiryDays: error.fieldErrors?.expiryWarningDays, form: error.fieldErrors ? undefined : error.message })
+      setIsSaving(false)
+      return
+    }
+    setIsSaving(false)
     setForm({ minStock: String(minStock), expiryDays: String(expiryDays) })
     setNotice(`Saved. Fewer than ${minStock} units at a branch shows as Low Stock, and a batch expiring within ${expiryDays} days shows as Expiring Soon.`)
   }
@@ -50,6 +58,7 @@ export default function PolicyForm({ settings, onSave }) {
       )}
 
       <form className="settings-box policy-box" onSubmit={handleSave} noValidate>
+        {errors.form && <span className="error-msg">{errors.form}</span>}
         <div className="form-group">
           <label htmlFor="settings-min-stock">Minimum Stock Level (units)</label>
           <input id="settings-min-stock" type="number" min="0" step="1" placeholder="e.g. 20" className={`input-field ${errors.minStock ? 'error' : ''}`} value={form.minStock} onChange={update('minStock')} />
@@ -67,8 +76,8 @@ export default function PolicyForm({ settings, onSave }) {
         </div>
 
         <div className="policy-actions">
-          <button type="submit" className="primary-action-btn" disabled={!isDirty}>
-            <Save size={16} /> Save
+          <button type="submit" className="primary-action-btn" disabled={!isDirty || isSaving}>
+            <Save size={16} /> {isSaving ? 'Saving…' : 'Save'}
           </button>
         </div>
       </form>

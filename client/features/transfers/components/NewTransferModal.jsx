@@ -15,6 +15,7 @@ const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', batch: ''
 export default function NewTransferModal({ branches, assignedBranchId, inventory, purchases, categories, maxQty, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_TRANSFER_FORM, from: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
+  const [isSaving, setIsSaving] = useState(false)
   const activeBranches = branches.filter((b) => b.status === 'Active')
 
   useEscapeKey(onClose)
@@ -30,7 +31,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
     ? [...new Set([
         product.batch,
         ...purchases
-          .filter((p) => p.status === 'Paid' && p.branchId === form.from && (p.medId === product.medId || sameText(p.product, product.name)))
+          .filter((p) => p.status === 'Paid' && p.branchId === form.from && (p.medId ? p.medId === product.medId : sameText(p.product, product.name)))
           .map(procurementBatch)
       ].filter(Boolean))]
     : []
@@ -56,20 +57,28 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const newErrors = validateTransfer(form, product, qty, maxQty)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
-    onSave({
-      from: form.from,
-      to: form.to,
-      product: product.name,
-      medId: product.medId,
-      batch: form.batch,
-      expiry: product.expiry,
-      qty
-    })
+    setIsSaving(true)
+    try {
+      // Saved on the server: the receiving branch sees it under Incoming and adds it with Add Medicine
+      await onSave({
+        from: form.from,
+        to: form.to,
+        category: product.category,
+        product: product.name,
+        medId: product.medId,
+        batch: form.batch,
+        expiry: product.expiry,
+        qty
+      })
+    } catch (error) {
+      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : error.message })
+      setIsSaving(false)
+    }
   }
 
   return createPortal(
@@ -82,7 +91,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
             </div>
             <div>
               <h2 id="new-transfer-title">New Stock Transfer</h2>
-              <p className="page-desc">Move stock from one branch to another. Stock moves as soon as you confirm.</p>
+              <p className="page-desc">Send stock to another branch. It leaves your stock now and reaches theirs when their Inventory Officer adds it.</p>
             </div>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
@@ -91,6 +100,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          {errors.form && <span className="error-msg">{errors.form}</span>}
           <div className="modal-section-title">Branches</div>
           <div className="modal-grid">
             <div className="form-group">
@@ -176,8 +186,8 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
             <button type="button" className="secondary-action-btn" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="primary-action-btn">
-              <ArrowLeftRight size={16} /> Transfer Stock
+            <button type="submit" className="primary-action-btn" disabled={isSaving}>
+              <ArrowLeftRight size={16} /> {isSaving ? 'Sending…' : 'Send Transfer'}
             </button>
           </div>
         </form>

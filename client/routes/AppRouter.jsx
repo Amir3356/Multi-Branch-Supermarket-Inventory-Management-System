@@ -22,17 +22,21 @@ import ReportsPage from '../pages/ReportsPage'
 import AuditLogsPage from '../pages/AuditLogsPage'
 import BranchesPage from '../pages/BranchesPage'
 import PolicyPage from '../pages/PolicyPage'
+import DashboardPage from '../pages/DashboardPage'
+import ReturnRequestsPage from '../pages/ReturnRequestsPage'
 import NotificationsPage from '../pages/NotificationsPage'
 import NotFoundPage from '../pages/NotFoundPage'
 
 // Dashboard pages by section key; each one is only open to the roles the API allows
 const SECTION_PAGES = {
+  dashboard: DashboardPage,
   accounts: AccountProvisionPage,
   inventory: InventoryPage,
   sales: SalesPage,
   customerReturns: CustomerReturnsPage,
   purchases: PurchasePage,
   supplierReturns: SupplierReturnsPage,
+  returnRequests: ReturnRequestsPage,
   transfers: StockTransfersPage,
   damaged: DamagedPage,
   reports: ReportsPage,

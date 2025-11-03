@@ -3,6 +3,7 @@
 namespace App\Features\Procurements\Repositories;
 
 use App\Features\Procurements\Models\Procurement;
+use App\Shared\Services\BatchNumbers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 // Every database read and write for procurements
 class ProcurementRepository
 {
+    public function __construct(private BatchNumbers $batchNumbers) {}
+
     /** Newest first. */
     public function latest(): Collection
     {
@@ -60,6 +63,14 @@ class ProcurementRepository
             ->where('created_at', '<=', now()->subMinutes($minMinutes))
             ->where('created_at', '>=', now()->subHours($maxHours))
             ->get();
+    }
+
+    /** The Inventory Officer added this paid order's stock to their branch: it gets the next batch number */
+    public function markReceived(Procurement $procurement, int $receivedBy, string $expiryDate): Procurement
+    {
+        $procurement->update(['received_at' => now(), 'received_by' => $receivedBy, 'batch' => $this->batchNumbers->next(), 'expiry_date' => $expiryDate]);
+
+        return $procurement;
     }
 
     public function update(Procurement $procurement, array $attributes): Procurement

@@ -25,6 +25,10 @@
  * @property {string} date               YYYY-MM-DD
  * @property {'Pending' | 'Paid' | 'Failed'} status
  * @property {string | null} checkoutUrl Chapa's page, while the payment can still be finished
+ * @property {string | null} receivedAt  when the branch's Inventory Officer added the stock (Add Medicine); until then
+ *                                       a paid order is not in stock and its delivery is Pending
+ * @property {string | null} batch       the batch number generated when it was added to stock (BT-00001, …)
+ * @property {string | null} expiryDate  its expiration date (YYYY-MM-DD), entered with the batch
  * @property {Payment | null} payment    once Paid
  *
  * The procurement as kept in the store (its payment is stored separately)
@@ -58,8 +62,11 @@ export const toProcurementPayload = (form, product, qty, totalCost) => ({
   qty
 })
 
-/** The batch number a paid procurement's stock was received under (receiveStock uses the procurement ID) */
+/** The batch number a procurement's stock arrived under: the generated one, else (older orders) its ID */
 export const procurementBatch = (procurement) => procurement.batch || procurement.id
 
 /** @returns {{ procurement: Procurement, payment: Payment | null }} */
+/** Delivery for the Procurement Officer: Pending until the receiving branch adds the stock, then Arrived */
+export const deliveryStatus = (procurement) => (procurement.status !== 'Paid' ? null : procurement.receivedAt ? 'Arrived' : 'Pending')
+
 export const procurementFromApi = ({ payment, ...procurement }) => ({ procurement, payment })

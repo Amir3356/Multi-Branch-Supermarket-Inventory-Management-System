@@ -929,6 +929,24 @@ a.nav-item {
 .role-tag.role-cashier { background: rgba(16, 185, 129, 0.12); color: var(--primary-emerald); }
 .role-tag.role-purchase-officer { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
 
+/* Dashboard period picker: Period, then From/To for a custom range */
+.dashboard-period {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-top: 1.25rem;
+}
+
+.dashboard-period .form-group {
+  min-width: 180px;
+}
+
+.dashboard-period > .field-hint,
+.dashboard-period > .error-msg {
+  flex-basis: 100%;
+}
+
 /* Summary cards (StatCard) and the icon tiles in page and modal headers */
 .stats-grid {
   display: grid;

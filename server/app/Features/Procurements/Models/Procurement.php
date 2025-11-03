@@ -15,7 +15,7 @@ class Procurement extends Model
 
     protected $fillable = [
         'id', 'branch_id', 'created_by', 'supplier', 'category', 'product', 'med_id', 'qty', 'unit_price', 'total',
-        'currency', 'status', 'tx_ref', 'checkout_url', 'chapa_reference', 'payment_method', 'paid_at',
+        'currency', 'status', 'tx_ref', 'checkout_url', 'chapa_reference', 'payment_method', 'paid_at', 'received_at', 'received_by', 'batch', 'expiry_date',
     ];
 
     protected function casts(): array
@@ -25,6 +25,8 @@ class Procurement extends Model
             'unit_price' => 'decimal:2',
             'total' => 'decimal:2',
             'paid_at' => 'datetime',
+            'received_at' => 'datetime',
+            'expiry_date' => 'date',
         ];
     }
 
@@ -36,6 +38,12 @@ class Procurement extends Model
             ->max() ?? 0;
 
         return sprintf('PO-%05d', $highest + 1);
+    }
+
+    /** Paid, and its Inventory Officer hasn't added the stock yet */
+    public function awaitsReceipt(): bool
+    {
+        return $this->status === 'paid' && $this->received_at === null;
     }
 
     public function isPending(): bool

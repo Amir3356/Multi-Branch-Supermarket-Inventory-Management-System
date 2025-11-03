@@ -22,7 +22,8 @@ class StoreAccountRequest extends FormRequest
             'fullName' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email:rfc', 'max:255', 'unique:users,email'],
             'role' => ['required', Rule::in(array_map(fn (Role $r) => $r->value, Role::staff()))],
-            'branchId' => ['required', 'string', 'exists:branches,id'],
+            // Pharmacists and Cashiers work at one branch; the Procurement Officer covers every branch, so none is set
+            'branchId' => [Rule::requiredIf(fn () => Role::tryFrom((string) $this->input('role'))?->coversAllBranches() === false), 'nullable', 'string', 'exists:branches,id'],
         ];
     }
 

@@ -14,12 +14,13 @@ const stockSlice = createSlice({
       const row = findRow(state, medId, branchId)
       if (row) row.stock += delta
     },
-    // Units arriving at a branch: added to its row, or a new row if the branch didn't stock the product
+    // Units arriving at a branch: added to its row, or a new row if the branch didn't stock the product. The row moves
+    // to the top, so the latest stock shows first in Inventory.
     stockReceived(state, action) {
       const { medId, branchId, qty, batch, expiry } = action.payload
       const row = findRow(state, medId, branchId)
-      if (row) row.stock += qty
-      else state.push({ medId, branchId, stock: qty, batch, expiry })
+      const updated = row ? { ...row, stock: row.stock + qty } : { medId, branchId, stock: qty, batch, expiry }
+      return [updated, ...state.filter((e) => e !== row)]
     },
     stockRowUpdated(state, action) {
       const { medId, branchId, changes } = action.payload

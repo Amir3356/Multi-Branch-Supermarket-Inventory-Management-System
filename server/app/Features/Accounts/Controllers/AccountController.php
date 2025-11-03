@@ -13,11 +13,13 @@ use App\Features\Accounts\Services\InvitationService;
 use App\Features\Sessions\Repositories\SessionRepository;
 use App\Features\Sessions\Services\SessionService;
 use App\Shared\Enums\AccountStatus;
+use App\Shared\Enums\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 // Owner-only: invite, edit, (de)activate and delete staff accounts
@@ -46,7 +48,7 @@ class AccountController
                 'full_name' => $data['fullName'],
                 'email' => $data['email'],
                 'role' => $data['role'],
-                'branch_id' => $data['branchId'],
+                'branch_id' => Role::from($data['role'])->coversAllBranches() ? null : $data['branchId'],
                 'status' => AccountStatus::Invited,
             ]);
             $this->invitations->send($user, $request->user());
@@ -77,6 +79,12 @@ class AccountController
             'branch_id' => $data['branchId'] ?? null,
             'status' => $data['status'] ?? null,
         ]));
+        // A role that covers every branch has no branch; the others must have one
+        if ($account->role->coversAllBranches()) {
+            $account->branch_id = null;
+        } elseif (! $account->branch_id) {
+            throw ValidationException::withMessages(['branchId' => 'Assign a branch for this role.']);
+        }
         $emailChanged = $account->isDirty('email');
         $previousRole = $account->isDirty('role') ? $account->getOriginal('role') : null;
         // Kept for access reviews of past periods, like role changes

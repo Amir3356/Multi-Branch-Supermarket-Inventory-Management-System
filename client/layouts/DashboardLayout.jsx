@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LogOut, Pill, User } from 'lucide-react'
@@ -11,8 +11,10 @@ import { reportDeviceLocation } from '../features/accounts/api/sessionsApi'
 import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
 import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/store/authThunks'
 import { loadBranches } from '../features/branches/store/branchesThunks'
-import { loadProcurements } from '../features/purchases/store/purchasesThunks'
+import { loadProcurements, procurementPushed } from '../features/purchases/store/purchasesThunks'
 import { loadReturnRequests, returnRequestPushed } from '../features/supplierReturns/store/returnRequestsThunks'
+import { loadPolicy, policyPushed } from '../features/policy/store/policyThunks'
+import { loadTransfers, transferPushed } from '../features/transfers/store/transfersThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 
@@ -31,39 +33,66 @@ export default function DashboardLayout() {
     [user]
   )
 
-  // Pick up role or branch changes the Owner made since this user signed in, and the branch list every page labels with
+  // Check the saved session first, picking up role or branch changes the Owner made since this user signed in. A
+  // session that ended meanwhile (e.g. signed out after inactivity while the browser was closed) gets one 401 and
+  // goes to the login page, instead of every request below failing too. If the API can't be reached, carry on.
+  const [sessionChecked, setSessionChecked] = useState(false)
   useEffect(() => {
-    dispatch(refreshCurrentUser()).catch(() => {})
+    dispatch(refreshCurrentUser())
+      .then(() => setSessionChecked(true))
+      .catch((error) => {
+        if (error.status !== 401) setSessionChecked(true)
+      })
+  }, [dispatch])
+
+  // Then the branch list every page labels with, and paid procurements, whose stock every branch's inventory
+  // includes. Return requests hold units out of that stock, so they load after procurements; after that, changes
+  // arrive over the WebSocket (below)
+  useEffect(() => {
+    if (!sessionChecked) return
     dispatch(loadBranches()).catch(() => {})
-  }, [dispatch])
+    // The shared policy decides Low Stock and Expiring Soon on every page
+    dispatch(loadPolicy()).catch(() => {})
+    // Stock is built in order: procurements bring it in, then return requests and transfers move it
+    dispatch(loadProcurements()).catch(() => {})
+      .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
+      .finally(() => dispatch(loadTransfers()).catch(() => {}))
+  }, [sessionChecked, dispatch])
 
-  // Paid procurements, whose stock every branch's inventory includes. Return requests hold units out of that stock,
-  // so they load after procurements; after that, changes arrive over the WebSocket (below)
-  useEffect(() => {
-    dispatch(loadProcurements()).catch(() => {}).finally(() => dispatch(loadReturnRequests()).catch(() => {}))
-  }, [dispatch])
-
-  // Live return requests: sent, approved, rejected or replaced on another screen updates this one's stock and lists
-  // at once. Staff listen to their own branch, the Owner to every branch. After a dropped connection, catch up once.
-  const returnChannels = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId])
-    .filter(Boolean)
-    .map((id) => `branch.${id}.return-requests`)
-    .join(' ')
+  // Live updates per branch: a paid procurement's stock and return requests (sent, approved, rejected, replaced) change
+  // this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
+  // Procurement Officer) to all of them. After a dropped connection, catch up once.
+  const liveBranchIds = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId]).filter(Boolean).join(' ')
   useEffect(() => {
     const echo = realtime()
-    if (!echo || !returnChannels) return undefined
-    const channels = returnChannels.split(' ')
-    channels.forEach((channel) => echo.private(channel).listen('.return-request.changed', (event) => dispatch(returnRequestPushed(event.request))))
+    if (!sessionChecked || !echo || !liveBranchIds) return undefined
+    const channels = []
+    for (const id of liveBranchIds.split(' ')) {
+      echo.private(`branch.${id}.procurements`).listen('.procurement.changed', (event) => dispatch(procurementPushed(event.procurement)))
+      echo.private(`branch.${id}.return-requests`).listen('.return-request.changed', (event) => dispatch(returnRequestPushed(event.request)))
+      echo.private(`branch.${id}.transfers`).listen('.transfer.changed', (event) => dispatch(transferPushed(event.transfer)))
+      channels.push(`branch.${id}.procurements`, `branch.${id}.return-requests`, `branch.${id}.transfers`)
+    }
+    // The policy is shared by every branch; branch changes (added, renamed, deactivated, deleted) reach everyone too
+    echo.private('policy').listen('.policy.changed', (event) => dispatch(policyPushed(event.policy)))
+    echo.private('branches').listen('.branches.changed', () => dispatch(loadBranches()).catch(() => {}))
+    channels.push('policy', 'branches')
     let wasConnected = null
     const stopWatching = watchConnection((connected) => {
-      if (connected && wasConnected === false) dispatch(loadReturnRequests()).catch(() => {})
+      if (connected && wasConnected === false) {
+        dispatch(loadPolicy()).catch(() => {})
+        dispatch(loadBranches()).catch(() => {})
+        dispatch(loadProcurements()).catch(() => {})
+          .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
+          .finally(() => dispatch(loadTransfers()).catch(() => {}))
+      }
       wasConnected = connected
     })
     return () => {
       channels.forEach((channel) => echo.leave(channel))
       stopWatching()
     }
-  }, [returnChannels, dispatch])
+  }, [sessionChecked, liveBranchIds, dispatch])
 
   // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),
   // pushed over the WebSocket; the token's id is the part before "|"
@@ -71,11 +100,11 @@ export default function DashboardLayout() {
   const sessionId = token?.split('|')[0]
   useEffect(() => {
     const echo = realtime()
-    if (!echo || !sessionId) return undefined
+    if (!sessionChecked || !echo || !sessionId) return undefined
     const channel = `session.${sessionId}`
     echo.private(channel).listen('.session.ended', (event) => dispatch(sessionEnded(event.reason)))
     return () => echo.leave(channel)
-  }, [dispatch, sessionId])
+  }, [sessionChecked, dispatch, sessionId])
 
   // Once per sign-in, ask the browser where it is so the Owner sees a precise place
   // (e.g. "Addis Ababa, Bole, Ethiopia"); if the person blocks it, the IP's city is used instead

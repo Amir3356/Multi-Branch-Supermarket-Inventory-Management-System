@@ -28,6 +28,12 @@ class ProcurementResource extends JsonResource
             'status' => ucfirst($this->status),
             // Lets the officer finish a payment they left half way
             'checkoutUrl' => $this->isPending() ? $this->checkout_url : null,
+            // Set when the receiving branch's Inventory Officer added the stock (Add Medicine); until then it isn't in stock
+            'receivedAt' => $this->received_at?->toIso8601String(),
+            // The batch number generated when the stock was added (older orders: their procurement ID)
+            'batch' => $this->batch,
+            // …and its expiration date (YYYY-MM-DD)
+            'expiryDate' => $this->expiry_date?->toDateString(),
             'payment' => $isPaid ? [
                 'id' => $this->chapa_reference ?: $this->tx_ref,
                 'purchaseId' => $this->id,

@@ -11,11 +11,11 @@ class ReturnRequestRepository
 {
     private const RELATIONS = ['procurement', 'requester', 'handler', 'replacer'];
 
-    /** Newest first: every branch for the Owner, otherwise the user's own branch. */
+    /** Newest first: every branch for those who cover all branches (Owner, Procurement Officer), otherwise the user's own. */
     public function visibleTo(User $user): Collection
     {
         return ReturnRequest::with(self::RELATIONS)
-            ->when(! $user->isOwner(), fn ($query) => $query->where('branch_id', $user->branch_id))
+            ->when(! $user->coversAllBranches(), fn ($query) => $query->where('branch_id', $user->branch_id))
             ->latest('id')
             ->get();
     }

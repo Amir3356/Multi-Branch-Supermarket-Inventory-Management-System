@@ -5,7 +5,6 @@ import {
   Search,
   Filter,
   X,
-  Trash2,
   Pencil,
   Undo2
 } from 'lucide-react'
@@ -35,7 +34,7 @@ const inventorySearchFn = (row, _columnId, value) => {
 
 // heldQty(item): units held out of stock by pending return requests, shown under Current Stock.
 // onRequestReturn: the Inventory Officer's "send back to supplier" button, on rows at returnBranchId (left out for other roles)
-export default function InventoryTable({ data, branches, categories, showBranch, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId }) {
+export default function InventoryTable({ data, branches, categories, showBranch, heldQty, onEdit, onRequestReturn, returnBranchId }) {
   const { moneyHeader, formatAmount } = useMoneyColumns()
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
@@ -44,6 +43,8 @@ export default function InventoryTable({ data, branches, categories, showBranch,
   const columns = useMemo(() => {
     const branchName = (id) => branches.find((b) => b.id === id)?.name || ''
     return [
+      // First column: the batch the row's stock arrived under (replaces the old row number)
+      { accessorKey: 'batch', header: 'Batch Number', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
       { accessorKey: 'name', header: 'Product Name', sortFn: 'text', cell: (info) => <span className="fw-600">{info.getValue()}</span> },
       ...(showBranch
         ? [{
@@ -75,7 +76,6 @@ export default function InventoryTable({ data, branches, categories, showBranch,
       { accessorKey: 'sellingPrice', header: moneyHeader('Unit Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
       // What the row's whole stock would sell for: Current Stock × Unit Selling Price (Not set until it has a price)
       { id: 'totalSellingPrice', accessorFn: (row) => (row.sellingPrice == null ? undefined : row.stock * row.sellingPrice), header: moneyHeader('Total Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
-      { accessorKey: 'batch', header: 'Batch Number', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
       {
         accessorKey: 'expiry',
         header: 'Expiration Date',
@@ -106,15 +106,13 @@ export default function InventoryTable({ data, branches, categories, showBranch,
                   <Undo2 size={15} />
                 </button>
               )}
-              <button type="button" className="icon-danger-btn" onClick={() => onDelete(item)} aria-label={`Delete ${item.name} at ${branches.find((b) => b.id === item.branchId)?.name}`} title="Delete">
-                <Trash2 size={15} />
-              </button>
+
             </div>
           )
         }
       }
     ]
-  }, [branches, showBranch, moneyHeader, formatAmount, heldQty, onEdit, onDelete, onRequestReturn, returnBranchId])
+  }, [branches, showBranch, moneyHeader, formatAmount, heldQty, onEdit, onRequestReturn, returnBranchId])
 
   // The branch filter only applies while the Branch column is shown
   const activeColumnFilters = showBranch ? columnFilters : columnFilters.filter((f) => f.id !== 'branchId')
@@ -146,7 +144,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
   }
 
   const matchingCount = table.getFilteredRowModel().rows.length
-  const visibleColumnCount = columns.length + 1
+  const visibleColumnCount = columns.length
 
   return (
     <>
@@ -207,7 +205,6 @@ export default function InventoryTable({ data, branches, categories, showBranch,
           <thead>
             {table.getHeaderGroups().map((group) => (
               <tr key={group.id}>
-                <th>No</th>
                 {group.headers.map((header) => (
                   <SortableHeader key={header.id} header={header} table={table} />
                 ))}
@@ -215,9 +212,8 @@ export default function InventoryTable({ data, branches, categories, showBranch,
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row, index) => (
+            {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
-                <td>{index + 1}</td>
                 {row.getAllCells().map((cell) => (
                   <td key={cell.id}>
                     <table.FlexRender cell={cell} />

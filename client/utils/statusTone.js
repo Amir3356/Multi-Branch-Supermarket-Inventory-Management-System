@@ -20,6 +20,7 @@ export const STATUS_TONE = {
   'Pending': 'low-stock',
   'Expiring Soon': 'low-stock',
   'Expired': 'out-of-stock',
+  'Arrived': 'in-stock',
   'Approved': 'in-stock',
   'Rejected': 'out-of-stock',
   'Replaced': 'in-stock',

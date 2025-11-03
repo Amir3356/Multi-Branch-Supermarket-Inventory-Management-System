@@ -20,7 +20,7 @@ class SessionResource extends JsonResource
             'email' => $user->email,
             'role' => $user->role->value,
             'roleLabel' => $user->role->label(),
-            'branchId' => $user->isOwner() ? 'all' : $user->branch_id,
+            'branchId' => $user->coversAllBranches() ? 'all' : $user->branch_id,
             'device' => SessionService::describeDevice($this->name),
             'ip' => $this->ip_address,
             'location' => $this->location,

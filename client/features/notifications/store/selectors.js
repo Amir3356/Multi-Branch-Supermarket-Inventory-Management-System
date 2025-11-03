@@ -3,7 +3,7 @@ import { daysUntil, formatDate, startOfToday } from '../../../utils'
 import { selectInventory } from '../../inventory/store/selectors'
 import { selectBranches } from '../../branches/store/branchesSlice'
 import { selectSettings } from '../../policy/store/settingsSlice'
-import { selectSelectedBranch } from '../../ui/store/uiSlice'
+import { selectBranchInView } from '../../ui/store/uiSlice'
 import { PATHS } from '../../../routes/paths'
 
 const TAX_REMINDER_DAYS = 60
@@ -17,7 +17,7 @@ const nextTaxDueDate = (rate) => {
 
 // Notifications generated from current stock and the tax policy, for the selected branch scope
 export const selectAllNotifications = createSelector(
-  [selectInventory, selectBranches, selectSettings, selectSelectedBranch],
+  [selectInventory, selectBranches, selectSettings, selectBranchInView],
   (inventory, branches, settings, selectedBranch) => {
     const branchById = (id) => branches.find((b) => b.id === id)
     const scoped = inventory.filter((i) => selectedBranch === 'all' || i.branchId === selectedBranch)

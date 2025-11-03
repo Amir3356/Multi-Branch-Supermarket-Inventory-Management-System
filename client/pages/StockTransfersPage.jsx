@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { ArrowLeftRight, CheckCircle2, Package, Plus } from 'lucide-react'
-import { BranchTag, Notice, PageHeader, StatCard, StatusTag } from '../components'
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CheckCircle2, Package, Plus } from 'lucide-react'
+import { Notice, PageHeader, StatCard } from '../components'
 import { useBranchScope } from '../hooks'
 import { selectTransfers } from '../features/transfers/store/transfersSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
@@ -9,14 +9,16 @@ import { selectCategories, selectProducts } from '../features/inventory/store/pr
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { selectPurchases } from '../features/purchases/store/purchasesSlice'
-import { recordTransfer } from '../features/transfers/store/transfersThunks'
+import { sendTransfer } from '../features/transfers/store/transfersThunks'
 import NewTransferModal from '../features/transfers/components/NewTransferModal'
+import TransfersTable from '../features/transfers/components/TransfersTable'
 import './StockTransfersPage.css'
 
 export default function StockTransfersPage() {
   const dispatch = useDispatch()
-  const { branches, branchById, scopeLabel, inScope } = useBranchScope()
-  const transfers = useSelector(selectTransfers).filter((t) => inScope(t.from) || inScope(t.to))
+  const { branches, branchById, scopeLabel, inScope, selectedBranch } = useBranchScope()
+  const allTransfers = useSelector(selectTransfers)
+  const transfers = allTransfers.filter((t) => inScope(t.from) || inScope(t.to))
   const inventory = useSelector(selectInventory)
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
@@ -28,14 +30,33 @@ export default function StockTransfersPage() {
   const [showNewTransfer, setShowNewTransfer] = useState(false)
   const [notice, setNotice] = useState(null)
 
-  const handleTransfer = (data) => {
-    setNotice({ type: 'success', text: dispatch(recordTransfer(data)).message })
+  // One branch in view (its own staff, or a branch picked): split into what it sent and what it received
+  const branchInView = selectedBranch !== 'all' ? selectedBranch : null
+  const outgoing = useMemo(() => (branchInView ? allTransfers.filter((t) => t.from === branchInView) : []), [allTransfers, branchInView])
+  const incoming = useMemo(() => (branchInView ? allTransfers.filter((t) => t.to === branchInView) : []), [allTransfers, branchInView])
+  const sum = (list) => list.reduce((total, t) => total + t.qty, 0)
+
+  // While this page is open, tell the sending branch when the other branch adds one of its transfers (pushed live)
+  const seenStatus = useRef(null)
+  useEffect(() => {
+    const before = seenStatus.current
+    seenStatus.current = Object.fromEntries(outgoing.map((t) => [t.id, t.status]))
+    if (!before) return
+    const added = outgoing.find((t) => t.status === 'Received' && before[t.id] === 'Pending')
+    if (added) {
+      setNotice({ type: 'success', text: `${branchById(added.to)?.name || 'The receiving branch'} added ${added.qty} × ${added.product} (${added.id}) to their stock${added.receivedBy ? ` — ${added.receivedBy}` : ''}.` })
+    }
+  }, [outgoing, branchById])
+
+  // Saved on the server; the form shows any error
+  const handleTransfer = async (data) => {
+    setNotice({ type: 'success', text: await dispatch(sendTransfer(data)) })
     setShowNewTransfer(false)
   }
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Stock Transfers · ${scopeLabel}`} description="Move stock between branches to cover shortages and rebalance expiring batches.">
+      <PageHeader title={`Stock Transfers · ${scopeLabel}`} description="Move stock between branches. It leaves the sending branch at once and reaches the receiving branch's Inventory when their Inventory Officer adds it (Add Medicine).">
         <button className="primary-action-btn" onClick={() => setShowNewTransfer(true)}>
           <Plus size={16} /> New Transfer
         </button>
@@ -43,43 +64,38 @@ export default function StockTransfersPage() {
 
       <Notice notice={notice} onDismiss={() => setNotice(null)} />
 
-      <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
-        <StatCard title="Total Transfers" icon={ArrowLeftRight} tone="cyan" value={transfers.length} chipTone="positive" chip={<><CheckCircle2 size={12} /> All completed</>} />
-        <StatCard title="Quantity Transferred" icon={Package} tone="teal" value={transfers.reduce((sum, t) => sum + t.qty, 0).toLocaleString()} chip="Moved between branches" />
-      </div>
+      {branchInView ? (
+        <>
+          <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
+            <StatCard title="Sent" icon={ArrowUpRight} tone="warning" value={sum(outgoing).toLocaleString()} chip={`${outgoing.length} ${outgoing.length === 1 ? 'transfer' : 'transfers'} to other branches`} />
+            <StatCard title="Received" icon={ArrowDownLeft} tone="teal" value={sum(incoming).toLocaleString()} chipTone="positive" chip={`${incoming.length} ${incoming.length === 1 ? 'transfer' : 'transfers'} from other branches`} />
+          </div>
 
-      <div className="table-responsive">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Transfer ID</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Category</th>
-              <th>Product Name</th>
-              <th>Batch</th>
-              <th>Quantity</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transfers.map((trf) => (
-              <tr key={trf.id}>
-                <td className="font-mono">{trf.id}</td>
-                <td><BranchTag branch={branchById(trf.from)} /></td>
-                <td><BranchTag branch={branchById(trf.to)} /></td>
-                <td>{products.find((m) => m.name === trf.product)?.category || '—'}</td>
-                <td className="fw-600">{trf.product}</td>
-                <td><span className="batch-badge">{trf.batch}</span></td>
-                <td>{trf.qty} units</td>
-                <td>{trf.date}</td>
-                <td><StatusTag status={trf.status} /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <div className="section-header">
+            <div>
+              <h3>Outgoing · Sent from {scopeLabel}</h3>
+              <p className="page-desc">Stock this branch moved to other branches.</p>
+            </div>
+          </div>
+          <TransfersTable transfers={outgoing} products={products} branchById={branchById} show="to" emptyText="Nothing sent to other branches yet." />
+
+          <div className="section-header" style={{ marginTop: '2.5rem' }}>
+            <div>
+              <h3>Incoming · Received at {scopeLabel}</h3>
+              <p className="page-desc">Stock other branches moved here.</p>
+            </div>
+          </div>
+          <TransfersTable transfers={incoming} products={products} branchById={branchById} show="from" emptyText="Nothing received from other branches yet." />
+        </>
+      ) : (
+        <>
+          <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
+            <StatCard title="Total Transfers" icon={ArrowLeftRight} tone="cyan" value={transfers.length} chipTone="positive" chip={<><CheckCircle2 size={12} /> {transfers.filter((t) => t.status === 'Pending').length} pending</>} />
+            <StatCard title="Quantity Transferred" icon={Package} tone="teal" value={sum(transfers).toLocaleString()} chip="Moved between branches" />
+          </div>
+          <TransfersTable transfers={transfers} products={products} branchById={branchById} emptyText="No stock transfers recorded." />
+        </>
+      )}
 
       {showNewTransfer && (
         <NewTransferModal branches={branches} assignedBranchId={assignedBranchId} inventory={inventory} purchases={purchases} categories={categories} maxQty={maxTransferQty} onClose={() => setShowNewTransfer(false)} onSave={handleTransfer} />

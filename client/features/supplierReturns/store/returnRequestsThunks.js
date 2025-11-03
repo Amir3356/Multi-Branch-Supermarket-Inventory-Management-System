@@ -1,4 +1,4 @@
-import { sameText } from '../../../utils'
+import { findCatalogProduct } from '../../../utils'
 import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { stockAdjusted } from '../../inventory/store/stockSlice'
 import { approveReturnRequestRequest, createReturnRequest, fetchReturnRequests, rejectReturnRequestRequest, replaceReturnRequestRequest } from '../api/returnRequestsApi'
@@ -16,7 +16,7 @@ import { recordSupplierReturn } from './supplierReturnsThunks'
 const syncReturnStock = () => (dispatch, getState) => {
   const { returnRequests, products, stock } = getState()
   for (const request of returnRequests.items) {
-    const medId = products.items.find((p) => p.id === request.medId || sameText(p.name, request.product))?.id
+    const medId = findCatalogProduct(products.items, request.medId, request.product)?.id
     // The branch's stock hasn't arrived in this browser yet (procurements still loading): try again next sync
     if (!stock.some((row) => row.medId === medId && row.branchId === request.branchId)) continue
 

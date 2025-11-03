@@ -28,7 +28,7 @@ class UpdateAccountRequest extends FormRequest
             'fullName' => ['sometimes', 'required', 'string', 'max:120'],
             'email' => ['sometimes', 'required', 'email:rfc', 'max:255', Rule::unique('users', 'email')->ignore($this->route('account'))],
             'role' => ['sometimes', 'required', Rule::in(array_map(fn (Role $r) => $r->value, Role::staff()))],
-            'branchId' => ['sometimes', 'required', 'string', 'exists:branches,id'],
+            'branchId' => ['sometimes', 'nullable', 'string', 'exists:branches,id'],
             'status' => ['sometimes', 'required', Rule::in(['active', 'inactive'])],
         ];
     }

@@ -38,7 +38,7 @@ class ReturnRequestController
         $this->live->changed($this->requests->withDetails($returnRequest));
 
         return response()->json([
-            'message' => "Return request sent: {$returnRequest->qty} × {$procurement->product} (batch {$procurement->id}). The Procurement Officer will review it.",
+            'message' => "Return request sent: {$returnRequest->qty} × {$procurement->product} (batch {$procurement->batch}). The Procurement Officer will review it.",
             'request' => new ReturnRequestResource($this->requests->withDetails($returnRequest)),
         ], 201);
     }
@@ -95,14 +95,14 @@ class ReturnRequestController
         $this->live->changed($replaced);
 
         return response()->json([
-            'message' => "{$replaced->replaced_qty} × {$replaced->procurement?->product} received from {$replaced->procurement?->supplier} back into batch {$replaced->procurement_id}.",
+            'message' => "{$replaced->replaced_qty} × {$replaced->procurement?->product} received from {$replaced->procurement?->supplier} back into batch {$replaced->procurement?->batch}.",
             'request' => new ReturnRequestResource($replaced),
         ]);
     }
 
     private function ensureSameBranch(Request $request, ReturnRequest $returnRequest): void
     {
-        if ($returnRequest->branch_id !== $request->user()->branch_id) {
+        if (! $request->user()->coversAllBranches() && $returnRequest->branch_id !== $request->user()->branch_id) {
             abort(403, 'This request is for another branch.');
         }
     }

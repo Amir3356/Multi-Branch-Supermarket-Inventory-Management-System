@@ -1,4 +1,5 @@
 import {
+  LayoutDashboard,
   UserCog,
   Package,
   ShoppingCart,
@@ -10,7 +11,7 @@ import {
   BarChart3,
   FileText,
   Building2,
-  ShieldCheck
+  Settings
 } from 'lucide-react'
 import { PATHS } from './paths'
 
@@ -19,6 +20,7 @@ export const NAV_GROUPS = [
   {
     title: 'MAIN MENU',
     items: [
+      { section: 'dashboard', path: PATHS.dashboard, label: 'Dashboard', icon: LayoutDashboard },
       { section: 'accounts', path: PATHS.accounts, label: 'Account Provision', icon: UserCog },
       { section: 'inventory', path: PATHS.inventory, label: 'Inventory', icon: Package, badge: 'inventoryAlerts' },
       { section: 'sales', path: PATHS.sales, label: 'Sales', icon: ShoppingCart },
@@ -45,7 +47,7 @@ export const NAV_GROUPS = [
     title: 'CONFIGURATION',
     items: [
       { section: 'branches', path: PATHS.branches, label: 'Branches', icon: Building2, badge: 'branchCount' },
-      { section: 'policy', path: PATHS.policy, label: 'Policy', icon: ShieldCheck }
+      { section: 'policy', path: PATHS.policy, label: 'Settings', icon: Settings }
     ]
   }
 ]

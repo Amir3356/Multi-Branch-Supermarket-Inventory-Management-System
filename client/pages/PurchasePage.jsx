@@ -9,6 +9,7 @@ import { selectSupplierReturns } from '../features/supplierReturns/store/supplie
 import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { startProcurement, verifyProcurement } from '../features/purchases/store/purchasesThunks'
+import { deliveryStatus } from '../features/purchases/model/procurement'
 import NewPurchaseModal from '../features/purchases/components/NewPurchaseModal'
 import './PurchasePage.css'
 
@@ -147,6 +148,7 @@ export default function PurchasePage() {
               <th>{moneyHeader('Total Cost')}</th>
               <th>Purchased On</th>
               <th>Status</th>
+              <th>Delivery</th>
             </tr>
           </thead>
           <tbody>
@@ -168,9 +170,14 @@ export default function PurchasePage() {
                     </a>
                   )}
                 </td>
+                {/* Pending until the receiving branch's Inventory Officer adds the stock (Add Medicine), then Arrived */}
+                <td>
+                  {deliveryStatus(po) ? <StatusTag status={deliveryStatus(po)} /> : '—'}
+                  {po.receivedAt && po.batch && <div className="page-desc" style={{ margin: 0 }}>Batch {po.batch}</div>}
+                </td>
               </tr>
             ))}
-            {purchases.length === 0 && <EmptyRow colSpan={isAllBranches ? 9 : 8}>No procurement records found.</EmptyRow>}
+            {purchases.length === 0 && <EmptyRow colSpan={isAllBranches ? 10 : 9}>No procurement records found.</EmptyRow>}
           </tbody>
         </table>
       </div>

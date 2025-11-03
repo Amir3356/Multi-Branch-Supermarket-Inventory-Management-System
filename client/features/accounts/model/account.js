@@ -31,16 +31,19 @@
 export const ACCOUNT_ROLES = {
   pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Inventory, stock transfers, damaged items, policy and reports' },
   cashier: { label: 'Cashier', hint: 'Sales, customer returns and reports' },
-  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement, supplier returns and reports' }
+  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement and supplier returns for every branch, and reports', allBranches: true }
 }
 
 export const EMPTY_ACCOUNT_FORM = { fullName: '', email: '', role: '', branchId: '', status: 'Active' }
 
 /** The form filled in from an existing account */
-export const accountToForm = (account) => ({ fullName: account.fullName, email: account.email, role: account.role, branchId: account.branchId, status: account.status })
+/** Works across every branch, so no branch is assigned (the Procurement Officer; the server agrees) */
+export const coversAllBranches = (role) => Boolean(ACCOUNT_ROLES[role]?.allBranches)
+
+export const accountToForm = (account) => ({ fullName: account.fullName, email: account.email, role: account.role, branchId: account.branchId === 'all' ? '' : account.branchId, status: account.status })
 
 /** @returns {AccountPayload} the form's values, cleaned up; `email` is already trimmed and lower-cased */
-export const toAccountPayload = (form, email) => ({ fullName: form.fullName.trim(), email, role: form.role, branchId: form.branchId, status: form.status })
+export const toAccountPayload = (form, email) => ({ fullName: form.fullName.trim(), email, role: form.role, branchId: coversAllBranches(form.role) ? null : form.branchId, status: form.status })
 
 /** @returns {AccountPayload} what an edit sends: status only once the invitation was accepted */
 export const toAccountChanges = (existing, data) => {

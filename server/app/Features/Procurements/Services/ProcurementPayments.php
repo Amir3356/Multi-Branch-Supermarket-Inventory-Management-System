@@ -10,7 +10,11 @@ use Illuminate\Support\Str;
 
 class ProcurementPayments
 {
-    public function __construct(private ChapaClient $chapa, private ProcurementRepository $procurements) {}
+    public function __construct(
+        private ChapaClient $chapa,
+        private ProcurementRepository $procurements,
+        private ProcurementBroadcaster $live,
+    ) {}
 
     /** Asks Chapa for a checkout page for this procurement and keeps its URL so the payment can be resumed. */
     public function startCheckout(Procurement $procurement, User $payer): string
@@ -55,7 +59,7 @@ class ProcurementPayments
             return $procurement; // not paid yet
         }
 
-        return DB::transaction(function () use ($procurement, $transaction) {
+        $synced = DB::transaction(function () use ($procurement, $transaction) {
             $procurement = $this->procurements->lockForUpdate($procurement);
             if (! $procurement->isPending()) {
                 return $procurement;
@@ -78,5 +82,12 @@ class ProcurementPayments
 
             return $procurement;
         });
+
+        // Paid or Failed now: tell the receiving branch's screens, so a paid order's stock shows up without reloading
+        if (! $synced->isPending()) {
+            $this->live->changed($synced);
+        }
+
+        return $synced;
     }
 }

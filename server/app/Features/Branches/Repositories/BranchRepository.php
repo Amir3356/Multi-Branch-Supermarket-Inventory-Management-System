@@ -36,6 +36,13 @@ class BranchRepository
         $branch->delete();
     }
 
+    /** Procurements or return requests recorded for it: deleting the branch would break that history */
+    public function hasHistory(Branch $branch): bool
+    {
+        return DB::table('procurements')->where('branch_id', $branch->id)->exists()
+            || DB::table('return_requests')->where('branch_id', $branch->id)->exists();
+    }
+
     public function hasStaff(Branch $branch): bool
     {
         return $branch->staff()->exists();

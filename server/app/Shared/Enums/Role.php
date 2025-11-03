@@ -15,6 +15,12 @@ enum Role: string
     case Cashier = 'cashier';
     case PurchaseOfficer = 'purchase_officer';
 
+    /** Works across every branch, so no branch is assigned: the Owner, and the Procurement Officer who buys for all of them */
+    public function coversAllBranches(): bool
+    {
+        return $this === self::Owner || $this === self::PurchaseOfficer;
+    }
+
     public function label(): string
     {
         return match ($this) {
@@ -25,14 +31,14 @@ enum Role: string
         };
     }
 
-    /** Sidebar sections this role can open; the first one is where they land after signing in. */
+    /** Sidebar sections this role can open; the first one is where they land after signing in (their Dashboard). */
     public function sections(): array
     {
         return match ($this) {
-            self::Owner => ['accounts', 'branches', 'auditLogs', 'reports'],
-            self::Pharmacist => ['inventory', 'transfers', 'damaged', 'policy', 'reports', 'notifications'],
-            self::Cashier => ['sales', 'customerReturns', 'reports'],
-            self::PurchaseOfficer => ['purchases', 'supplierReturns', 'reports'],
+            self::Owner => ['dashboard', 'accounts', 'branches', 'auditLogs', 'reports'],
+            self::Pharmacist => ['dashboard', 'inventory', 'returnRequests', 'transfers', 'damaged', 'policy', 'reports', 'notifications'],
+            self::Cashier => ['dashboard', 'sales', 'customerReturns', 'reports'],
+            self::PurchaseOfficer => ['dashboard', 'purchases', 'supplierReturns', 'reports'],
         };
     }
 

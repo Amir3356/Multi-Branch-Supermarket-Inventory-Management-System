@@ -59,15 +59,16 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState: loadSettings,
   reducers: {
-    minStockLevelChanged(state, action) {
-      state.defaultMinStock = action.payload
-    },
-    expiryWarningDaysChanged(state, action) {
-      state.expiryWarningDays = action.payload
+    // The shared policy from the server (on load, after saving, or pushed when someone else saves it)
+    policyLoaded(state, action) {
+      state.defaultMinStock = action.payload.defaultMinStock
+      state.expiryWarningDays = action.payload.expiryWarningDays
+      state.policyUpdatedBy = action.payload.updatedBy
+      state.policyUpdatedAt = action.payload.updatedAt
     }
   }
 })
 
-export const { minStockLevelChanged, expiryWarningDaysChanged } = settingsSlice.actions
+export const { policyLoaded } = settingsSlice.actions
 export const selectSettings = (state) => state.settings
 export default settingsSlice.reducer

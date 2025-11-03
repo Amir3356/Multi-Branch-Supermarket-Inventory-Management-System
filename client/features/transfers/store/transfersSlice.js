@@ -1,17 +1,29 @@
 import { createSlice } from '@reduxjs/toolkit'
-import TRANSFERS from '../../../data/transfers.json'
 
+// Stock transfers between branches (loaded from the API), and which of their stock moves this browser has applied:
+// leaving the sending branch (sentIds) and entering the receiving one (receivedIds)
 const transfersSlice = createSlice({
   name: 'transfers',
-  initialState: TRANSFERS,
+  initialState: { items: [], sentIds: [], receivedIds: [] },
   reducers: {
-    // New records go to the top of the list
-    transferAdded(state, action) {
-      state.unshift(action.payload)
+    transfersLoaded(state, action) {
+      state.items = action.payload
+    },
+    // Added on top, or replaced when it was received
+    transferSaved(state, action) {
+      const index = state.items.findIndex((t) => t.id === action.payload.id)
+      if (index === -1) state.items.unshift(action.payload)
+      else state.items[index] = action.payload
+    },
+    transferSentApplied(state, action) {
+      state.sentIds.push(action.payload)
+    },
+    transferReceivedApplied(state, action) {
+      state.receivedIds.push(action.payload)
     }
   }
 })
 
-export const { transferAdded } = transfersSlice.actions
-export const selectTransfers = (state) => state.transfers
+export const { transfersLoaded, transferSaved, transferSentApplied, transferReceivedApplied } = transfersSlice.actions
+export const selectTransfers = (state) => state.transfers.items
 export default transfersSlice.reducer

@@ -1,16 +1,22 @@
-import { isWholeNumber, sameText } from '../../../utils'
+import { findCatalogProduct, isWholeNumber, todayKey } from '../../../utils'
 
 const isPositivePrice = (raw, value) => raw !== '' && !Number.isNaN(value) && value > 0
 
 // The catalog product a procurement bought: matched by id, or by name for a product the purchase added
 export const findProcurementProduct = (products, procurement) =>
-  procurement ? products.find((p) => p.id === procurement.medId || sameText(p.name, procurement.product)) : undefined
+  procurement ? findCatalogProduct(products, procurement.medId, procurement.product) : undefined
 
-// Field errors for Add Medicine (setting the selling price for a paid procurement's product)
+// Field errors for Add Medicine: which arrived order (category and product), its expiry date, and the selling price
 export function validateMedicinePrices(form, procurement, product, sellingPrice) {
   const errors = {}
-  if (!procurement) errors.purchaseId = 'Select a procurement'
+  if (!form.category) errors.category = 'Select a category'
+  if (!procurement) errors.purchaseId = form.category ? 'Select a product' : 'Select a category first'
   else if (!product) errors.purchaseId = "This product isn't in the catalog yet. Reload the page and try again."
+  // A transfer brings its expiry date with it (fixedExpiry); a paid order's is entered from the package
+  if (!procurement?.fixedExpiry) {
+    if (!form.expiryDate) errors.expiryDate = 'Enter the expiration date printed on the package'
+    else if (form.expiryDate <= todayKey()) errors.expiryDate = 'This stock has already expired; it can’t be added'
+  }
   if (!isPositivePrice(form.sellingPrice, sellingPrice)) errors.sellingPrice = 'Enter a selling price greater than 0'
   return errors
 }

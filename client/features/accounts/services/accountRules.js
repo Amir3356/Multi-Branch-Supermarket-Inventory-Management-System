@@ -1,3 +1,5 @@
+import { coversAllBranches } from '../model/account'
+
 // Field errors for the Add/Edit Account form; empty when it can be saved. `email` is already trimmed and lower-cased.
 export function validateAccount(form, email) {
   const errors = {}
@@ -5,6 +7,7 @@ export function validateAccount(form, email) {
   if (!form.fullName.trim()) errors.fullName = 'Full name is required'
   if (!email) errors.email = 'Email is required'
   else if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Enter a valid email address'
-  if (!form.branchId) errors.branchId = 'Assign a branch'
+  // The Procurement Officer covers every branch; Pharmacists and Cashiers work at one
+  if (!form.branchId && !coversAllBranches(form.role)) errors.branchId = 'Assign a branch'
   return errors
 }

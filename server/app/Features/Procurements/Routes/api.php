@@ -20,6 +20,10 @@ Route::middleware(['auth:sanctum', 'role:purchase_officer'])->group(function () 
     Route::post('/procurements/{procurement}/verify', [ProcurementController::class, 'verify']);
 });
 
+// Inventory Officer: add a paid order's stock to their branch (Add Medicine)
+Route::middleware(['auth:sanctum', 'role:pharmacist'])
+    ->post('/procurements/{procurement}/receive', [ProcurementController::class, 'receive']);
+
 // CHAPA_MODE=fake only: the pretend checkout page the officer is sent to instead of Chapa's
 if (config('services.chapa.mode') === 'fake') {
     Route::get('/procurements/fake-checkout/{txRef}', [FakeChapaCheckoutController::class, 'show']);

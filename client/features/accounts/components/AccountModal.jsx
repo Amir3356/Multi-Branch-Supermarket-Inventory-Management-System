@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Save, Send, UserCog } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
-import { ACCOUNT_ROLES, EMPTY_ACCOUNT_FORM, accountToForm, toAccountPayload } from '../model/account'
+import { ACCOUNT_ROLES, EMPTY_ACCOUNT_FORM, accountToForm, coversAllBranches, toAccountPayload } from '../model/account'
 import { validateAccount } from '../services/accountRules'
 
 // Invite a staff member (they get an email to set their password), or edit an existing account
@@ -93,13 +93,18 @@ export default function AccountModal({ account, branches, onClose, onSave }) {
           </div>
           <div className="modal-grid">
             <div className="form-group">
-              <label htmlFor="account-branch">Assigned Branch *</label>
-              <select id="account-branch" className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={update('branchId')}>
-                <option value="">Select branch…</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}{b.status === 'Inactive' ? ' (inactive)' : ''}</option>
-                ))}
-              </select>
+              <label htmlFor="account-branch">Assigned Branch {coversAllBranches(form.role) ? '' : '*'}</label>
+              {coversAllBranches(form.role) ? (
+                // The Procurement Officer buys for every branch, so there is no branch to assign
+                <input id="account-branch" className="input-field" value="All Branches" readOnly disabled />
+              ) : (
+                <select id="account-branch" className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={update('branchId')}>
+                  <option value="">Select branch…</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}{b.status === 'Inactive' ? ' (inactive)' : ''}</option>
+                  ))}
+                </select>
+              )}
               {errors.branchId && <span className="error-msg">{errors.branchId}</span>}
             </div>
             {isEdit && (

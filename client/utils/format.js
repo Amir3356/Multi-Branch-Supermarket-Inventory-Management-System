@@ -17,6 +17,11 @@ export const formatAmount = (value) =>
 /** Case-insensitive comparison of two names */
 export const sameText = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
+/** The catalog product a record refers to: by its product id first, by name only when it has none (two products
+ * can share a name, so a name match must never win over the id) */
+export const findCatalogProduct = (products, medId, name) =>
+  (medId && products.find((p) => p.id === medId)) || (name ? products.find((p) => sameText(p.name, name)) : undefined)
+
 export const isWholeNumber = (value, min, max = Infinity) =>
   Number.isInteger(Number(value)) && value !== '' && Number(value) >= min && Number(value) <= max
 

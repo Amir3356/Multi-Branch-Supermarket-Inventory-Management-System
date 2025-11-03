@@ -53,6 +53,12 @@ class User extends Authenticatable
         return $this->role === Role::Owner;
     }
 
+    /** No assigned branch: works at every branch (Owner, Procurement Officer) */
+    public function coversAllBranches(): bool
+    {
+        return $this->role->coversAllBranches();
+    }
+
     // Used by Laravel's password broker for "forgot password"
     public function sendPasswordResetNotification($token): void
     {

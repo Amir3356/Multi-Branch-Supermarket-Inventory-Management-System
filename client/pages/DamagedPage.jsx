@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { DollarSign, Package, PackageX, Plus } from 'lucide-react'
-import { BranchTag, EmptyRow, Notice, PageHeader, StatCard } from '../components'
+import { Plus } from 'lucide-react'
+import { BranchTag, EmptyRow, Notice, PageHeader } from '../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectDamaged } from '../features/damaged/store/damagedSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
@@ -35,12 +35,6 @@ export default function DamagedPage() {
       </PageHeader>
 
       <Notice notice={notice} onDismiss={() => setNotice(null)} />
-
-      <div className="stats-grid" style={{ margin: '1.5rem 0' }}>
-        <StatCard title="Damaged Records" icon={PackageX} tone="danger" value={damaged.length} chip="Write-offs recorded" />
-        <StatCard title="Quantity Damaged" icon={Package} tone="warning" value={damaged.reduce((sum, d) => sum + d.qty, 0).toLocaleString()} chip="Units removed from stock" />
-        <StatCard title="Loss Value" icon={DollarSign} tone="danger" value={formatMoney(damaged.reduce((sum, d) => sum + d.lossValue, 0))} valueStyle={{ color: '#fb7185' }} chip="At purchase price" chipTone="negative" />
-      </div>
 
       <div className="table-responsive">
         <table className="data-table">

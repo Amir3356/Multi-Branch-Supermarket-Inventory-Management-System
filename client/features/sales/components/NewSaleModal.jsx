@@ -11,7 +11,11 @@ import { validateSale } from '../services/saleRules'
 const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
 
 export default function NewSaleModal({ branches, inventory, categories, formatMoney, onClose, onSave }) {
-  const [form, setForm] = useState(EMPTY_SALE_FORM)
+  // A cashier's own branch is the only choice, so it starts selected
+  const [form, setForm] = useState(() => {
+    const active = branches.filter((b) => b.status === 'Active')
+    return { ...EMPTY_SALE_FORM, branchId: active.length === 1 ? active[0].id : '' }
+  })
   const [errors, setErrors] = useState({})
 
   useEscapeKey(onClose)

@@ -6,13 +6,13 @@ const requestedDate = (iso) => new Date(iso).toLocaleDateString('en-CA')
 
 // Inventory Officers' requests to send stock back to suppliers. The Procurement Officer approves
 // (which records the supplier return) or rejects them, and receives the supplier's replacement for approved ones;
-// others only follow along (description: a different line under the heading).
-export default function ReturnRequestsPanel({ requests, isAllBranches, branchById, canHandle, description, onApprove, onReject, onReplace }) {
+// others only follow along (description: a different line under the heading; showHeading=false when the page has its own title).
+export default function ReturnRequestsPanel({ requests, isAllBranches, branchById, canHandle, description, showHeading = true, onApprove, onReject, onReplace }) {
   const colSpan = 9 + (isAllBranches ? 1 : 0) + (canHandle ? 1 : 0)
 
   return (
     <div style={{ marginTop: '1.5rem' }}>
-      <div className="section-header">
+      {showHeading && <div className="section-header">
         <div>
           <h3>Return Requests</h3>
           <p className="page-desc">
@@ -21,7 +21,7 @@ export default function ReturnRequestsPanel({ requests, isAllBranches, branchByI
               : 'Requests from Inventory Officers to send stock back to suppliers.')}
           </p>
         </div>
-      </div>
+      </div>}
 
       <div className="table-responsive" style={{ marginTop: '1rem' }}>
         <table className="data-table">

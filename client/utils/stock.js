@@ -16,9 +16,13 @@ export const getStockStatus = (stock, minLevel, settings) => {
 /** Past its expiration date (YYYY-MM-DD): from the day after it, in this computer's local time */
 export const isExpired = (expiry) => Boolean(expiry) && expiry < todayKey()
 
-/** A batch within the expiry warning window (expired ones included) */
+/** Whole calendar days from today to an expiry date (YYYY-MM-DD): 0 today, 1 tomorrow, negative once past */
+export const daysToExpiry = (expiry) => Math.round((Date.parse(`${expiry}T00:00:00Z`) - Date.parse(`${todayKey()}T00:00:00Z`)) / 86400000)
+
+/** A batch within the expiry warning window (expired ones included). Counted in calendar days, so the result is the
+ * same at any time of day. */
 export const isExpiringSoon = (expiry, settings) =>
-  settings.expiryAlerts && (new Date(expiry) - new Date()) / (1000 * 60 * 60 * 24) <= settings.expiryWarningDays
+  Boolean(settings.expiryAlerts && expiry) && daysToExpiry(expiry) <= settings.expiryWarningDays
 
 /**
  * The Inventory table's Status: none left wins, then expiry, then quantity. An expired batch stays Expired however

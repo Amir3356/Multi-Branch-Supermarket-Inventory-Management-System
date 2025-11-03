@@ -14,8 +14,8 @@ class ReturnRequestResource extends JsonResource
         return [
             'id' => $this->id,
             'procurementId' => $this->procurement_id,
-            // Each paid procurement is received as one batch, named after it
-            'batch' => $this->procurement_id,
+            // Each paid procurement is received as one batch: the number entered when it arrived
+            'batch' => $procurement?->batch ?? $this->procurement_id,
             'branchId' => $this->branch_id,
             'supplier' => $procurement?->supplier,
             'category' => $procurement?->category,

@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-// Only the Owner is seeded; the Owner creates branches and invites staff after signing in
+// The Owner, plus ready-to-use staff accounts at one branch (the Owner can still invite more after signing in)
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(OwnerSeeder::class);
+        $this->call([OwnerSeeder::class, StaffSeeder::class]);
     }
 }

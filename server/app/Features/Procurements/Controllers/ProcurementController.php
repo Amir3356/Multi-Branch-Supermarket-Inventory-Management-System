@@ -6,10 +6,12 @@ use App\Features\Procurements\Models\Procurement;
 use App\Features\Procurements\Repositories\ProcurementRepository;
 use App\Features\Procurements\Requests\StoreProcurementRequest;
 use App\Features\Procurements\Resources\ProcurementResource;
+use App\Features\Procurements\Services\ProcurementBroadcaster;
 use App\Features\Procurements\Services\ProcurementPayments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -18,6 +20,7 @@ class ProcurementController
     public function __construct(
         private ProcurementPayments $payments,
         private ProcurementRepository $procurements,
+        private ProcurementBroadcaster $live,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -37,11 +40,46 @@ class ProcurementController
             throw $e;
         }
 
+        // New Pending order: shows on other screens (e.g. the Owner's) right away
+        $this->live->changed($procurement);
+
         return response()->json([
             'message' => "Procurement {$procurement->id} created. Complete the payment on Chapa to receive the stock.",
             'procurement' => new ProcurementResource($this->procurements->fresh($procurement)),
             'checkoutUrl' => $checkoutUrl,
         ], 201);
+    }
+
+    // Inventory Officer (Add Medicine): add a paid order's stock to their own branch, once
+    public function receive(Request $request, Procurement $procurement): JsonResponse
+    {
+        if ($procurement->branch_id !== $request->user()->branch_id) {
+            abort(403, 'This procurement was bought for another branch.');
+        }
+        // "Today" in the pharmacy's local time: stock that has already expired can't be added
+        $today = now(config('pharmacy.timezone'))->toDateString();
+        $data = $request->validate([
+            'expiryDate' => ['required', 'date_format:Y-m-d', "after:{$today}"],
+        ], [
+            'expiryDate.required' => 'Enter the expiration date printed on the package.',
+            'expiryDate.after' => 'This stock has already expired; it can’t be added.',
+        ]);
+
+        // The batch number is generated (BT-00001, …) when the stock is added
+        $received = DB::transaction(function () use ($procurement, $request, $data) {
+            $locked = $this->procurements->lockForUpdate($procurement);
+            if (! $locked->awaitsReceipt()) {
+                abort(422, $locked->received_at ? 'This procurement was already added to stock.' : 'Only a paid procurement can be added to stock.');
+            }
+
+            return $this->procurements->markReceived($locked, $request->user()->id, $data['expiryDate']);
+        });
+        $this->live->changed($received);
+
+        return response()->json([
+            'message' => "{$received->qty} × {$received->product} (batch {$received->batch}) added to stock.",
+            'procurement' => new ProcurementResource($received),
+        ]);
     }
 
     // The Procurement page calls this when Chapa sends the officer back

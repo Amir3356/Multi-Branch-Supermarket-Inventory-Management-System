@@ -3,14 +3,6 @@ import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { productUpdated } from './productsSlice'
 import { stockRowRemoved, stockRowUpdated } from './stockSlice'
 
-// Add Medicine: set a catalog product's prices (applies at every branch)
-export const saveMedicinePrices = ({ medId, name, purchasePrice, sellingPrice }) => (dispatch, getState) => {
-  const { money } = thunkContext(getState)
-  dispatch(productUpdated({ id: medId, changes: { purchasePrice, sellingPrice } }))
-  dispatch(logAdded('Product prices set', 'Inventory', medId, `${name}: purchase price ${money(purchasePrice)}, selling price ${money(sellingPrice)}.`))
-  return `${name} is ready for sale at ${money(sellingPrice)} per unit.`
-}
-
 // Edit one branch's stock row; prices are stored on the product, so they change at every branch
 export const editInventoryItem = (item, data) => (dispatch, getState) => {
   const { money, branchName } = thunkContext(getState)

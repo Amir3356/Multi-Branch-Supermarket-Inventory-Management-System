@@ -17,8 +17,8 @@ class AccountResource extends JsonResource
             'role' => $this->role->value,
             'roleLabel' => $this->role->label(),
             // The Owner covers every branch
-            'branchId' => $this->isOwner() ? 'all' : $this->branch_id,
-            'branchName' => $this->isOwner() ? 'All Branches' : $this->branch?->name,
+            'branchId' => $this->coversAllBranches() ? 'all' : $this->branch_id,
+            'branchName' => $this->coversAllBranches() ? 'All Branches' : $this->branch?->name,
             'status' => $this->status->label(),
             'invitationExpired' => $this->when(
                 $this->status === AccountStatus::Invited && $this->relationLoaded('invitation'),

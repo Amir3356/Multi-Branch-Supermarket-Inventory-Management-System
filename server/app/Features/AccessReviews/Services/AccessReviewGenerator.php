@@ -142,7 +142,7 @@ class AccessReviewGenerator
                     'email' => $user->email,
                     'role' => $role->value,
                     'roleLabel' => $role->label(),
-                    'branchName' => $role === Role::Owner ? 'All Branches' : ($branchNames[$branchId] ?? null),
+                    'branchName' => $role->coversAllBranches() ? 'All Branches' : ($branchNames[$branchId] ?? null),
                     'status' => $status->label(),
                     'createdAt' => $user->created_at->copy()->setTimezone(config('pharmacy.timezone'))->toDateString(),
                     'lastLoginAt' => $lastLogin?->toIso8601String(),
