@@ -5,7 +5,7 @@ import {
   ShoppingCart,
   X
 } from 'lucide-react'
-import { useEscapeKey } from '../../../hooks'
+import { useEscapeKey, useMoneyColumns } from '../../../hooks'
 import { validateSale } from '../services/saleRules'
 
 const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
@@ -17,6 +17,9 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
     return { ...EMPTY_SALE_FORM, branchId: active.length === 1 ? active[0].id : '' }
   })
   const [errors, setErrors] = useState({})
+  const [isSaving, setIsSaving] = useState(false)
+  // The currency is in the label ("Unit Selling Price (ETB)"), so the amounts show the number alone
+  const { moneyHeader, formatAmount } = useMoneyColumns()
 
   useEscapeKey(onClose)
 
@@ -46,22 +49,28 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const newErrors = validateSale(form, product, qty)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
 
-    onSave({
-      branchId: form.branchId,
-      customer: form.customer.trim() || 'Walk-in Customer',
-      category: product.category,
-      product: product.name,
-      medId: product.medId,
-      qty,
-      total: Math.round(total * 100) / 100,
-      status: 'Paid'
-    })
+    setIsSaving(true)
+    try {
+      // Saved on the server, which works out the total from the unit price
+      await onSave({
+        branchId: form.branchId,
+        customer: form.customer.trim() || 'Walk-in Customer',
+        category: product.category,
+        product: product.name,
+        medId: product.medId,
+        qty,
+        unitPrice: product.sellingPrice
+      })
+    } catch (error) {
+      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : error.message })
+      setIsSaving(false)
+    }
   }
 
   return createPortal(
@@ -83,6 +92,7 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          {(errors.form || errors.branchId) && <span className="error-msg">{errors.form || errors.branchId}</span>}
           <div className="form-group">
             <label htmlFor="sale-branch">Branch *</label>
             <select id="sale-branch" autoFocus className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={(e) => update('branchId', e.target.value)}>
@@ -138,15 +148,15 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
 
           <div className="sale-summary">
             <div><small>In Stock</small><strong>{product ? `${product.stock} units` : '—'}</strong></div>
-            <div><small>Unit Price</small><strong>{product ? formatMoney(product.sellingPrice) : '—'}</strong></div>
-            <div><small>Total</small><strong className="sale-total">{formatMoney(total)}</strong></div>
+            <div><small>{moneyHeader('Unit Selling Price')}</small><strong>{product ? formatAmount(product.sellingPrice) : '—'}</strong></div>
+            <div><small>{moneyHeader('Total Selling Price')}</small><strong className="sale-total">{formatAmount(total)}</strong></div>
           </div>
 
           <div className="modal-actions">
             <button type="button" className="secondary-action-btn" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="primary-action-btn">
+            <button type="submit" className="primary-action-btn" disabled={isSaving}>
               <CheckCircle2 size={16} /> Complete Sale
             </button>
           </div>

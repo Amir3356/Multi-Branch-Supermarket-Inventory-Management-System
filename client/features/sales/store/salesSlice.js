@@ -1,17 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit'
-import SALES from '../../../data/sales.json'
 
+// Sales (loaded from the API), and which of them this browser has already taken out of branch stock
 const salesSlice = createSlice({
   name: 'sales',
-  initialState: SALES,
+  initialState: { items: [], appliedIds: [] },
   reducers: {
-    // New records go to the top of the list
-    saleAdded(state, action) {
-      state.unshift(action.payload)
+    salesLoaded(state, action) {
+      state.items = action.payload
+    },
+    // New sales go to the top of the list
+    saleSaved(state, action) {
+      if (!state.items.some((s) => s.id === action.payload.id)) state.items.unshift(action.payload)
+    },
+    saleStockApplied(state, action) {
+      state.appliedIds.push(action.payload)
     }
   }
 })
 
-export const { saleAdded } = salesSlice.actions
-export const selectSales = (state) => state.sales
+export const { salesLoaded, saleSaved, saleStockApplied } = salesSlice.actions
+export const selectSales = (state) => state.sales.items
 export default salesSlice.reducer

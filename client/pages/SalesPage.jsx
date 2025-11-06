@@ -30,8 +30,10 @@ export default function SalesPage() {
     return returned >= sale.qty ? 'Refunded' : 'Partially Refunded'
   }
 
-  const handleRecordSale = (data) => {
-    setNotice({ type: 'success', text: dispatch(recordSale(data)).message })
+  const handleRecordSale = async (data) => {
+    // Saved on the server; the form shows any error
+    const { message } = await dispatch(recordSale(data))
+    setNotice({ type: 'success', text: message })
     setShowNewSale(false)
   }
 

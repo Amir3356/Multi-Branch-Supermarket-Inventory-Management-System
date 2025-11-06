@@ -22,17 +22,6 @@
     "status": "Paid"
   },
   {
-    "id": "SL-5003",
-    "branchId": "BR-03",
-    "customer": "Sarah Smith",
-    "category": "Medicines",
-    "product": "Omeprazole 20mg",
-    "qty": 3,
-    "total": 10304,
-    "date": "2026-10-01",
-    "status": "Paid"
-  },
-  {
     "id": "SL-5004",
     "branchId": "BR-04",
     "customer": "Walk-in Customer",
@@ -84,17 +73,6 @@
     "product": "Vitamin C 1000mg (60 Tablets)",
     "qty": 3,
     "total": 5554.5,
-    "date": "2026-10-05",
-    "status": "Paid"
-  },
-  {
-    "id": "SL-5009",
-    "branchId": "BR-03",
-    "customer": "Dawit H.",
-    "category": "Baby & Mother Care",
-    "product": "Baby Diapers Size 3",
-    "qty": 2,
-    "total": 5152,
     "date": "2026-10-05",
     "status": "Paid"
   },

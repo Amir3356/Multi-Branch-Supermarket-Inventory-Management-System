@@ -36,15 +36,6 @@
     "description": "500 × Paracetamol 650mg bought from MedPharma Global Logistics into Main Branch (HQ) for Br 402,500.00."
   },
   {
-    "id": "LOG-0021",
-    "date": "2026-10-05",
-    "time": "12:00",
-    "action": "Sale recorded",
-    "module": "Sales",
-    "record": "SL-5009",
-    "description": "2 × Baby Diapers Size 3 sold to Dawit H. at Westside Branch for Br 5,152.00."
-  },
-  {
     "id": "LOG-0020",
     "date": "2026-10-05",
     "time": "11:03",
@@ -160,15 +151,6 @@
     "module": "Sales",
     "record": "SL-5001",
     "description": "2 × Amoxicillin 500mg sold to Walk-in Customer at Main Branch (HQ) for Br 6,762.00."
-  },
-  {
-    "id": "LOG-0006",
-    "date": "2026-10-01",
-    "time": "17:49",
-    "action": "Sale recorded",
-    "module": "Sales",
-    "record": "SL-5003",
-    "description": "3 × Omeprazole 20mg sold to Sarah Smith at Westside Branch for Br 10,304.00."
   },
   {
     "id": "LOG-0005",

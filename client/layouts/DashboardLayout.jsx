@@ -15,6 +15,7 @@ import { loadProcurements, procurementPushed } from '../features/purchases/store
 import { loadReturnRequests, returnRequestPushed } from '../features/supplierReturns/store/returnRequestsThunks'
 import { loadPolicy, policyPushed } from '../features/policy/store/policyThunks'
 import { loadTransfers, transferPushed } from '../features/transfers/store/transfersThunks'
+import { loadSales, salePushed } from '../features/sales/store/salesThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 
@@ -53,10 +54,11 @@ export default function DashboardLayout() {
     dispatch(loadBranches()).catch(() => {})
     // The shared policy decides Low Stock and Expiring Soon on every page
     dispatch(loadPolicy()).catch(() => {})
-    // Stock is built in order: procurements bring it in, then return requests and transfers move it
+    // Stock is built in order: procurements bring it in, then return requests, transfers and sales move it
     dispatch(loadProcurements()).catch(() => {})
       .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
       .finally(() => dispatch(loadTransfers()).catch(() => {}))
+      .finally(() => dispatch(loadSales()).catch(() => {}))
   }, [sessionChecked, dispatch])
 
   // Live updates per branch: a paid procurement's stock and return requests (sent, approved, rejected, replaced) change
@@ -71,7 +73,8 @@ export default function DashboardLayout() {
       echo.private(`branch.${id}.procurements`).listen('.procurement.changed', (event) => dispatch(procurementPushed(event.procurement)))
       echo.private(`branch.${id}.return-requests`).listen('.return-request.changed', (event) => dispatch(returnRequestPushed(event.request)))
       echo.private(`branch.${id}.transfers`).listen('.transfer.changed', (event) => dispatch(transferPushed(event.transfer)))
-      channels.push(`branch.${id}.procurements`, `branch.${id}.return-requests`, `branch.${id}.transfers`)
+      echo.private(`branch.${id}.sales`).listen('.sale.recorded', (event) => dispatch(salePushed(event.sale)))
+      channels.push(`branch.${id}.procurements`, `branch.${id}.return-requests`, `branch.${id}.transfers`, `branch.${id}.sales`)
     }
     // The policy is shared by every branch; branch changes (added, renamed, deactivated, deleted) reach everyone too
     echo.private('policy').listen('.policy.changed', (event) => dispatch(policyPushed(event.policy)))
@@ -85,6 +88,7 @@ export default function DashboardLayout() {
         dispatch(loadProcurements()).catch(() => {})
           .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
           .finally(() => dispatch(loadTransfers()).catch(() => {}))
+          .finally(() => dispatch(loadSales()).catch(() => {}))
       }
       wasConnected = connected
     })
