@@ -1,10 +1,13 @@
+import { updateSellingPrice } from '../api/productsApi'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { productUpdated } from './productsSlice'
 import { stockRowRemoved, stockRowUpdated } from './stockSlice'
 
 // Edit one branch's stock row; prices are stored on the product, so they change at every branch
-export const editInventoryItem = (item, data) => (dispatch, getState) => {
+export const editInventoryItem = (item, data) => async (dispatch, getState) => {
+  // The selling price is the product's at every branch, so it is saved on the server (throws ApiError)
+  if (data.sellingPrice !== item.sellingPrice) await updateSellingPrice(item.medId, data.sellingPrice)
   const { money, branchName } = thunkContext(getState)
   dispatch(stockRowUpdated({ medId: item.medId, branchId: item.branchId, changes: { stock: data.stock, batch: data.batch, expiry: data.expiry } }))
   dispatch(productUpdated({ id: item.medId, changes: { purchasePrice: data.purchasePrice, sellingPrice: data.sellingPrice } }))

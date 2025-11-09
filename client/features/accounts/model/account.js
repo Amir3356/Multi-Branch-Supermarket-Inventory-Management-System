@@ -30,8 +30,8 @@
 // The Owner account itself is not created here: it covers all branches and manages these accounts.
 export const ACCOUNT_ROLES = {
   pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Inventory, stock transfers, damaged items, policy and reports' },
-  cashier: { label: 'Cashier', hint: 'Sales, customer returns and reports' },
-  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement and supplier returns for every branch, and reports', allBranches: true }
+  cashier: { label: 'Cashier', hint: 'Sales and reports' },
+  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement for every branch, and reports', allBranches: true }
 }
 
 export const EMPTY_ACCOUNT_FORM = { fullName: '', email: '', role: '', branchId: '', status: 'Active' }

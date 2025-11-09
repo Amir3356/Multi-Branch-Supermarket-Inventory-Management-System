@@ -8,11 +8,9 @@ import branchesReducer from '../features/branches/store/branchesSlice'
 import productsReducer from '../features/inventory/store/productsSlice'
 import stockReducer from '../features/inventory/store/stockSlice'
 import salesReducer from '../features/sales/store/salesSlice'
-import customerReturnsReducer from '../features/customerReturns/store/customerReturnsSlice'
 import purchasesReducer from '../features/purchases/store/purchasesSlice'
-import supplierReturnsReducer from '../features/supplierReturns/store/supplierReturnsSlice'
-import returnRequestsReducer from '../features/supplierReturns/store/returnRequestsSlice'
 import transfersReducer from '../features/transfers/store/transfersSlice'
+import expensesReducer from '../features/expenses/store/expensesSlice'
 import damagedReducer from '../features/damaged/store/damagedSlice'
 import accountsReducer from '../features/accounts/store/accountsSlice'
 import sessionsReducer from '../features/accounts/store/sessionsSlice'
@@ -29,11 +27,9 @@ export const store = configureStore({
     products: productsReducer,
     stock: stockReducer,
     sales: salesReducer,
-    customerReturns: customerReturnsReducer,
     purchases: purchasesReducer,
-    supplierReturns: supplierReturnsReducer,
-    returnRequests: returnRequestsReducer,
     transfers: transfersReducer,
+    expenses: expensesReducer,
     damaged: damagedReducer,
     accounts: accountsReducer,
     sessions: sessionsReducer,

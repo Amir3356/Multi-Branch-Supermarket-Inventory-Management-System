@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import DAMAGED from '../../../data/damaged.json'
+
+const DAMAGED = []
 
 const damagedSlice = createSlice({
   name: 'damaged',

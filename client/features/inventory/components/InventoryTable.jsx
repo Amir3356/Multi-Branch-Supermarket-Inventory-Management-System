@@ -5,8 +5,7 @@ import {
   Search,
   Filter,
   X,
-  Pencil,
-  Undo2
+  Pencil
 } from 'lucide-react'
 import { useMoneyColumns } from '../../../hooks'
 import { listTableFeatures, INVENTORY_STATUSES } from '../../../utils'
@@ -32,9 +31,7 @@ const inventorySearchFn = (row, _columnId, value) => {
   return [name, id, batch].some((field) => field.toLowerCase().includes(query))
 }
 
-// heldQty(item): units held out of stock by pending return requests, shown under Current Stock.
-// onRequestReturn: the Inventory Officer's "send back to supplier" button, on rows at returnBranchId (left out for other roles)
-export default function InventoryTable({ data, branches, categories, showBranch, heldQty, onEdit, onRequestReturn, returnBranchId }) {
+export default function InventoryTable({ data, branches, categories, showBranch, onEdit }) {
   const { moneyHeader, formatAmount } = useMoneyColumns()
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
@@ -56,20 +53,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
           }]
         : []),
       { accessorKey: 'category', header: 'Category', filterFn: 'equalsString', sortFn: 'text' },
-      {
-        accessorKey: 'stock',
-        header: 'Current Stock',
-        sortFn: 'basic',
-        cell: (info) => {
-          const held = heldQty?.(info.row.original) || 0
-          return (
-            <>
-              {info.getValue()} units
-              {held > 0 && <div className="page-desc" style={{ margin: 0 }}>{held} on hold for return</div>}
-            </>
-          )
-        }
-      },
+      { accessorKey: 'stock', header: 'Current Stock', sortFn: 'basic', cell: (info) => `${info.getValue()} units` },
       { accessorKey: 'purchasePrice', header: moneyHeader('Unit Purchase Price'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
       // The whole quantity's purchase cost: Current Stock × unit purchase price
       { id: 'totalCost', accessorFn: (row) => row.stock * (row.purchasePrice || 0), header: moneyHeader('Total Cost'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
@@ -101,18 +85,12 @@ export default function InventoryTable({ data, branches, categories, showBranch,
               <button type="button" className="icon-btn" onClick={() => onEdit(item)} aria-label={`Edit ${item.name} at ${branches.find((b) => b.id === item.branchId)?.name}`} title="Edit">
                 <Pencil size={15} />
               </button>
-              {onRequestReturn && item.stock > 0 && item.branchId === returnBranchId && (
-                <button type="button" className="icon-btn" onClick={() => onRequestReturn(item)} aria-label={`Request a supplier return of ${item.name} at ${branches.find((b) => b.id === item.branchId)?.name}`} title="Request supplier return">
-                  <Undo2 size={15} />
-                </button>
-              )}
-
             </div>
           )
         }
       }
     ]
-  }, [branches, showBranch, moneyHeader, formatAmount, heldQty, onEdit, onRequestReturn, returnBranchId])
+  }, [branches, showBranch, moneyHeader, formatAmount, onEdit])
 
   // The branch filter only applies while the Branch column is shown
   const activeColumnFilters = showBranch ? columnFilters : columnFilters.filter((f) => f.id !== 'branchId')

@@ -13,9 +13,7 @@ import AcceptInvitationPage from '../pages/AcceptInvitationPage'
 import AccountProvisionPage from '../pages/AccountProvisionPage'
 import InventoryPage from '../pages/InventoryPage'
 import SalesPage from '../pages/SalesPage'
-import CustomerReturnsPage from '../pages/CustomerReturnsPage'
 import PurchasePage from '../pages/PurchasePage'
-import SupplierReturnsPage from '../pages/SupplierReturnsPage'
 import StockTransfersPage from '../pages/StockTransfersPage'
 import DamagedPage from '../pages/DamagedPage'
 import ReportsPage from '../pages/ReportsPage'
@@ -23,7 +21,7 @@ import AuditLogsPage from '../pages/AuditLogsPage'
 import BranchesPage from '../pages/BranchesPage'
 import PolicyPage from '../pages/PolicyPage'
 import DashboardPage from '../pages/DashboardPage'
-import ReturnRequestsPage from '../pages/ReturnRequestsPage'
+import ExpensesPage from '../pages/ExpensesPage'
 import NotificationsPage from '../pages/NotificationsPage'
 import NotFoundPage from '../pages/NotFoundPage'
 
@@ -33,12 +31,10 @@ const SECTION_PAGES = {
   accounts: AccountProvisionPage,
   inventory: InventoryPage,
   sales: SalesPage,
-  customerReturns: CustomerReturnsPage,
   purchases: PurchasePage,
-  supplierReturns: SupplierReturnsPage,
-  returnRequests: ReturnRequestsPage,
   transfers: StockTransfersPage,
   damaged: DamagedPage,
+  expenses: ExpensesPage,
   reports: ReportsPage,
   auditLogs: AuditLogsPage,
   branches: BranchesPage,

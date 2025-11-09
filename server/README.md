@@ -32,7 +32,6 @@ app/
     Accounts/    Owner's Account Provision: invite, edit, (de)activate, delete; accept invitation
     Branches/    Owner's Branches page: add, edit, (de)activate, delete; branch list for everyone
     AccessReviews/  Owner's access review reports for a chosen period: users, roles, last login, flags; PDF export
-    ReturnRequests/  Inventory Officer asks to send a paid batch back to its supplier; the branch's Procurement Officer approves (records the return) or rejects
     Sessions/    Owner's Session Monitoring: every sign-in (one Sanctum token) with device, IP, last activity; end or remove
     <Feature>/
       Routes/        API endpoints mapped to controllers (api.php), WebSocket channels (channels.php),
@@ -59,8 +58,8 @@ A feature's Blade views are namespaced by folder name, so `app/Features/Accounts
 | --- | --- |
 | Owner | Account Provision, Branches, Audit Logs, Reports |
 | Pharmacist (Inventory Officer) | Dashboard, Inventory, Stock Transfers, Damaged, Policy, Reports, Notifications |
-| Cashier | Sales, Customer Returns, Reports |
-| Procurement Officer | Procurement, Supplier Returns, Reports |
+| Cashier | Sales, Reports |
+| Procurement Officer | Procurement (every branch), Reports |
 
 `Role::sections()` is the single source: `/api/auth/me` returns it and the client builds the sidebar and route guards from it. Protect new endpoints with the same roles, e.g. `Route::middleware(['auth:sanctum', 'role:cashier'])`.
 

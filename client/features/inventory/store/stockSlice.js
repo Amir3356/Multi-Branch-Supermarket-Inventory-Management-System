@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import BRANCH_STOCK from '../../../data/branchStock.json'
+
+const BRANCH_STOCK = []
 
 const findRow = (state, medId, branchId) => state.find((e) => e.medId === medId && e.branchId === branchId)
 

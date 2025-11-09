@@ -1,12 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit'
-import MEDICINES from '../../../data/medicines.json'
-import CATEGORIES from '../../../data/categories.json'
 
-// The product catalog shared by every branch, plus its categories
+const CATEGORIES = [
+  'Medicines',
+  'Cosmetics',
+  'Medical Supplies',
+  'Medical Equipment',
+  'Vitamins & Supplements',
+  'Baby & Mother Care',
+  'First Aid',
+  'Personal Care & Hygiene',
+  'Diabetes Care',
+  'Eye & Ear Care',
+  'Oral Care',
+  'Respiratory Care',
+  'Pain Relief',
+  'Herbal & Natural Products',
+  'Family Planning',
+  'Orthopedic Supports'
+]
+
+// The product catalog shared by every branch (loaded from the server), plus its categories. Prices are added here as
+// stock arrives (purchase price) and is set up for sale (selling price).
 const productsSlice = createSlice({
   name: 'products',
-  initialState: { items: MEDICINES, categories: CATEGORIES },
+  initialState: { items: [], categories: CATEGORIES },
   reducers: {
+    // The server's catalog: products keep any prices this browser already knows
+    productsLoaded(state, action) {
+      const known = Object.fromEntries(state.items.map((p) => [p.id, p]))
+      const fromServer = action.payload.map((p) => ({ purchasePrice: null, sellingPrice: null, ...known[p.id], ...p }))
+      const serverIds = new Set(action.payload.map((p) => p.id))
+      state.items = [...fromServer, ...state.items.filter((p) => !serverIds.has(p.id))]
+      for (const p of action.payload) if (!state.categories.includes(p.category)) state.categories.push(p.category)
+    },
     productAdded(state, action) {
       state.items.push(action.payload)
     },
@@ -20,7 +46,7 @@ const productsSlice = createSlice({
   }
 })
 
-export const { productAdded, productUpdated, categoryAdded } = productsSlice.actions
+export const { productsLoaded, productAdded, productUpdated, categoryAdded } = productsSlice.actions
 export const selectProducts = (state) => state.products.items
 export const selectCategories = (state) => state.products.categories
 export default productsSlice.reducer

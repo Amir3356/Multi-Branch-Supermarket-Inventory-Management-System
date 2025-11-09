@@ -51,7 +51,8 @@ const procurementSynced = (apiProcurement) => (dispatch, getState) => {
 // Inventory Officer (Add Medicine): add a paid order's stock to their branch with the expiry on the package (the server
 // generates its batch number), and set its selling price; returns the confirmation, or throws ApiError (e.g. already added on another screen)
 export const addProcurementToStock = (procurement, sellingPrice, { expiryDate }) => async (dispatch, getState) => {
-  const { procurement: received } = await receiveProcurement(procurement.id, { expiryDate })
+  // The server saves the product's shared prices too (this order's unit cost, and the selling price)
+  const { procurement: received } = await receiveProcurement(procurement.id, { expiryDate, sellingPrice })
   dispatch(procurementSynced(received))
   const { state, money, branchName } = thunkContext(getState)
   const product = findCatalogProduct(state.products.items, received.medId, received.product)

@@ -30,19 +30,23 @@ export default function EditInventoryModal({ item, branchName, formatMoney, onCl
     setErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const sellingPrice = Number(form.sellingPrice)
     const newErrors = validateInventoryItem(form, sellingPrice)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
-    onSave({
-      stock: Number(form.stock),
-      batch: item.batch,
-      expiry: form.expiry,
-      purchasePrice,
-      sellingPrice: Math.round(sellingPrice * 100) / 100
-    })
+    try {
+      await onSave({
+        stock: Number(form.stock),
+        batch: item.batch,
+        expiry: form.expiry,
+        purchasePrice,
+        sellingPrice: Math.round(sellingPrice * 100) / 100
+      })
+    } catch (error) {
+      setErrors({ sellingPrice: error.fieldErrors?.sellingPrice || error.message })
+    }
   }
 
   const field = (name, label, props = {}) => (

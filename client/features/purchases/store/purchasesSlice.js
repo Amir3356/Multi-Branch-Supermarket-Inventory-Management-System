@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
-import PURCHASES from '../../../data/purchases.json'
-import PAYMENTS from '../../../data/supplierPayments.json'
+
+const PURCHASES = []
+const PAYMENTS = []
 
 const upsert = (list, record) => {
   const index = list.findIndex((item) => item.id === record.id)

@@ -3,11 +3,10 @@ import {
   UserCog,
   Package,
   ShoppingCart,
-  Undo2,
   PackageCheck,
-  PackageMinus,
   ArrowLeftRight,
   PackageX,
+  Wallet,
   BarChart3,
   FileText,
   Building2,
@@ -23,17 +22,16 @@ export const NAV_GROUPS = [
       { section: 'dashboard', path: PATHS.dashboard, label: 'Dashboard', icon: LayoutDashboard },
       { section: 'accounts', path: PATHS.accounts, label: 'Account Provision', icon: UserCog },
       { section: 'inventory', path: PATHS.inventory, label: 'Inventory', icon: Package, badge: 'inventoryAlerts' },
-      { section: 'sales', path: PATHS.sales, label: 'Sales', icon: ShoppingCart },
-      { section: 'customerReturns', path: PATHS.customerReturns, label: 'Customer Returns', icon: Undo2 }
+      { section: 'sales', path: PATHS.sales, label: 'Sales', icon: ShoppingCart }
     ]
   },
   {
     title: 'OPERATIONS',
     items: [
       { section: 'purchases', path: PATHS.purchases, label: 'Procurement', icon: PackageCheck },
-      { section: 'supplierReturns', path: PATHS.supplierReturns, label: 'Supplier Returns', icon: PackageMinus },
       { section: 'transfers', path: PATHS.transfers, label: 'Stock Transfers', icon: ArrowLeftRight },
-      { section: 'damaged', path: PATHS.damaged, label: 'Damaged', icon: PackageX }
+      { section: 'damaged', path: PATHS.damaged, label: 'Damaged', icon: PackageX },
+      { section: 'expenses', path: PATHS.expenses, label: 'Expenses', icon: Wallet }
     ]
   },
   {

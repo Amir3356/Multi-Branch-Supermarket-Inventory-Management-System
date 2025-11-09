@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { STORAGE_KEYS, readJson } from '../../../utils'
-import MEDICINES from '../../../data/medicines.json'
-import GOVERNMENT_TAXES from '../../../data/governmentTaxes.json'
-import EXPENSE_CATEGORIES from '../../../data/expenseCategories.json'
+
+const MEDICINES = []
+const GOVERNMENT_TAXES = []
+const EXPENSE_CATEGORIES = []
 
 const USD_TO_ETB = 161
 

@@ -4,9 +4,9 @@ import { useBranchScope } from '../hooks'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 
 const ROLE_INTRO = {
-  pharmacist: 'Your branch’s stock at a glance: what needs restocking, what is expiring, and your return requests.',
-  cashier: 'Your branch’s sales and customer returns today.',
-  purchase_officer: 'Your branch’s procurements, payments and supplier returns.'
+  pharmacist: 'Your branch’s stock at a glance: what needs restocking, and what is expiring.',
+  cashier: 'Your branch’s sales today.',
+  purchase_officer: 'Procurements and payments for every branch.'
 }
 
 // Each role's home page. The Owner's is Coming Soon.

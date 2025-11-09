@@ -50,9 +50,9 @@ class BranchController
         if ($this->branches->hasStaff($branch)) {
             abort(422, "{$branch->name} can't be deleted because staff accounts are assigned to it. Deactivate it instead.");
         }
-        // Procurements and return requests keep pointing at their branch, so its history must stay
+        // Procurements, transfers and sales keep pointing at their branch, so its history must stay
         if ($this->branches->hasHistory($branch)) {
-            abort(422, "{$branch->name} can't be deleted because it has procurement or return records. Deactivate it instead.");
+            abort(422, "{$branch->name} can't be deleted because it has procurement, transfer or sales records. Deactivate it instead.");
         }
 
         $this->branches->delete($branch);

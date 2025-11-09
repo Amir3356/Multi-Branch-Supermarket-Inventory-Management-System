@@ -1,0 +1,1797 @@
+[
+  {
+    "id": "MED-101",
+    "name": "Amoxicillin 500mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-102",
+    "name": "Paracetamol 650mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-103",
+    "name": "Metformin 850mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-104",
+    "name": "Atorvastatin 20mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-105",
+    "name": "Omeprazole 20mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-106",
+    "name": "Azithromycin 250mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-107",
+    "name": "Sunscreen SPF 50 (100ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-108",
+    "name": "Disposable Syringes 5ml",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-109",
+    "name": "Digital Thermometer",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-110",
+    "name": "Vitamin C 1000mg (60 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-111",
+    "name": "Baby Diapers Size 3",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-112",
+    "name": "Adhesive Bandages",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-113",
+    "name": "Hand Sanitizer 500ml",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-114",
+    "name": "Ibuprofen 400mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-115",
+    "name": "Ciprofloxacin 500mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-116",
+    "name": "Amlodipine 5mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-117",
+    "name": "Cetirizine 10mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-118",
+    "name": "Losartan 50mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-119",
+    "name": "Doxycycline 100mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-120",
+    "name": "Moisturizing Lotion (250ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-121",
+    "name": "Lip Balm SPF 15",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-122",
+    "name": "Facial Cleanser (150ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-123",
+    "name": "Anti-Acne Gel (30g)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-124",
+    "name": "Hair Conditioner (300ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-125",
+    "name": "Disposable Syringes 10ml",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-126",
+    "name": "Surgical Gloves (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-127",
+    "name": "Face Masks 3-Ply (Box of 50)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-128",
+    "name": "Cotton Wool Roll 500g",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-129",
+    "name": "IV Cannula 20G",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-130",
+    "name": "Alcohol Swabs (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-131",
+    "name": "Blood Pressure Monitor",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-132",
+    "name": "Pulse Oximeter",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-133",
+    "name": "Glucometer Kit",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-134",
+    "name": "Nebulizer Machine",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-135",
+    "name": "Stethoscope",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-136",
+    "name": "Vitamin D3 1000 IU (60 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-137",
+    "name": "Multivitamin (30 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-138",
+    "name": "Omega-3 Fish Oil (60 Softgels)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-139",
+    "name": "Zinc 50mg (60 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-140",
+    "name": "Iron + Folic Acid (30 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-141",
+    "name": "Baby Diapers Size 4",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-142",
+    "name": "Baby Wipes (80 pcs)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-143",
+    "name": "Infant Formula Stage 1 (400g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-144",
+    "name": "Baby Lotion (200ml)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-145",
+    "name": "Prenatal Vitamins (30 Tablets)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-146",
+    "name": "Elastic Bandage 10cm",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-147",
+    "name": "Sterile Gauze Pads (Pack of 10)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-148",
+    "name": "Antiseptic Solution (250ml)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-149",
+    "name": "Medical Adhesive Tape",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-150",
+    "name": "First Aid Kit (Standard)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-151",
+    "name": "Antibacterial Soap (100g)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-152",
+    "name": "Toothpaste (100ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-153",
+    "name": "Mouthwash (250ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-154",
+    "name": "Sanitary Pads (Pack of 10)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-155",
+    "name": "Liquid Hand Wash (250ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-156",
+    "name": "Metronidazole 400mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-157",
+    "name": "Diclofenac 50mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-158",
+    "name": "Salbutamol Inhaler 100mcg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-159",
+    "name": "Prednisolone 5mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-160",
+    "name": "Ceftriaxone 1g Injection",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-161",
+    "name": "Loratadine 10mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-162",
+    "name": "Hydrochlorothiazide 25mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-163",
+    "name": "Insulin Glargine Pen",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-164",
+    "name": "Body Lotion Cocoa Butter (400ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-165",
+    "name": "Micellar Water (200ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-166",
+    "name": "Shampoo Anti-Dandruff (250ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-167",
+    "name": "Face Serum Vitamin C (30ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-168",
+    "name": "Petroleum Jelly (250ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-169",
+    "name": "Urine Collection Bags (2L)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-170",
+    "name": "Disposable Syringes 2ml",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-171",
+    "name": "Infusion Set",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-172",
+    "name": "Examination Gloves Nitrile (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-173",
+    "name": "Urinary Catheter 16Fr",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-174",
+    "name": "Infrared Forehead Thermometer",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-175",
+    "name": "Wheelchair Standard",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-176",
+    "name": "Walking Stick Adjustable",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-177",
+    "name": "Digital Weighing Scale",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-178",
+    "name": "Oxygen Concentrator 5L",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-179",
+    "name": "Calcium + Vitamin D (60 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-180",
+    "name": "Vitamin B Complex (30 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-181",
+    "name": "Magnesium 250mg (60 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-182",
+    "name": "Biotin 5000mcg (60 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-183",
+    "name": "Probiotic (30 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-184",
+    "name": "Baby Diapers Size 2",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-185",
+    "name": "Feeding Bottle 250ml",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-186",
+    "name": "Baby Shampoo (200ml)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-187",
+    "name": "Nipple Cream (30g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-188",
+    "name": "Breast Pump Manual",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-189",
+    "name": "Burn Gel (50g)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-190",
+    "name": "Instant Cold Pack",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-191",
+    "name": "Triangular Bandage",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-192",
+    "name": "Hydrogen Peroxide 3% (200ml)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-193",
+    "name": "Wound Closure Strips",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-194",
+    "name": "Deodorant Roll-On (50ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-195",
+    "name": "Toothbrush Soft",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-196",
+    "name": "Cotton Buds (200 pcs)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-197",
+    "name": "Adult Diapers Medium (10 pcs)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-198",
+    "name": "Dental Floss (50m)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-199",
+    "name": "Glucose Test Strips (50 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-200",
+    "name": "Lancets (100 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-201",
+    "name": "Insulin Syringes 1ml (Box of 100)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-202",
+    "name": "Glucose Tablets (10 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-203",
+    "name": "Diabetic Socks (Pair)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-204",
+    "name": "Glibenclamide 5mg",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-205",
+    "name": "Artificial Tears Eye Drops (10ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-206",
+    "name": "Chloramphenicol Eye Drops 0.5%",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-207",
+    "name": "Ear Wax Removal Drops (10ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-208",
+    "name": "Contact Lens Solution (360ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-209",
+    "name": "Ciprofloxacin Ear Drops",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-210",
+    "name": "Eye Patch Sterile (Pack of 10)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-211",
+    "name": "Sensitive Toothpaste (75ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-212",
+    "name": "Chlorhexidine Mouthwash 0.2%",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-213",
+    "name": "Interdental Brushes (Pack of 6)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-214",
+    "name": "Denture Cleaning Tablets (30 pcs)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-215",
+    "name": "Orthodontic Wax",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-216",
+    "name": "Oral Gel for Mouth Ulcers (10g)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-217",
+    "name": "Cough Syrup (100ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-218",
+    "name": "Saline Nasal Spray (20ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-219",
+    "name": "Spacer Device for Inhalers",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-220",
+    "name": "Steam Inhaler",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-221",
+    "name": "Throat Lozenges (16 pcs)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-222",
+    "name": "Peak Flow Meter",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-223",
+    "name": "Muscle Pain Relief Gel (50g)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-224",
+    "name": "Pain Relief Patch (5 pcs)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-225",
+    "name": "Aspirin 75mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-226",
+    "name": "Tramadol 50mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-227",
+    "name": "Hot Water Bottle",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-228",
+    "name": "Menthol Balm (25g)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-229",
+    "name": "Ginger Root Tea (20 bags)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-230",
+    "name": "Moringa Capsules (60 pcs)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-231",
+    "name": "Honey & Lemon Syrup (150ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-232",
+    "name": "Black Seed Oil (100ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-233",
+    "name": "Aloe Vera Gel (100ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-234",
+    "name": "Eucalyptus Oil (30ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-235",
+    "name": "Male Condoms (Pack of 12)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-236",
+    "name": "Oral Contraceptive Pills (28 Tablets)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-237",
+    "name": "Emergency Contraceptive Pill",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-238",
+    "name": "Pregnancy Test Kit",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-239",
+    "name": "Ovulation Test Strips (10 pcs)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-240",
+    "name": "Lubricant Gel (50ml)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-241",
+    "name": "Knee Support Brace",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-242",
+    "name": "Lumbar Back Support Belt",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-243",
+    "name": "Wrist Splint",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-244",
+    "name": "Ankle Support Brace",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-245",
+    "name": "Cervical Collar Soft",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-246",
+    "name": "Arm Sling",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-247",
+    "name": "Amoxicillin + Clavulanate 625mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-248",
+    "name": "Cefalexin 500mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-249",
+    "name": "Fluconazole 150mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-250",
+    "name": "Albendazole 400mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-251",
+    "name": "Ranitidine 150mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-252",
+    "name": "Enalapril 10mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-253",
+    "name": "Furosemide 40mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-254",
+    "name": "Warfarin 5mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-255",
+    "name": "Levothyroxine 100mcg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-256",
+    "name": "Clopidogrel 75mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-257",
+    "name": "Simvastatin 20mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-258",
+    "name": "Artemether-Lumefantrine 20/120mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-259",
+    "name": "Ivermectin 6mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-260",
+    "name": "Co-trimoxazole 960mg",
+    "category": "Medicines"
+  },
+  {
+    "id": "MED-261",
+    "name": "Hand Cream (75ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-262",
+    "name": "Night Repair Cream (50ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-263",
+    "name": "Toner Rose Water (200ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-264",
+    "name": "Exfoliating Face Scrub (100ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-265",
+    "name": "Shea Butter (200g)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-266",
+    "name": "Glycerin (200ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-267",
+    "name": "Hair Oil Argan (100ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-268",
+    "name": "Makeup Remover Wipes (25 pcs)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-269",
+    "name": "Eye Cream (15ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-270",
+    "name": "Body Wash (500ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-271",
+    "name": "Clay Face Mask (100g)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-272",
+    "name": "Tinted Sunscreen SPF 30 (50ml)",
+    "category": "Cosmetics"
+  },
+  {
+    "id": "MED-273",
+    "name": "Disposable Syringes 20ml",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-274",
+    "name": "Hypodermic Needles 23G (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-275",
+    "name": "Crepe Bandage 7.5cm",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-276",
+    "name": "Surgical Blades No. 22 (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-277",
+    "name": "Suture Nylon 3-0",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-278",
+    "name": "Specimen Containers (Pack of 50)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-279",
+    "name": "Tongue Depressors (Box of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-280",
+    "name": "Disposable Underpads (10 pcs)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-281",
+    "name": "Nasogastric Tube 16Fr",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-282",
+    "name": "Oxygen Nasal Cannula",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-283",
+    "name": "Surgical Caps (Pack of 100)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-284",
+    "name": "Sharps Container 5L",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-285",
+    "name": "Blood Lancets (Box of 200)",
+    "category": "Medical Supplies"
+  },
+  {
+    "id": "MED-286",
+    "name": "Nebulizer Mask Kit",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-287",
+    "name": "Crutches (Pair)",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-288",
+    "name": "Walker Folding",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-289",
+    "name": "Hospital Bed Manual",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-290",
+    "name": "Suction Machine",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-291",
+    "name": "Otoscope",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-292",
+    "name": "Tape Measure Medical",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-293",
+    "name": "Height Measuring Rod",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-294",
+    "name": "Commode Chair",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-295",
+    "name": "Heating Pad Electric",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-296",
+    "name": "Digital Thermometer Flexible Tip",
+    "category": "Medical Equipment"
+  },
+  {
+    "id": "MED-297",
+    "name": "Vitamin E 400 IU (30 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-298",
+    "name": "Vitamin A 10000 IU (60 Softgels)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-299",
+    "name": "Folic Acid 5mg (30 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-300",
+    "name": "Cod Liver Oil (100 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-301",
+    "name": "Collagen Powder (300g)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-302",
+    "name": "Glucosamine + Chondroitin (60 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-303",
+    "name": "Coenzyme Q10 100mg (30 Capsules)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-304",
+    "name": "Whey Protein (1kg)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-305",
+    "name": "Children Multivitamin Syrup (200ml)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-306",
+    "name": "Vitamin C Effervescent (20 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-307",
+    "name": "Electrolyte Powder (10 Sachets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-308",
+    "name": "Ferrous Sulfate 200mg (100 Tablets)",
+    "category": "Vitamins & Supplements"
+  },
+  {
+    "id": "MED-309",
+    "name": "Baby Diapers Size 1 Newborn",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-310",
+    "name": "Baby Diapers Size 5",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-311",
+    "name": "Infant Formula Stage 2 (400g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-312",
+    "name": "Baby Cereal Wheat (250g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-313",
+    "name": "Diaper Rash Cream (50g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-314",
+    "name": "Baby Powder (200g)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-315",
+    "name": "Pacifier (0-6 months)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-316",
+    "name": "Baby Nasal Aspirator",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-317",
+    "name": "Maternity Pads (Pack of 10)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-318",
+    "name": "Breast Pads Disposable (30 pcs)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-319",
+    "name": "Baby Oil (200ml)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-320",
+    "name": "Gripe Water (150ml)",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-321",
+    "name": "Baby Thermometer Digital",
+    "category": "Baby & Mother Care"
+  },
+  {
+    "id": "MED-322",
+    "name": "Plaster Strips Waterproof (20 pcs)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-323",
+    "name": "Povidone-Iodine Solution 10% (100ml)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-324",
+    "name": "Calamine Lotion (100ml)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-325",
+    "name": "Sterile Eye Wash (100ml)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-326",
+    "name": "CPR Face Shield",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-327",
+    "name": "Emergency Thermal Blanket",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-328",
+    "name": "Scissors First Aid",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-329",
+    "name": "Tweezers Stainless Steel",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-330",
+    "name": "Safety Pins (Pack of 12)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-331",
+    "name": "Oral Rehydration Salts (10 Sachets)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-332",
+    "name": "Antiseptic Cream (30g)",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-333",
+    "name": "Splint Finger Aluminium",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-334",
+    "name": "Cotton Bandage 5cm",
+    "category": "First Aid"
+  },
+  {
+    "id": "MED-335",
+    "name": "Hand Sanitizer 100ml",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-336",
+    "name": "Shower Gel (250ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-337",
+    "name": "Shaving Cream (100ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-338",
+    "name": "Disposable Razors (Pack of 5)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-339",
+    "name": "Feminine Wash (200ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-340",
+    "name": "Wet Wipes Antibacterial (50 pcs)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-341",
+    "name": "Nail Clipper",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-342",
+    "name": "Tampons Regular (16 pcs)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-343",
+    "name": "Talcum Powder (200g)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-344",
+    "name": "Panty Liners (Pack of 20)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-345",
+    "name": "Lice Treatment Shampoo (100ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-346",
+    "name": "Foot Cream (75ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-347",
+    "name": "Hair Removal Cream (100ml)",
+    "category": "Personal Care & Hygiene"
+  },
+  {
+    "id": "MED-348",
+    "name": "Metformin 500mg",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-349",
+    "name": "Gliclazide 80mg",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-350",
+    "name": "Insulin Regular (10ml Vial)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-351",
+    "name": "Insulin NPH (10ml Vial)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-352",
+    "name": "Insulin Pen Needles 4mm (100 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-353",
+    "name": "Glucometer Strips Value Pack (100 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-354",
+    "name": "Blood Glucose Control Solution",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-355",
+    "name": "Diabetic Foot Cream (100ml)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-356",
+    "name": "Sugar-Free Sweetener (100 Tablets)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-357",
+    "name": "Insulin Cooling Pouch",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-358",
+    "name": "HbA1c Home Test Kit",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-359",
+    "name": "Ketone Test Strips (50 pcs)",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-360",
+    "name": "Sitagliptin 100mg",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-361",
+    "name": "Glimepiride 2mg",
+    "category": "Diabetes Care"
+  },
+  {
+    "id": "MED-362",
+    "name": "Tobramycin Eye Drops 0.3%",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-363",
+    "name": "Antihistamine Eye Drops (10ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-364",
+    "name": "Lubricating Eye Gel (10g)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-365",
+    "name": "Eye Wash Cup",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-366",
+    "name": "Reading Glasses +1.5",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-367",
+    "name": "Reading Glasses +2.0",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-368",
+    "name": "Ear Plugs Foam (10 Pairs)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-369",
+    "name": "Olive Oil Ear Drops (10ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-370",
+    "name": "Ear Bulb Syringe",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-371",
+    "name": "Timolol Eye Drops 0.5%",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-372",
+    "name": "Eyelid Cleansing Wipes (20 pcs)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-373",
+    "name": "Gentamicin Eye/Ear Drops",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-374",
+    "name": "Contact Lens Case",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-375",
+    "name": "Swimmer Ear Drops (15ml)",
+    "category": "Eye & Ear Care"
+  },
+  {
+    "id": "MED-376",
+    "name": "Whitening Toothpaste (100ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-377",
+    "name": "Children Toothpaste Fluoride (50ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-378",
+    "name": "Electric Toothbrush",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-379",
+    "name": "Toothbrush Medium (Pack of 3)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-380",
+    "name": "Children Toothbrush",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-381",
+    "name": "Tongue Cleaner",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-382",
+    "name": "Fluoride Mouthwash (500ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-383",
+    "name": "Dry Mouth Spray (50ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-384",
+    "name": "Denture Adhesive Cream (40g)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-385",
+    "name": "Teething Gel (10g)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-386",
+    "name": "Water Flosser Portable",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-387",
+    "name": "Toothache Drops (5ml)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-388",
+    "name": "Floss Picks (Pack of 50)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-389",
+    "name": "Benzocaine Oral Gel (10g)",
+    "category": "Oral Care"
+  },
+  {
+    "id": "MED-390",
+    "name": "Salbutamol Syrup (100ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-391",
+    "name": "Budesonide Inhaler 200mcg",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-392",
+    "name": "Beclomethasone Inhaler 100mcg",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-393",
+    "name": "Ambroxol Syrup (100ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-394",
+    "name": "Bromhexine 8mg",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-395",
+    "name": "Chest Rub Vapor Balm (50g)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-396",
+    "name": "Nebulizer Solution Saline (20 Vials)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-397",
+    "name": "Montelukast 10mg",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-398",
+    "name": "Dextromethorphan Syrup (100ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-399",
+    "name": "Nasal Decongestant Spray (15ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-400",
+    "name": "Incentive Spirometer",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-401",
+    "name": "N95 Respirator Masks (Pack of 10)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-402",
+    "name": "Guaifenesin Expectorant (100ml)",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-403",
+    "name": "Pseudoephedrine 60mg",
+    "category": "Respiratory Care"
+  },
+  {
+    "id": "MED-404",
+    "name": "Paracetamol 500mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-405",
+    "name": "Ibuprofen 200mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-406",
+    "name": "Naproxen 500mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-407",
+    "name": "Mefenamic Acid 500mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-408",
+    "name": "Diclofenac Gel 1% (50g)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-409",
+    "name": "Codeine + Paracetamol 30/500mg",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-410",
+    "name": "Migraine Relief Tablets (12 pcs)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-411",
+    "name": "Children Paracetamol Syrup (100ml)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-412",
+    "name": "Children Ibuprofen Suspension (100ml)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-413",
+    "name": "Heat Wrap Back (2 pcs)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-414",
+    "name": "Ice Gel Pack Reusable",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-415",
+    "name": "Arthritis Pain Cream (100g)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-416",
+    "name": "Period Pain Relief Tablets (12 pcs)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-417",
+    "name": "Ketoprofen Gel 2.5% (50g)",
+    "category": "Pain Relief"
+  },
+  {
+    "id": "MED-418",
+    "name": "Garlic Extract Capsules (60 pcs)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-419",
+    "name": "Turmeric Curcumin Capsules (60 pcs)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-420",
+    "name": "Chamomile Tea (20 bags)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-421",
+    "name": "Peppermint Oil (30ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-422",
+    "name": "Tea Tree Oil (30ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-423",
+    "name": "Ginseng Capsules (30 pcs)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-424",
+    "name": "Green Tea Extract (60 Capsules)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-425",
+    "name": "Apple Cider Vinegar (500ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-426",
+    "name": "Coconut Oil Virgin (250ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-427",
+    "name": "Senna Herbal Laxative Tea (20 bags)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-428",
+    "name": "Echinacea Drops (50ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-429",
+    "name": "Castor Oil (100ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-430",
+    "name": "Fenugreek Seeds Capsules (60 pcs)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-431",
+    "name": "Rosemary Hair Oil (100ml)",
+    "category": "Herbal & Natural Products"
+  },
+  {
+    "id": "MED-432",
+    "name": "Female Condoms (Pack of 3)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-433",
+    "name": "Injectable Contraceptive (DMPA)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-434",
+    "name": "Contraceptive Implant",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-435",
+    "name": "Copper IUD",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-436",
+    "name": "Progestin-Only Pills (28 Tablets)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-437",
+    "name": "Combined Oral Pills Low Dose (28 Tablets)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-438",
+    "name": "Pregnancy Test Midstream",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-439",
+    "name": "Spermicidal Gel (50ml)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-440",
+    "name": "Ultra Thin Condoms (Pack of 12)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-441",
+    "name": "Basal Body Thermometer",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-442",
+    "name": "Fertility Supplement Women (30 Tablets)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-443",
+    "name": "Fertility Supplement Men (30 Tablets)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-444",
+    "name": "Vaginal pH Test Kit",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-445",
+    "name": "Contraceptive Patch (3 pcs)",
+    "category": "Family Planning"
+  },
+  {
+    "id": "MED-446",
+    "name": "Elbow Support Sleeve",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-447",
+    "name": "Shoulder Support Brace",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-448",
+    "name": "Posture Corrector",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-449",
+    "name": "Rib Belt",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-450",
+    "name": "Thumb Spica Splint",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-451",
+    "name": "Hinged Knee Brace",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-452",
+    "name": "Compression Stockings Knee-High",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-453",
+    "name": "Heel Cushion Gel (Pair)",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-454",
+    "name": "Arch Support Insoles",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-455",
+    "name": "Hernia Belt",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-456",
+    "name": "Abdominal Binder Post-Surgery",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-457",
+    "name": "Tennis Elbow Strap",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-458",
+    "name": "Cervical Pillow",
+    "category": "Orthopedic Supports"
+  },
+  {
+    "id": "MED-459",
+    "name": "Plantar Fasciitis Night Splint",
+    "category": "Orthopedic Supports"
+  }
+]

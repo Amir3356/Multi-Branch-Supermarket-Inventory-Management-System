@@ -4,7 +4,6 @@ import { Plus } from 'lucide-react'
 import { BranchTag, Notice, PageHeader, StatusTag } from '../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectSales } from '../features/sales/store/salesSlice'
-import { selectCustomerReturns } from '../features/customerReturns/store/customerReturnsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 import { selectCategories } from '../features/inventory/store/productsSlice'
 import { recordSale } from '../features/sales/store/salesThunks'
@@ -17,18 +16,10 @@ export default function SalesPage() {
   const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branches, branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const sales = useSelector(selectSales).filter((s) => inScope(s.branchId))
-  const customerReturns = useSelector(selectCustomerReturns)
   const inventory = useSelector(selectInventory)
   const categories = useSelector(selectCategories)
   const [showNewSale, setShowNewSale] = useState(false)
   const [notice, setNotice] = useState(null)
-
-  // Sales with returns show how much was refunded instead of just "Paid"
-  const saleStatus = (sale) => {
-    const returned = customerReturns.filter((r) => r.saleId === sale.id).reduce((sum, r) => sum + r.qty, 0)
-    if (!returned) return sale.status
-    return returned >= sale.qty ? 'Refunded' : 'Partially Refunded'
-  }
 
   const handleRecordSale = async (data) => {
     // Saved on the server; the form shows any error
@@ -71,7 +62,7 @@ export default function SalesPage() {
                 <td>{sale.qty} {sale.qty === 1 ? 'unit' : 'units'}</td>
                 <td className="fw-600">{formatAmount(sale.total)}</td>
                 <td>{sale.date}</td>
-                <td><StatusTag status={saleStatus(sale)} /></td>
+                <td><StatusTag status={sale.status} /></td>
               </tr>
             ))}
           </tbody>

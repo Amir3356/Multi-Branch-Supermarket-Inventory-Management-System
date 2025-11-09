@@ -7,6 +7,8 @@ use App\Features\Transfers\Repositories\TransferRepository;
 use App\Features\Transfers\Requests\StoreTransferRequest;
 use App\Features\Transfers\Resources\TransferResource;
 use App\Features\Transfers\Services\TransferBroadcaster;
+use App\Features\Products\Repositories\ProductRepository;
+use App\Features\Products\Services\ProductBroadcaster;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -15,7 +17,12 @@ use Illuminate\Support\Facades\DB;
 // Stock moving between branches: sent by one branch, added to stock by the other
 class TransferController
 {
-    public function __construct(private TransferRepository $transfers, private TransferBroadcaster $live) {}
+    public function __construct(
+        private TransferRepository $transfers,
+        private TransferBroadcaster $live,
+        private ProductRepository $products,
+        private ProductBroadcaster $catalog,
+    ) {}
 
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -51,16 +58,24 @@ class TransferController
         if ($transfer->to_branch_id !== $request->user()->branch_id) {
             abort(403, 'This transfer is for another branch.');
         }
+        $sellingPrice = (float) $request->validate(
+            ['sellingPrice' => ['required', 'numeric', 'gt:0', 'max:10000000']],
+            ['sellingPrice.*' => 'Enter a selling price greater than 0'],
+        )['sellingPrice'];
 
-        $received = DB::transaction(function () use ($transfer, $request) {
+        $received = DB::transaction(function () use ($transfer, $request, $sellingPrice) {
             $locked = $this->transfers->lockForUpdate($transfer);
             if (! $locked->isInTransit()) {
                 abort(422, 'This transfer was already added to stock.');
             }
 
+            // The selling price is the product's, at every branch
+            $this->products->setPrices($locked->med_id, null, $sellingPrice, $request->user());
+
             return $this->transfers->withPeople($this->transfers->markReceived($locked, $request->user()));
         });
         $this->live->changed($received);
+        $this->catalog->changed();
 
         return response()->json([
             'message' => "{$received->qty} × {$received->product} added to stock as batch {$received->received_batch}.",

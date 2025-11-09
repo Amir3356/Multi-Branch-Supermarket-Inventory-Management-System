@@ -5,7 +5,6 @@ import { CreditCard, Plus } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatusTag } from '../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectPurchases, selectSupplierPayments } from '../features/purchases/store/purchasesSlice'
-import { selectSupplierReturns } from '../features/supplierReturns/store/supplierReturnsSlice'
 import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { startProcurement, verifyProcurement } from '../features/purchases/store/purchasesThunks'
@@ -32,7 +31,6 @@ export default function PurchasePage() {
   const allPurchases = useSelector(selectPurchases)
   const purchases = allPurchases.filter((p) => inScope(p.branchId))
   const payments = useSelector(selectSupplierPayments).filter((p) => inScope(p.branchId))
-  const supplierReturns = useSelector(selectSupplierReturns)
   const products = useSelector(selectProducts)
   const categories = useSelector(selectCategories)
   const user = useSelector(selectCurrentUser)
@@ -88,13 +86,6 @@ export default function PurchasePage() {
       .catch((error) => setNotice({ type: 'error', text: error.message }))
     setSearchParams({}, { replace: true })
   }, [dispatch, returnedFrom, setSearchParams])
-
-  // Purchases with stock sent back show how much was returned instead of just "Paid"
-  const purchaseStatus = (po) => {
-    const returned = supplierReturns.filter((r) => r.purchaseId === po.id).reduce((sum, r) => sum + r.qty, 0)
-    if (!returned) return po.status
-    return returned >= po.qty ? 'Returned' : 'Partially Returned'
-  }
 
   // Saved as Pending on the server, then paid in Chapa's checkout popup; stock arrives once the payment is verified.
   // The popup opens before the API call, while the click still counts, or the browser would block it.
@@ -163,7 +154,7 @@ export default function PurchasePage() {
                 <td className="fw-600">{formatAmount(po.total)}</td>
                 <td>{po.date}</td>
                 <td>
-                  <StatusTag status={purchaseStatus(po)} />
+                  <StatusTag status={po.status} />
                   {po.status === 'Pending' && po.checkoutUrl && (
                     <a className="secondary-action-btn" style={{ marginLeft: '0.5rem' }} href={po.checkoutUrl} onClick={(e) => resumePayment(e, po)}>
                       <CreditCard size={14} /> Complete payment

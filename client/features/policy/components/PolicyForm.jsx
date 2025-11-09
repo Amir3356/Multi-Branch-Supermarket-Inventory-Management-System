@@ -68,7 +68,7 @@ export default function PolicyForm({ settings, onSave }) {
         </div>
 
         <div className="form-group">
-          <label htmlFor="settings-expiring-soon">Expiring Soon (days before expiry)</label>
+          <label htmlFor="settings-expiring-soon">Expiring Soon Reminder (days before expiry)</label>
           <input id="settings-expiring-soon" type="number" min="1" max={MAX_WARNING_DAYS} step="1" placeholder="e.g. 60" className={`input-field ${errors.expiryDays ? 'error' : ''}`} value={form.expiryDays} onChange={update('expiryDays')} />
           {errors.expiryDays
             ? <span className="error-msg">{errors.expiryDays}</span>

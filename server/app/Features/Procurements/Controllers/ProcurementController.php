@@ -7,6 +7,8 @@ use App\Features\Procurements\Repositories\ProcurementRepository;
 use App\Features\Procurements\Requests\StoreProcurementRequest;
 use App\Features\Procurements\Resources\ProcurementResource;
 use App\Features\Procurements\Services\ProcurementBroadcaster;
+use App\Features\Products\Repositories\ProductRepository;
+use App\Features\Products\Services\ProductBroadcaster;
 use App\Features\Procurements\Services\ProcurementPayments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,8 @@ class ProcurementController
         private ProcurementPayments $payments,
         private ProcurementRepository $procurements,
         private ProcurementBroadcaster $live,
+        private ProductRepository $products,
+        private ProductBroadcaster $catalog,
     ) {}
 
     public function index(): AnonymousResourceCollection
@@ -60,9 +64,11 @@ class ProcurementController
         $today = now(config('pharmacy.timezone'))->toDateString();
         $data = $request->validate([
             'expiryDate' => ['required', 'date_format:Y-m-d', "after:{$today}"],
+            'sellingPrice' => ['required', 'numeric', 'gt:0', 'max:10000000'],
         ], [
             'expiryDate.required' => 'Enter the expiration date printed on the package.',
             'expiryDate.after' => 'This stock has already expired; it can’t be added.',
+            'sellingPrice.*' => 'Enter a selling price greater than 0',
         ]);
 
         // The batch number is generated (BT-00001, …) when the stock is added
@@ -72,9 +78,13 @@ class ProcurementController
                 abort(422, $locked->received_at ? 'This procurement was already added to stock.' : 'Only a paid procurement can be added to stock.');
             }
 
+            // The product's shared prices: what one unit cost on this order, and what it sells for at every branch
+            $this->products->setPrices($locked->med_id, (float) $locked->unit_price, (float) $data['sellingPrice'], $request->user());
+
             return $this->procurements->markReceived($locked, $request->user()->id, $data['expiryDate']);
         });
         $this->live->changed($received);
+        $this->catalog->changed();
 
         return response()->json([
             'message' => "{$received->qty} × {$received->product} (batch {$received->batch}) added to stock.",

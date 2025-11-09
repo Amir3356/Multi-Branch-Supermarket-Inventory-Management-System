@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
-import AUDIT_LOGS from '../../../data/auditLogs.json'
 import { nextId, timeKey, toDateKey } from '../../../utils'
 
-export const AUDIT_MODULES = ['Accounts', 'Sales', 'Customer Returns', 'Purchase', 'Supplier Returns', 'Stock Transfers', 'Damaged', 'Inventory', 'Branches', 'Policy']
+const AUDIT_LOGS = []
+
+export const AUDIT_MODULES = ['Accounts', 'Sales', 'Purchase', 'Stock Transfers', 'Damaged', 'Expenses', 'Inventory', 'Branches', 'Policy']
 
 // Read-only history of important actions
 const auditLogsSlice = createSlice({

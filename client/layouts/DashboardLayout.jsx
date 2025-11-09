@@ -12,10 +12,10 @@ import { STORAGE_KEYS, getPosition, readText, writeText } from '../utils'
 import { refreshCurrentUser, signOut as signOutThunk, signOutAfterInactivity } from '../features/auth/store/authThunks'
 import { loadBranches } from '../features/branches/store/branchesThunks'
 import { loadProcurements, procurementPushed } from '../features/purchases/store/purchasesThunks'
-import { loadReturnRequests, returnRequestPushed } from '../features/supplierReturns/store/returnRequestsThunks'
 import { loadPolicy, policyPushed } from '../features/policy/store/policyThunks'
 import { loadTransfers, transferPushed } from '../features/transfers/store/transfersThunks'
 import { loadSales, salePushed } from '../features/sales/store/salesThunks'
+import { loadProducts, productsPushed } from '../features/inventory/store/productsThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 
@@ -46,23 +46,21 @@ export default function DashboardLayout() {
       })
   }, [dispatch])
 
-  // Then the branch list every page labels with, and paid procurements, whose stock every branch's inventory
-  // includes. Return requests hold units out of that stock, so they load after procurements; after that, changes
-  // arrive over the WebSocket (below)
+  // Then the branch list every page labels with, and the stock movements every branch's inventory is built from;
+  // after that, changes arrive over the WebSocket (below)
   useEffect(() => {
     if (!sessionChecked) return
     dispatch(loadBranches()).catch(() => {})
     // The shared policy decides Low Stock and Expiring Soon on every page
     dispatch(loadPolicy()).catch(() => {})
-    // Stock is built in order: procurements bring it in, then return requests, transfers and sales move it
-    dispatch(loadProcurements()).catch(() => {})
-      .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
+    // Stock is built in order: the catalog first, then procurements bring stock in, then transfers and sales move it
+    dispatch(loadProducts()).catch(() => {})
+      .finally(() => dispatch(loadProcurements()).catch(() => {}))
       .finally(() => dispatch(loadTransfers()).catch(() => {}))
       .finally(() => dispatch(loadSales()).catch(() => {}))
   }, [sessionChecked, dispatch])
 
-  // Live updates per branch: a paid procurement's stock and return requests (sent, approved, rejected, replaced) change
-  // this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
+  // Live updates per branch: procurements, transfers and sales change this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
   // Procurement Officer) to all of them. After a dropped connection, catch up once.
   const liveBranchIds = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId]).filter(Boolean).join(' ')
   useEffect(() => {
@@ -71,22 +69,23 @@ export default function DashboardLayout() {
     const channels = []
     for (const id of liveBranchIds.split(' ')) {
       echo.private(`branch.${id}.procurements`).listen('.procurement.changed', (event) => dispatch(procurementPushed(event.procurement)))
-      echo.private(`branch.${id}.return-requests`).listen('.return-request.changed', (event) => dispatch(returnRequestPushed(event.request)))
       echo.private(`branch.${id}.transfers`).listen('.transfer.changed', (event) => dispatch(transferPushed(event.transfer)))
       echo.private(`branch.${id}.sales`).listen('.sale.recorded', (event) => dispatch(salePushed(event.sale)))
-      channels.push(`branch.${id}.procurements`, `branch.${id}.return-requests`, `branch.${id}.transfers`, `branch.${id}.sales`)
+      channels.push(`branch.${id}.procurements`, `branch.${id}.transfers`, `branch.${id}.sales`)
     }
     // The policy is shared by every branch; branch changes (added, renamed, deactivated, deleted) reach everyone too
     echo.private('policy').listen('.policy.changed', (event) => dispatch(policyPushed(event.policy)))
     echo.private('branches').listen('.branches.changed', () => dispatch(loadBranches()).catch(() => {}))
-    channels.push('policy', 'branches')
+    // Product prices (set when stock is added or edited) are shared by every branch
+    echo.private('products').listen('.products.changed', () => dispatch(productsPushed()))
+    channels.push('policy', 'branches', 'products')
     let wasConnected = null
     const stopWatching = watchConnection((connected) => {
       if (connected && wasConnected === false) {
         dispatch(loadPolicy()).catch(() => {})
         dispatch(loadBranches()).catch(() => {})
+        dispatch(loadProducts()).catch(() => {})
         dispatch(loadProcurements()).catch(() => {})
-          .finally(() => dispatch(loadReturnRequests()).catch(() => {}))
           .finally(() => dispatch(loadTransfers()).catch(() => {}))
           .finally(() => dispatch(loadSales()).catch(() => {}))
       }

@@ -22,7 +22,8 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
   useEscapeKey(onClose)
 
   const categoryProducts = products.filter((p) => p.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
-  const product = products.find((p) => p.id === form.medId)
+  // Picked from the product catalog (the same list for every user)
+  const product = categoryProducts.find((p) => p.id === form.medId)
   const qty = Number(form.qty)
   const totalCost = Number(form.totalCost)
   // The officer enters what the whole order costs; the unit price follows from it
@@ -122,7 +123,7 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
           <div className="form-group">
             <label htmlFor="purchase-product">Product Name *</label>
             <select id="purchase-product" className={`input-field ${errors.medId ? 'error' : ''}`} value={form.medId} onChange={(e) => update('medId', e.target.value)} disabled={!form.category}>
-              <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
+              <option value="">{!form.category ? 'Select a category first' : categoryProducts.length ? `Select product… (${categoryProducts.length} in ${form.category})` : 'No products in this category'}</option>
               {categoryProducts.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}

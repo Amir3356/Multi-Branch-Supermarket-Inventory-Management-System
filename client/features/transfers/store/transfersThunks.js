@@ -59,7 +59,8 @@ export const sendTransfer = ({ medId, expiry, ...data }) => async (dispatch, get
 // Receiving branch's Inventory Officer (Add Medicine): the units enter this branch's stock, and the product's selling
 // price is set
 export const receiveTransferToStock = (transfer, sellingPrice) => async (dispatch, getState) => {
-  const { transfer: received } = await receiveTransfer(transfer.id)
+  // The server saves the product's selling price too, for every branch
+  const { transfer: received } = await receiveTransfer(transfer.id, sellingPrice)
   dispatch(transferSaved(received))
   dispatch(syncTransferStock())
   const { state, money, branchName } = thunkContext(getState)
