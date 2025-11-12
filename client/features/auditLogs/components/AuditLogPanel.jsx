@@ -89,7 +89,7 @@ export default function AuditLogPanel({ logs }) {
             {visible.length === 0 && (
               <tr>
                 <td colSpan="7" style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
-                  No actions match your search or filter.
+                  {logs.length === 0 ? 'No audit logs recorded yet.' : 'No actions match your search or filter.'}
                 </td>
               </tr>
             )}

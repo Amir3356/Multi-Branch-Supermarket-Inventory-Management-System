@@ -18,11 +18,16 @@ function cashierCards({ sales }, { money, today, period }) {
   ]
 }
 
-function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], damaged }, { money, month, settings }) {
+// Stock cards show the shelf right now; Stock Added, Damaged and Expenses follow the chosen period
+function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], damaged, expenses = [] }, { money, settings, period }) {
   const inStock = inventory.filter((i) => i.stock > 0)
   // Paid for this branch, or sent here by another branch, but not added with Add Medicine yet, so not in stock
   const waiting = [...purchases.filter((p) => p.status === 'Paid' && !p.receivedAt), ...incomingTransfers.filter((t) => t.status === 'Pending')]
-  const damagedThisMonth = damaged.filter((d) => d.date.startsWith(month))
+  // Added to stock with Add Medicine during the period (the day it was added, in this computer's local time)
+  const addedOn = (iso) => (iso ? new Date(iso).toLocaleDateString('en-CA') : null)
+  const added = [...purchases, ...incomingTransfers].filter((x) => x.receivedAt && inPeriod(addedOn(x.receivedAt), period.range))
+  const damagedInPeriod = damaged.filter((d) => inPeriod(d.date, period.range))
+  const expensesInPeriod = expenses.filter((e) => inPeriod(e.date, period.range))
   return [
     { title: 'Waiting to Add', icon: 'procurement', tone: 'warning', value: waiting.length, chip: waiting.length ? `${plural(sum(waiting, (p) => p.qty), 'unit', 'units')} · use Add Medicine` : 'Nothing waiting', chipTone: waiting.length ? 'negative' : 'neutral' },
     { title: 'Products in Stock', icon: 'stock', tone: 'teal', value: inStock.length, chip: plural(sum(inStock, (i) => i.stock), 'unit on hand', 'units on hand') },
@@ -31,7 +36,9 @@ function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], d
     { title: 'Expired', icon: 'expired', tone: 'danger', value: inStock.filter((i) => i.expired).length, chip: 'Must not be sold', chipTone: 'negative' },
     { title: 'Out of Stock', icon: 'empty', tone: 'danger', value: inventory.filter((i) => i.stock <= 0).length, chip: 'Ask for a restock', chipTone: 'negative' },
     { title: 'Stock Value', icon: 'money', tone: 'cyan', value: money(sum(inventory, (i) => i.stock * (i.purchasePrice || 0))), chip: `Selling value ${money(sum(inventory, (i) => i.stock * (i.sellingPrice || 0)))}`, chipTone: 'positive' },
-    { title: 'Damaged This Month', icon: 'damaged', tone: 'danger', value: plural(sum(damagedThisMonth, (d) => d.qty), 'unit', 'units'), chip: `Loss ${money(sum(damagedThisMonth, (d) => d.lossValue))}`, chipTone: 'negative' }
+    { title: 'Stock Added', icon: 'procurement', tone: 'teal', value: plural(sum(added, (x) => x.qty), 'unit', 'units'), chip: `${plural(added.length, 'arrival', 'arrivals')} · ${period.name}`, chipTone: 'positive' },
+    { title: 'Damaged', icon: 'damaged', tone: 'danger', value: plural(sum(damagedInPeriod, (d) => d.qty), 'unit', 'units'), chip: `Loss ${money(sum(damagedInPeriod, (d) => d.lossValue))} · ${period.name}`, chipTone: 'negative' },
+    { title: 'Expenses', icon: 'wallet', tone: 'warning', value: money(sum(expensesInPeriod, (e) => e.amount)), chip: `${plural(expensesInPeriod.length, 'expense', 'expenses')} · ${period.name}`, chipTone: 'negative' }
   ]
 }
 
@@ -58,4 +65,19 @@ export function dashboardCards(role, data, { money, settings, period }) {
 }
 
 // Roles whose dashboard has a period picker
-export const ROLES_WITH_PERIOD = ['cashier']
+export const ROLES_WITH_PERIOD = ['cashier', 'pharmacist']
+
+// The Inventory Officer's to-do list: stock rows to act on, most urgent first
+const ATTENTION_ORDER = { Expired: 0, 'Out of Stock': 1, 'Expiring Soon': 2, 'Low Stock': 3 }
+const ATTENTION_ACTION = {
+  Expired: 'Take it off the shelf and record it as damaged',
+  'Out of Stock': 'Ask the Procurement Officer for a restock',
+  'Expiring Soon': 'Sell it first or move it to another branch',
+  'Low Stock': 'Ask the Procurement Officer for a restock'
+}
+
+export const needsAttention = (inventory) =>
+  inventory
+    .filter((i) => i.inventoryStatus in ATTENTION_ORDER)
+    .map((i) => ({ ...i, action: ATTENTION_ACTION[i.inventoryStatus] }))
+    .sort((a, b) => ATTENTION_ORDER[a.inventoryStatus] - ATTENTION_ORDER[b.inventoryStatus] || (a.expiry || '').localeCompare(b.expiry || ''))

@@ -1,9 +1,8 @@
 import { toDateKey, todayKey } from '../../../utils'
 
-// The periods the dashboard can show; each runs up to today (weeks start on Monday)
+// The periods the dashboard can show; each runs up to today
 export const PERIODS = {
   daily: 'Today',
-  weekly: 'This Week',
   monthly: 'This Month',
   quarterly: 'This Quarter',
   yearly: 'This Year',
