@@ -18,27 +18,24 @@ function cashierCards({ sales }, { money, today, period }) {
   ]
 }
 
-// Stock cards show the shelf right now; Stock Added, Damaged and Expenses follow the chosen period
+// Stock cards show the shelf right now; Damaged and Expenses follow the chosen period
 function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], damaged, expenses = [] }, { money, settings, period }) {
   const inStock = inventory.filter((i) => i.stock > 0)
   // Paid for this branch, or sent here by another branch, but not added with Add Medicine yet, so not in stock
   const waiting = [...purchases.filter((p) => p.status === 'Paid' && !p.receivedAt), ...incomingTransfers.filter((t) => t.status === 'Pending')]
-  // Added to stock with Add Medicine during the period (the day it was added, in this computer's local time)
-  const addedOn = (iso) => (iso ? new Date(iso).toLocaleDateString('en-CA') : null)
-  const added = [...purchases, ...incomingTransfers].filter((x) => x.receivedAt && inPeriod(addedOn(x.receivedAt), period.range))
   const damagedInPeriod = damaged.filter((d) => inPeriod(d.date, period.range))
   const expensesInPeriod = expenses.filter((e) => inPeriod(e.date, period.range))
+  // group: 'stock' cards show the shelf right now, 'period' cards follow the chosen period; wide cards span two columns
   return [
-    { title: 'Waiting to Add', icon: 'procurement', tone: 'warning', value: waiting.length, chip: waiting.length ? `${plural(sum(waiting, (p) => p.qty), 'unit', 'units')} · use Add Medicine` : 'Nothing waiting', chipTone: waiting.length ? 'negative' : 'neutral' },
-    { title: 'Products in Stock', icon: 'stock', tone: 'teal', value: inStock.length, chip: plural(sum(inStock, (i) => i.stock), 'unit on hand', 'units on hand') },
-    { title: 'Low Stock', icon: 'low', tone: 'warning', value: inStock.filter((i) => i.status === 'Low Stock').length, chip: `Below ${settings.defaultMinStock} units`, chipTone: 'negative' },
-    { title: 'Expiring Soon', icon: 'clock', tone: 'warning', value: inventory.filter((i) => i.inventoryStatus === 'Expiring Soon').length, chip: `Within ${settings.expiryWarningDays} days`, chipTone: 'negative' },
-    { title: 'Expired', icon: 'expired', tone: 'danger', value: inStock.filter((i) => i.expired).length, chip: 'Must not be sold', chipTone: 'negative' },
-    { title: 'Out of Stock', icon: 'empty', tone: 'danger', value: inventory.filter((i) => i.stock <= 0).length, chip: 'Ask for a restock', chipTone: 'negative' },
-    { title: 'Stock Value', icon: 'money', tone: 'cyan', value: money(sum(inventory, (i) => i.stock * (i.purchasePrice || 0))), chip: `Selling value ${money(sum(inventory, (i) => i.stock * (i.sellingPrice || 0)))}`, chipTone: 'positive' },
-    { title: 'Stock Added', icon: 'procurement', tone: 'teal', value: plural(sum(added, (x) => x.qty), 'unit', 'units'), chip: `${plural(added.length, 'arrival', 'arrivals')} · ${period.name}`, chipTone: 'positive' },
-    { title: 'Damaged', icon: 'damaged', tone: 'danger', value: plural(sum(damagedInPeriod, (d) => d.qty), 'unit', 'units'), chip: `Loss ${money(sum(damagedInPeriod, (d) => d.lossValue))} · ${period.name}`, chipTone: 'negative' },
-    { title: 'Expenses', icon: 'wallet', tone: 'warning', value: money(sum(expensesInPeriod, (e) => e.amount)), chip: `${plural(expensesInPeriod.length, 'expense', 'expenses')} · ${period.name}`, chipTone: 'negative' }
+    { group: 'stock', title: 'Products in Stock', icon: 'stock', tone: 'teal', value: inStock.length, chip: plural(sum(inStock, (i) => i.stock), 'unit on hand', 'units on hand') },
+    { group: 'stock', wide: true, title: 'Stock Value', icon: 'money', tone: 'cyan', value: money(sum(inventory, (i) => i.stock * (i.purchasePrice || 0))), chip: `Selling value ${money(sum(inventory, (i) => i.stock * (i.sellingPrice || 0)))}`, chipTone: 'positive' },
+    { group: 'stock', title: 'Waiting to Add', icon: 'procurement', tone: 'warning', value: waiting.length, chip: waiting.length ? `${plural(sum(waiting, (p) => p.qty), 'unit', 'units')} · use Add Medicine` : 'Nothing waiting', chipTone: waiting.length ? 'negative' : 'neutral' },
+    { group: 'stock', title: 'Low Stock', icon: 'low', tone: 'warning', value: inStock.filter((i) => i.status === 'Low Stock').length, chip: `Below ${settings.defaultMinStock} units`, chipTone: 'negative' },
+    { group: 'stock', title: 'Expiring Soon', icon: 'clock', tone: 'warning', value: inventory.filter((i) => i.inventoryStatus === 'Expiring Soon').length, chip: `Within ${settings.expiryWarningDays} days`, chipTone: 'negative' },
+    { group: 'stock', title: 'Expired', icon: 'expired', tone: 'danger', value: inStock.filter((i) => i.expired).length, chip: 'Must not be sold', chipTone: 'negative' },
+    { group: 'stock', title: 'Out of Stock', icon: 'empty', tone: 'danger', value: inventory.filter((i) => i.stock <= 0).length, chip: 'Ask for a restock', chipTone: 'negative' },
+    { group: 'period', title: 'Damaged', icon: 'damaged', tone: 'danger', value: plural(sum(damagedInPeriod, (d) => d.qty), 'unit', 'units'), chip: `Loss ${money(sum(damagedInPeriod, (d) => d.lossValue))} · ${period.name}`, chipTone: 'negative' },
+    { group: 'period', title: 'Expenses', icon: 'wallet', tone: 'warning', value: money(sum(expensesInPeriod, (e) => e.amount)), chip: `${plural(expensesInPeriod.length, 'expense', 'expenses')} · ${period.name}`, chipTone: 'negative' }
   ]
 }
 

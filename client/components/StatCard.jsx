@@ -1,7 +1,7 @@
 // Summary card: title, icon, big value, and a small chip underneath
-export default function StatCard({ title, icon: Icon, tone = 'cyan', value, valueStyle, chip, chipTone = 'neutral', chipTitle }) {
+export default function StatCard({ title, icon: Icon, tone = 'cyan', value, valueStyle, chip, chipTone = 'neutral', chipTitle, className = '' }) {
   return (
-    <div className="stat-card">
+    <div className={`stat-card ${className}`.trim()}>
       <div className="stat-header">
         <span className="stat-title">{title}</span>
         <div className={`stat-icon-wrapper ${tone}`}>
