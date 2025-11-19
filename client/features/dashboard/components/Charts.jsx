@@ -51,19 +51,19 @@ export function DonutChart({ items, unit, emptyText }) {
   )
 }
 
-/** One bar per row; `items` are { label, value, tone } */
+/** One bar per row; `items` are { label, value, tone, detail? } (detail shows after the value) */
 export function HorizontalBarChart({ items, format = (v) => v.toLocaleString(), emptyText }) {
   if (!items.length) return <ChartEmpty>{emptyText}</ChartEmpty>
   const max = Math.max(...items.map((i) => i.value), 1)
   return (
     <ul className="hbar-chart">
       {items.map((i) => (
-        <li key={i.label} title={`${i.label}: ${format(i.value)}`}>
+        <li key={i.label} title={`${i.label}: ${format(i.value)}${i.detail ? ` · ${i.detail}` : ''}`}>
           <span className="hbar-label">{i.label}</span>
           <span className="hbar-track">
             <span className={`hbar-fill tone-${i.tone || 'cyan'}`} style={{ width: `${Math.max((i.value / max) * 100, i.value ? 2 : 0)}%` }} />
           </span>
-          <span className="hbar-value">{format(i.value)}</span>
+          <span className="hbar-value">{format(i.value)}{i.detail && <small> · {i.detail}</small>}</span>
         </li>
       ))}
       {/* Rows that are all zero still show, with the empty text under them */}

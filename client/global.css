@@ -952,6 +952,11 @@ a.nav-item {
 .dashboard-period select.input-field option { background: var(--bg-dark); color: var(--text-main); }
 .dashboard-range-error { display: block; padding: 1.5rem 0; }
 
+/* A period picker at the top of the page, above everything it filters */
+.dashboard-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 1.25rem; margin-top: 1.5rem; }
+.dashboard-toolbar > .page-desc { margin: 0 0 0.6rem; }
+.dashboard-toolbar + .dashboard-section { margin-top: 1.5rem; }
+
 /* Stock: holdings on the first row (Stock Value spans two), warnings on the second */
 .dashboard-stock-grid,
 .dashboard-period-grid {
@@ -961,6 +966,7 @@ a.nav-item {
 }
 
 .dashboard-period-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dashboard-three-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .dashboard-stock-grid .stat-card.wide { grid-column: span 2; }
 .dashboard-section .stat-value { font-variant-numeric: tabular-nums; }
 
@@ -968,11 +974,15 @@ a.nav-item {
   /* Two columns: Stock Value takes the full first row, the six counts pair up below it */
   .dashboard-stock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dashboard-stock-grid .stat-card.wide { order: -1; }
+  .dashboard-three-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-three-grid > :last-child:nth-child(odd) { grid-column: span 2; }
 }
 
 @media (max-width: 600px) {
   .dashboard-stock-grid,
-  .dashboard-period-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-period-grid,
+  .dashboard-three-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-three-grid > :last-child:nth-child(odd) { grid-column: auto; }
   .dashboard-stock-grid .stat-card.wide { grid-column: auto; }
   .dashboard-period,
   .dashboard-period .form-group { width: 100%; }
@@ -1410,6 +1420,7 @@ a.nav-item {
 
 /* Chart colours, shared by bars, slices and legend dots */
 .tone-cyan { --tone: var(--primary-cyan); }
+.tone-teal { --tone: var(--primary-teal); }
 .tone-green { --tone: var(--primary-emerald); }
 .tone-amber { --tone: #f59e0b; }
 .tone-orange { --tone: #fb923c; }
@@ -1437,6 +1448,7 @@ a.nav-item {
 .hbar-track { height: 10px; border-radius: var(--radius-full); background: var(--border-subtle); overflow: hidden; }
 .hbar-fill { display: block; height: 100%; border-radius: inherit; background: var(--tone); transition: width var(--transition-normal); }
 .hbar-value { color: var(--text-main); font-weight: 600; white-space: nowrap; }
+.hbar-value small { font-size: inherit; font-weight: 400; color: var(--text-dim); }
 .hbar-chart li.hbar-note { display: block; margin-top: 0.4rem; font-size: 0.82rem; color: var(--text-dim); text-align: center; }
 
 .bar-chart { display: grid; grid-template-columns: auto 1fr; column-gap: 0.6rem; }

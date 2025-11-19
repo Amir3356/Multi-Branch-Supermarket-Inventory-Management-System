@@ -39,12 +39,13 @@ function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], d
   ]
 }
 
-function procurementOfficerCards({ purchases }, { money, month }) {
-  const pending = purchases.filter((p) => p.status === 'Pending')
-  const paidThisMonth = purchases.filter((p) => p.status === 'Paid' && p.date.startsWith(month))
+// Total Purchases follows the chosen period (paid orders, by order date); Awaiting Delivery is every paid order not in stock yet
+function procurementOfficerCards({ purchases }, { money, period }) {
+  const paid = purchases.filter((p) => p.status === 'Paid' && inPeriod(p.date, period.range))
+  const undelivered = purchases.filter((p) => p.status === 'Paid' && !p.receivedAt)
   return [
-    { title: 'Awaiting Payment', icon: 'card', tone: 'warning', value: pending.length, chip: `${money(sum(pending, (p) => p.total))} to pay`, chipTone: 'negative' },
-    { title: 'Paid This Month', icon: 'procurement', tone: 'teal', value: paidThisMonth.length, chip: `Total cost ${money(sum(paidThisMonth, (p) => p.total))}` }
+    { title: 'Total Purchases', icon: 'money', tone: 'teal', value: money(sum(paid, (p) => p.total)), chip: `${plural(paid.length, 'paid order', 'paid orders')} · ${period.name}`, chipTone: 'positive' },
+    { title: 'Awaiting Delivery', icon: 'truck', tone: 'cyan', value: undelivered.length, chip: undelivered.length ? `${plural(sum(undelivered, (p) => p.qty), 'unit', 'units')} not added to stock yet` : 'Every paid order is in stock', chipTone: 'neutral' }
   ]
 }
 

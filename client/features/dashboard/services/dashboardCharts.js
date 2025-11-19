@@ -69,3 +69,35 @@ export function expensesByCategory(expenses, range) {
   for (const e of expenses.filter((x) => inPeriod(x.date, range))) totals.set(e.category, (totals.get(e.category) || 0) + e.amount)
   return [...totals].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value)
 }
+
+// The Procurement Officer's chart
+
+/** Paid order totals (money) per column of the period, by order date */
+export const purchasesOverTime = (purchases, range) =>
+  periodBuckets(range).map((b) => ({
+    label: b.label,
+    title: b.from === b.to ? b.from : `${b.from} – ${b.to}`,
+    values: [sum(purchases.filter((p) => p.status === 'Paid' && inPeriod(p.date, [b.from, b.to])), (p) => p.total)]
+  }))
+
+// The Cashier's charts
+
+/** Sales totals (money) per column of the period */
+export const salesOverTime = (sales, range) =>
+  periodBuckets(range).map((b) => ({
+    label: b.label,
+    title: b.from === b.to ? b.from : `${b.from} – ${b.to}`,
+    values: [sum(sales.filter((s) => inPeriod(s.date, [b.from, b.to])), (s) => s.total)]
+  }))
+
+/** The products that brought in the most money in the period, with the units sold, largest first */
+export function topSellingProducts(sales, range, limit = 8) {
+  const byProduct = new Map()
+  for (const s of sales.filter((x) => inPeriod(x.date, range))) {
+    const row = byProduct.get(s.product) || { label: s.product, value: 0, qty: 0 }
+    row.value += s.total
+    row.qty += s.qty
+    byProduct.set(s.product, row)
+  }
+  return [...byProduct.values()].sort((a, b) => b.value - a.value).slice(0, limit)
+}
