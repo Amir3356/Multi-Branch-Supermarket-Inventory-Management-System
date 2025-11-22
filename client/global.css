@@ -1421,6 +1421,7 @@ a.nav-item {
 /* Chart colours, shared by bars, slices and legend dots */
 .tone-cyan { --tone: var(--primary-cyan); }
 .tone-teal { --tone: var(--primary-teal); }
+.tone-violet { --tone: #a78bfa; }
 .tone-green { --tone: var(--primary-emerald); }
 .tone-amber { --tone: #f59e0b; }
 .tone-orange { --tone: #fb923c; }
@@ -1429,7 +1430,7 @@ a.nav-item {
 
 .chart-legend { list-style: none; display: grid; gap: 0.45rem; font-size: 0.82rem; color: var(--text-muted); }
 .chart-legend li { display: flex; align-items: center; gap: 0.5rem; }
-.chart-legend strong { margin-left: auto; color: var(--text-main); font-weight: 700; }
+.chart-legend strong { margin-left: auto; color: var(--text-main); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .chart-legend.inline { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 0.75rem; }
 .legend-dot { width: 10px; height: 10px; border-radius: 3px; background: var(--tone); flex-shrink: 0; }
 
@@ -1441,6 +1442,15 @@ a.nav-item {
 .donut-slice { stroke: var(--tone); transition: stroke-dasharray var(--transition-normal); }
 .donut-total { text-anchor: middle; font-size: 7px; font-weight: 800; fill: var(--text-main); }
 .donut-unit { text-anchor: middle; font-size: 3px; fill: var(--text-dim); }
+.pie-slice { fill: var(--tone); stroke: var(--bg-dark); stroke-width: 0.35; transition: opacity var(--transition-fast); }
+.pie-chart svg:hover .pie-slice { opacity: 0.6; }
+.pie-chart svg .pie-slice:hover { opacity: 1; }
+.pie-empty { fill: var(--border-subtle); }
+.pie-empty-text { flex: 1; min-width: 160px; padding: 0; text-align: left; }
+.pie-chart .chart-legend li { min-width: 0; }
+.legend-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-share { width: 2.6rem; text-align: right; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+:root[data-theme="light"] .tone-violet { --tone: #7c3aed; }
 
 .hbar-chart { list-style: none; display: grid; gap: 0.6rem; }
 .hbar-chart li { display: grid; grid-template-columns: minmax(0, 13rem) minmax(3rem, 1fr) auto; align-items: center; gap: 0.75rem; font-size: 0.8rem; }
@@ -1449,12 +1459,19 @@ a.nav-item {
 .hbar-fill { display: block; height: 100%; border-radius: inherit; background: var(--tone); transition: width var(--transition-normal); }
 .hbar-value { color: var(--text-main); font-weight: 600; white-space: nowrap; }
 .hbar-value small { font-size: inherit; font-weight: 400; color: var(--text-dim); }
+.hbar-placeholder { position: relative; }
+.hbar-placeholder .hbar-chart { opacity: 0.35; }
+.hbar-placeholder .hbar-value { color: var(--text-dim); }
+.placeholder-line { display: block; height: 8px; border-radius: var(--radius-full); background: var(--border-subtle); }
+.hbar-placeholder-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 1rem; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+.hbar-placeholder-text span { padding: 0.4rem 0.9rem; border-radius: var(--radius-full); background: var(--bg-dark); border: 1px solid var(--border-subtle); }
 .hbar-chart li.hbar-note { display: block; margin-top: 0.4rem; font-size: 0.82rem; color: var(--text-dim); text-align: center; }
 
-.bar-chart { display: grid; grid-template-columns: auto 1fr; column-gap: 0.6rem; }
+.bar-chart { --bar-label-h: 1.4rem; display: grid; grid-template-columns: auto 1fr; column-gap: 0.6rem; }
+.bar-chart.wrap-labels { --bar-label-h: 2.6rem; }
 .bar-chart-scale { display: flex; flex-direction: column; justify-content: space-between; height: calc(200px + 0.8rem); margin-top: -0.4rem; font-size: 0.68rem; line-height: 0.8rem; color: var(--text-dim); text-align: right; white-space: nowrap; }
-.bar-chart-plot { position: relative; display: flex; align-items: stretch; gap: 4px; min-width: 0; padding: 0 4px; border-left: 1px solid var(--border-subtle); }
-.bar-chart-grid { position: absolute; inset: 0 0 1.4rem 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+.bar-chart-plot { position: relative; min-height: calc(200px + var(--bar-label-h)); display: flex; align-items: stretch; gap: 4px; min-width: 0; padding: 0 4px; border-left: 1px solid var(--border-subtle); }
+.bar-chart-grid { position: absolute; inset: 0 0 var(--bar-label-h) 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
 .bar-chart-grid span { border-top: 1px dashed var(--border-subtle); }
 .bar-chart-grid span:last-child { border-top-style: solid; }
 .bar-group { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; border-radius: 4px; }
@@ -1463,9 +1480,10 @@ a.nav-item {
 .bar-group-bars { height: 200px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; }
 .bar { flex: 1; max-width: 24px; background: var(--tone); border-radius: 3px 3px 0 0; transition: height var(--transition-normal); }
 .bar-group.single .bar { max-width: 48px; }
-.bar-label { height: 1.4rem; padding-top: 0.3rem; font-size: 0.66rem; color: var(--text-dim); text-align: center; white-space: nowrap; }
+.bar-label { height: var(--bar-label-h); padding-top: 0.3rem; font-size: 0.66rem; color: var(--text-dim); text-align: center; white-space: nowrap; }
+.wrap-labels .bar-label { white-space: normal; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; padding-inline: 2px; }
 .bar-chart .chart-legend { grid-column: 2; }
-.bar-chart-empty { position: absolute; inset: 0 0 1.4rem 0; display: flex; align-items: center; justify-content: center; padding: 0 1rem; text-align: center; font-size: 0.85rem; color: var(--text-dim); pointer-events: none; }
+.bar-chart-empty { position: absolute; inset: 0 0 var(--bar-label-h) 0; display: flex; align-items: center; justify-content: center; padding: 0 1rem; text-align: center; font-size: 0.85rem; color: var(--text-dim); pointer-events: none; }
 
 :root[data-theme="light"] .tone-amber { --tone: #d97706; }
 :root[data-theme="light"] .tone-rose { --tone: #e11d48; }

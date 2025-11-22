@@ -53,7 +53,23 @@ export function DonutChart({ items, unit, emptyText }) {
 
 /** One bar per row; `items` are { label, value, tone, detail? } (detail shows after the value) */
 export function HorizontalBarChart({ items, format = (v) => v.toLocaleString(), emptyText }) {
-  if (!items.length) return <ChartEmpty>{emptyText}</ChartEmpty>
+  // Nothing to list: empty placeholder rows keep the chart's shape, with the empty text over them
+  if (!items.length) {
+    return (
+      <div className="hbar-placeholder">
+        <ul className="hbar-chart" aria-hidden="true">
+          {[72, 56, 40, 28, 16].map((width) => (
+            <li key={width}>
+              <span className="hbar-label"><span className="placeholder-line" style={{ width: `${width + 20}%` }} /></span>
+              <span className="hbar-track"><span className="hbar-fill tone-slate" style={{ width: `${width}%` }} /></span>
+              <span className="hbar-value">—</span>
+            </li>
+          ))}
+        </ul>
+        <p className="hbar-placeholder-text"><span>{emptyText}</span></p>
+      </div>
+    )
+  }
   const max = Math.max(...items.map((i) => i.value), 1)
   return (
     <ul className="hbar-chart">
@@ -80,8 +96,9 @@ function niceTicks(max) {
   return Array.from({ length: Math.ceil(max / step) + 1 }, (_, i) => i * step)
 }
 
-/** Bar chart: one group of side-by-side bars per column; `series` are { label, tone }, each column is { label, title, values[] } */
-export function BarChart({ columns, series, format = (v) => v.toLocaleString(), emptyText }) {
+/** Bar chart: one group of side-by-side bars per column; `series` are { label, tone }, each column is { label, title, values[] }.
+ * `wrapLabels` gives long labels (product names) two lines instead of one. */
+export function BarChart({ columns, series, format = (v) => v.toLocaleString(), emptyText, wrapLabels = false }) {
   const max = Math.max(...columns.flatMap((c) => c.values), 0)
   // With nothing to show the axes and columns stay, with the empty text over them
   const ticks = max ? niceTicks(max) : [0, 0, 0, 0, 0]
@@ -89,7 +106,7 @@ export function BarChart({ columns, series, format = (v) => v.toLocaleString(), 
   // Keep the axis readable when there are many columns
   const labelEvery = Math.ceil(columns.length / 10)
   return (
-    <div className="bar-chart">
+    <div className={`bar-chart ${wrapLabels ? 'wrap-labels' : ''}`}>
       <div className="bar-chart-scale">
         {[...ticks].reverse().map((t, i) => <span key={i}>{max || i === ticks.length - 1 ? format(t) : ''}</span>)}
       </div>
@@ -115,6 +132,50 @@ export function BarChart({ columns, series, format = (v) => v.toLocaleString(), 
           <li key={s.label}><span className={`legend-dot tone-${s.tone}`} />{s.label}</li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+// Polar point on the pie, angle in turns (0 = 12 o'clock, clockwise)
+const pointAt = (turn, r = 20) => [21 + r * Math.sin(turn * 2 * Math.PI), 21 - r * Math.cos(turn * 2 * Math.PI)]
+
+/** Pie split into slices; `items` are { label, value, tone, detail? }, legend shows each value and its share */
+export function PieChart({ items, format = (v) => v.toLocaleString(), emptyText }) {
+  const shown = items.filter((i) => i.value > 0)
+  const total = shown.reduce((t, i) => t + i.value, 0)
+  // Each slice starts where the previous one ended
+  const slices = shown.reduce((list, i) => {
+    const start = list.length ? list[list.length - 1].end : 0
+    return [...list, { ...i, start, end: start + i.value / total }]
+  }, [])
+  const share = (v) => `${Math.round((v / total) * 100)}%`
+  return (
+    <div className="donut-chart pie-chart">
+      <svg viewBox="0 0 42 42" role="img" aria-label={total ? slices.map((s) => `${s.label}: ${format(s.value)} (${share(s.value)})`).join(', ') : emptyText}>
+        {!total && <circle cx="21" cy="21" r="20" className="pie-empty" />}
+        {slices.length === 1 && <circle cx="21" cy="21" r="20" className={`pie-slice tone-${slices[0].tone}`}><title>{`${slices[0].label}: ${format(slices[0].value)}`}</title></circle>}
+        {slices.length > 1 && slices.map((s) => {
+          const [x1, y1] = pointAt(s.start)
+          const [x2, y2] = pointAt(s.end)
+          return (
+            <path key={s.label} className={`pie-slice tone-${s.tone}`} d={`M21 21 L${x1} ${y1} A20 20 0 ${s.end - s.start > 0.5 ? 1 : 0} 1 ${x2} ${y2} Z`}>
+              <title>{`${s.label}: ${format(s.value)} (${share(s.value)})${s.detail ? ` · ${s.detail}` : ''}`}</title>
+            </path>
+          )
+        })}
+      </svg>
+      {total ? (
+        <ul className="chart-legend">
+          {slices.map((s) => (
+            <li key={s.label} title={s.detail ? `${s.label} · ${s.detail}` : s.label}>
+              <span className={`legend-dot tone-${s.tone}`} />
+              <span className="legend-label">{s.label}</span>
+              <strong>{format(s.value)}</strong>
+              <span className="legend-share">{share(s.value)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="chart-empty pie-empty-text">{emptyText}</p>}
     </div>
   )
 }

@@ -90,8 +90,9 @@ export const salesOverTime = (sales, range) =>
     values: [sum(sales.filter((s) => inPeriod(s.date, [b.from, b.to])), (s) => s.total)]
   }))
 
-/** The products that brought in the most money in the period, with the units sold, largest first */
-export function topSellingProducts(sales, range, limit = 8) {
+/** Pie slices for the products that brought in the most money in the period, largest first, with the units sold;
+ * beyond the top `limit - 1`, the rest are added together as "Other" */
+export function topSellingSlices(sales, range, limit = 8) {
   const byProduct = new Map()
   for (const s of sales.filter((x) => inPeriod(x.date, range))) {
     const row = byProduct.get(s.product) || { label: s.product, value: 0, qty: 0 }
@@ -99,5 +100,8 @@ export function topSellingProducts(sales, range, limit = 8) {
     row.qty += s.qty
     byProduct.set(s.product, row)
   }
-  return [...byProduct.values()].sort((a, b) => b.value - a.value).slice(0, limit)
+  const ranked = [...byProduct.values()].sort((a, b) => b.value - a.value)
+  if (ranked.length <= limit) return ranked
+  const rest = ranked.slice(limit - 1)
+  return [...ranked.slice(0, limit - 1), { label: `Other (${rest.length} products)`, value: sum(rest, (r) => r.value), qty: sum(rest, (r) => r.qty) }]
 }

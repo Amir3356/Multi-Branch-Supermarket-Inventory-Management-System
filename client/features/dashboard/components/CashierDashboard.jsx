@@ -4,12 +4,15 @@ import { useFormatMoney } from '../../../hooks'
 import { selectSettings } from '../../policy/store/settingsSlice'
 import { selectSales } from '../../sales/store/salesSlice'
 import { dashboardCards } from '../services/dashboardCards'
-import { salesOverTime, topSellingProducts } from '../services/dashboardCharts'
+import { salesOverTime, topSellingSlices } from '../services/dashboardCharts'
 import { usePeriod } from '../hooks/usePeriod'
-import { BarChart, ChartCard, HorizontalBarChart } from './Charts'
+import { BarChart, ChartCard, PieChart } from './Charts'
 import { CardGrid, PeriodError, PeriodPicker } from './DashboardParts'
 
 const ICONS = { receipt: Receipt, sales: ShoppingCart, stock: Package }
+
+// One colour per pie slice, the last (grey) for Other
+const PIE_TONES = ['teal', 'cyan', 'violet', 'amber', 'rose', 'green', 'orange', 'slate']
 
 // The Cashier's dashboard: their branch's sales for the chosen period (Today's Sales is always today)
 export default function CashierDashboard({ branchId }) {
@@ -42,9 +45,13 @@ export default function CashierDashboard({ branchId }) {
                   emptyText="No sales in this period."
                 />
               </ChartCard>
-              <ChartCard title="Top Selling Products" subtitle={`By sales · ${period.name}`}>
-                <HorizontalBarChart
-                  items={topSellingProducts(sales, period.range).map((p) => ({ ...p, tone: 'teal', detail: `${p.qty.toLocaleString()} ${p.qty === 1 ? 'unit' : 'units'}` }))}
+              <ChartCard title="Top Selling Products" subtitle={`Share of sales · ${period.name}`}>
+                <PieChart
+                  items={topSellingSlices(sales, period.range).map((p, index) => ({
+                    ...p,
+                    tone: PIE_TONES[index],
+                    detail: `${p.qty.toLocaleString()} ${p.qty === 1 ? 'unit' : 'units'} sold`
+                  }))}
                   format={shortMoney}
                   emptyText="No sales in this period."
                 />
