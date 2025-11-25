@@ -1,11 +1,12 @@
 import { createPortal } from 'react-dom'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   CheckCircle2,
   ShoppingCart,
   X
 } from 'lucide-react'
 import { useEscapeKey, useMoneyColumns } from '../../../hooks'
+import { newIdempotencyKey } from '../../../utils'
 import { validateSale } from '../services/saleRules'
 
 const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
@@ -18,10 +19,28 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
   })
   const [errors, setErrors] = useState({})
   const [isSaving, setIsSaving] = useState(false)
+  // One key for this sale, kept for every try: if a response is lost and Complete Sale is tapped again, the server
+  // returns the sale it already recorded instead of recording it twice. A new sale (a new window) gets a new key.
+  const [idempotencyKey] = useState(newIdempotencyKey)
+  // Blocks a second submit at once, before the disabled button has re-rendered (a double tap, Enter plus a click)
+  const submitting = useRef(false)
   // The currency is in the label ("Unit Selling Price (ETB)"), so the amounts show the number alone
   const { moneyHeader, formatAmount } = useMoneyColumns()
 
-  useEscapeKey(onClose)
+  // While a sale is sending the window stays open: closing it and starting again would make a new key, so a sale that
+  // did reach the server could be recorded twice
+  const closeIfIdle = () => {
+    if (!submitting.current) onClose()
+  }
+  useEscapeKey(closeIfIdle)
+
+  // Reloading or closing the tab mid-sale asks first, for the same reason
+  useEffect(() => {
+    if (!isSaving) return
+    const warn = (e) => e.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [isSaving])
 
   // Only products the chosen branch actually has in stock can be sold there
   const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0 && i.sellingPrice != null)
@@ -53,8 +72,9 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
     e.preventDefault()
     const newErrors = validateSale(form, product, qty)
     setErrors(newErrors)
-    if (Object.keys(newErrors).length) return
+    if (Object.keys(newErrors).length || submitting.current) return
 
+    submitting.current = true
     setIsSaving(true)
     try {
       // Saved on the server, which works out the total from the unit price
@@ -66,15 +86,18 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
         medId: product.medId,
         qty,
         unitPrice: product.sellingPrice
-      })
+      }, idempotencyKey)
     } catch (error) {
-      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : error.message })
+      // No answer (status 0): the sale may or may not have reached the server, and retrying with the same key is safe
+      const message = error.status === 0 ? `${error.message} Tap Complete Sale again: it won’t be recorded twice.` : error.message
+      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : message })
+      submitting.current = false
       setIsSaving(false)
     }
   }
 
   return createPortal(
-    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay" onMouseDown={(e) => e.target === e.currentTarget && closeIfIdle()}>
       <div className="modal-card" role="dialog" aria-modal="true" aria-labelledby="new-sale-title">
         <div className="modal-header">
           <div className="modal-title-wrap">
@@ -86,7 +109,7 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
               <p className="page-desc">Record a sale to a customer at one of your branches.</p>
             </div>
           </div>
-          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <button type="button" className="modal-close-btn" onClick={closeIfIdle} disabled={isSaving} aria-label="Close">
             <X size={18} />
           </button>
         </div>
@@ -153,11 +176,11 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="secondary-action-btn" onClick={onClose}>
+            <button type="button" className="secondary-action-btn" onClick={closeIfIdle} disabled={isSaving}>
               Cancel
             </button>
             <button type="submit" className="primary-action-btn" disabled={isSaving}>
-              <CheckCircle2 size={16} /> Complete Sale
+              <CheckCircle2 size={16} /> {isSaving ? 'Saving…' : 'Complete Sale'}
             </button>
           </div>
         </form>

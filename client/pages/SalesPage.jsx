@@ -21,9 +21,9 @@ export default function SalesPage() {
   const [showNewSale, setShowNewSale] = useState(false)
   const [notice, setNotice] = useState(null)
 
-  const handleRecordSale = async (data) => {
+  const handleRecordSale = async (data, idempotencyKey) => {
     // Saved on the server; the form shows any error
-    const { message } = await dispatch(recordSale(data))
+    const { message } = await dispatch(recordSale(data, idempotencyKey))
     setNotice({ type: 'success', text: message })
     setShowNewSale(false)
   }

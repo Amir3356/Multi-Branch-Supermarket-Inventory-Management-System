@@ -22,15 +22,23 @@ export const onUnauthorized = (handler) => {
   unauthorizedHandler = handler
 }
 
-export async function api(path, { method = 'GET', body } = {}) {
-  const headers = { Accept: 'application/json' }
+// `headers` adds request headers, e.g. { 'Idempotency-Key': … } so a retried POST can't record the same thing twice.
+// `timeoutMs` gives up waiting after that long (a slow or dropped connection) instead of hanging.
+export async function api(path, { method = 'GET', body, headers: extraHeaders, timeoutMs } = {}) {
+  const headers = { Accept: 'application/json', ...extraHeaders }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (authToken) headers.Authorization = `Bearer ${authToken}`
 
   let response
   try {
-    response = await fetch(`${API_URL}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) })
-  } catch {
+    response = await fetch(`${API_URL}${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: timeoutMs ? AbortSignal.timeout(timeoutMs) : undefined
+    })
+  } catch (error) {
+    if (error?.name === 'TimeoutError') throw new ApiError('No answer from the server. The connection is slow or dropped.', 0)
     throw new ApiError("Can't reach the server. Check your connection and try again.", 0)
   }
 

@@ -33,9 +33,10 @@ export const salePushed = (sale) => (dispatch) => {
   dispatch(syncSaleStock())
 }
 
-// Cashier: records a sale at their branch; returns the sale and a confirmation
-export const recordSale = (data) => async (dispatch, getState) => {
-  const { sale } = await createSale(toSalePayload(data))
+// Cashier: records a sale at their branch; returns the sale and a confirmation. `idempotencyKey` stays the same for every
+// try of one sale, so a retry after a lost response gets the recorded sale back instead of selling it twice.
+export const recordSale = (data, idempotencyKey) => async (dispatch, getState) => {
+  const { sale } = await createSale(toSalePayload(data), idempotencyKey)
   dispatch(saleSaved(sale))
   dispatch(syncSaleStock())
   const { money, branchName } = thunkContext(getState)

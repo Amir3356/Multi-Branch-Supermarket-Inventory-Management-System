@@ -12,7 +12,7 @@ class Sale extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'branch_id', 'customer', 'category', 'product', 'med_id', 'qty', 'unit_price', 'total', 'status', 'sold_by'];
+    protected $fillable = ['id', 'branch_id', 'customer', 'category', 'product', 'med_id', 'qty', 'unit_price', 'total', 'status', 'sold_by', 'idempotency_key'];
 
     protected function casts(): array
     {

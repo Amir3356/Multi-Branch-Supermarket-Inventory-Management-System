@@ -11,7 +11,11 @@ class StoreSaleRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        $this->merge(['customer' => trim((string) $this->input('customer')) ?: 'Walk-in Customer']);
+        $this->merge([
+            'customer' => trim((string) $this->input('customer')) ?: 'Walk-in Customer',
+            // Sent as the Idempotency-Key header: one per sale on the Cashier's screen, the same on every retry
+            'idempotencyKey' => $this->header('Idempotency-Key'),
+        ]);
     }
 
     public function rules(): array
@@ -24,12 +28,17 @@ class StoreSaleRequest extends FormRequest
             'medId' => ['nullable', 'string', 'max:20'],
             'qty' => ['required', 'integer', 'min:1', 'max:1000000'],
             'unitPrice' => ['required', 'numeric', 'gt:0', 'max:10000000'],
+            'idempotencyKey' => ['required', 'uuid'],
         ];
     }
 
     public function messages(): array
     {
-        return ['branchId.exists' => 'This branch is inactive, so it can’t record sales.'];
+        return [
+            'branchId.exists' => 'This branch is inactive, so it can’t record sales.',
+            'idempotencyKey.required' => 'This sale is missing its Idempotency-Key header. Reload the page and try again.',
+            'idempotencyKey.uuid' => 'The Idempotency-Key header must be a UUID.',
+        ];
     }
 
     private function ownBranchOnly(): Closure
