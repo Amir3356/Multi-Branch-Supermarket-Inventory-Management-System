@@ -2,6 +2,7 @@
 
 namespace App\Features\AccessReviews\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\AccessReviews\Models\AccessReview;
 use App\Features\AccessReviews\Repositories\AccessReviewRepository;
 use App\Features\AccessReviews\Resources\AccessReviewResource;
@@ -58,6 +59,8 @@ class AccessReviewController
             return [$this->generator->generate($start, $end, $data['period'], $request->user()), $replaced];
         });
 
+        app(AuditLogger::class)->record('Access Reviews', $replaced->isEmpty() ? 'Access review generated' : 'Access review regenerated', (string) $review->id, ucfirst($data['period']).' report for '.$start->toDateString().' – '.$end->toDateString().'.');
+
         return response()->json([
             'message' => $replaced->isEmpty() ? 'Access review generated.' : 'Access review updated with the latest data.',
             'review' => new AccessReviewResource($this->reviews->withPeople($review)),
@@ -69,6 +72,7 @@ class AccessReviewController
     public function destroy(AccessReview $accessReview): JsonResponse
     {
         $this->reviews->delete($accessReview);
+        app(AuditLogger::class)->record('Access Reviews', 'Access review deleted', (string) $accessReview->id, ucfirst($accessReview->period_type).' report for '.$accessReview->period_start->toDateString().' – '.$accessReview->period_end->toDateString().' was deleted.');
 
         return response()->json(['message' => 'Access review deleted.']);
     }

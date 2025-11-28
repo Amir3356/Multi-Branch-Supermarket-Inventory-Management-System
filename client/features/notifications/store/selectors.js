@@ -3,7 +3,7 @@ import { daysUntil, formatDate, startOfToday } from '../../../utils'
 import { selectInventory } from '../../inventory/store/selectors'
 import { selectBranches } from '../../branches/store/branchesSlice'
 import { selectSettings } from '../../policy/store/settingsSlice'
-import { selectBranchInView } from '../../ui/store/uiSlice'
+import { selectBranchInView } from '../../auth/store/authSlice'
 import { PATHS } from '../../../routes/paths'
 
 const TAX_REMINDER_DAYS = 60
@@ -22,18 +22,20 @@ export const selectAllNotifications = createSelector(
     const branchById = (id) => branches.find((b) => b.id === id)
     const scoped = inventory.filter((i) => selectedBranch === 'all' || i.branchId === selectedBranch)
     return [
+      // One alert per product at a branch, however many batches it has (stock levels are per product)
       ...scoped
         .filter((i) => i.status !== 'In Stock')
+        .filter((i, index, rows) => rows.findIndex((r) => r.medId === i.medId && r.branchId === i.branchId) === index)
         .map((i) => ({
-          id: `low-${i.key}-${i.stock}`,
+          id: `low-${i.medId}-${i.branchId}-${i.productStock}`,
           type: 'low-stock',
           path: PATHS.inventory,
           branch: branchById(i.branchId),
           title: i.status === 'Out of Stock' ? `Out of stock: ${i.name}` : `Low stock: ${i.name}`,
           message: i.status === 'Out of Stock'
             ? 'No units left at this branch. Create a purchase or transfer stock from another branch.'
-            : `Only ${i.stock} units left, below the low stock level of ${i.reorderLevel} units. Reorder or request a transfer.`,
-          meta: `Batch ${i.batch}`,
+            : `Only ${i.productStock} units left, below the low stock level of ${i.reorderLevel} units. Reorder or request a transfer.`,
+          meta: `${i.productStock} units in stock`,
           sort: 1
         })),
       ...scoped

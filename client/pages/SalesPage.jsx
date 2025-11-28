@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Plus } from 'lucide-react'
 import { BranchTag, Notice, PageHeader, StatusTag } from '../components'
-import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
+import { useBranchScope, useMoneyColumns } from '../hooks'
 import { selectSales } from '../features/sales/store/salesSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 import { selectCategories } from '../features/inventory/store/productsSlice'
@@ -12,7 +12,6 @@ import './SalesPage.css'
 
 export default function SalesPage() {
   const dispatch = useDispatch()
-  const formatMoney = useFormatMoney()
   const { moneyHeader, formatAmount } = useMoneyColumns()
   const { branches, branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const sales = useSelector(selectSales).filter((s) => inScope(s.branchId))
@@ -70,7 +69,7 @@ export default function SalesPage() {
       </div>
 
       {showNewSale && (
-        <NewSaleModal branches={branches.filter((b) => inScope(b.id))} inventory={inventory.filter((i) => inScope(i.branchId))} categories={categories} formatMoney={formatMoney} onClose={() => setShowNewSale(false)} onSave={handleRecordSale} />
+        <NewSaleModal branches={branches.filter((b) => inScope(b.id))} inventory={inventory.filter((i) => inScope(i.branchId))} categories={categories} onClose={() => setShowNewSale(false)} onSave={handleRecordSale} />
       )}
     </div>
   )

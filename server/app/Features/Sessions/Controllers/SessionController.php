@@ -2,6 +2,7 @@
 
 namespace App\Features\Sessions\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Sessions\Jobs\PruneOldSessions;
 use App\Features\Sessions\Repositories\SessionRepository;
 use App\Features\Sessions\Resources\SessionResource;
@@ -35,6 +36,7 @@ class SessionController
     {
         $this->ensureNotCurrent($request, $session);
         $this->sessions->end($session, 'Ended by the Owner');
+        app(AuditLogger::class)->record('Sessions', 'Session ended', (string) $session->id, "{$session->tokenable?->email} was signed out on ".SessionService::describeDevice($session->name).' by the Owner.', $session->tokenable?->branch_id);
 
         return response()->json([
             'message' => "{$session->tokenable->email} was signed out on ".SessionService::describeDevice($session->name).'.',
@@ -49,6 +51,7 @@ class SessionController
         $email = $session->tokenable?->email;
         $wasOpen = $session->ended_at === null;
         $this->repository->delete($session);
+        app(AuditLogger::class)->record('Sessions', 'Session removed', (string) $session->id, "{$email}’s session on ".SessionService::describeDevice($session->name).' was removed from the list'.($wasOpen ? ' (it was still open, so it was signed out).' : '.'));
         if ($wasOpen) {
             $this->sessions->notifyEnded([$session->id], 'Ended by the Owner');
         }

@@ -2,6 +2,7 @@
 
 namespace App\Features\Expenses\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Expenses\Models\Expense;
 use App\Features\Expenses\Repositories\ExpenseRepository;
 use App\Features\Expenses\Requests\StoreExpenseRequest;
@@ -33,6 +34,7 @@ class ExpenseController
             'recorded_by' => $request->user()->id,
         ]);
         $this->live->changed($expense->branch_id);
+        app(AuditLogger::class)->record('Expenses', 'Expense recorded', $expense->id, "{$expense->category}".($expense->description ? " ({$expense->description})" : '').': '.AuditLogger::money($expense->amount)." on {$data['date']}.", $expense->branch_id);
 
         return response()->json(['message' => "Expense {$expense->id} recorded.", 'expense' => new ExpenseResource($expense)], 201);
     }
@@ -43,6 +45,7 @@ class ExpenseController
             abort(403, 'This expense belongs to another branch.');
         }
         $this->expenses->delete($expense);
+        app(AuditLogger::class)->record('Expenses', 'Expense deleted', $expense->id, "{$expense->category} expense of ".AuditLogger::money($expense->amount).' was deleted.', $expense->branch_id);
         $this->live->changed($expense->branch_id);
 
         return response()->json(['message' => "Expense {$expense->id} deleted."]);

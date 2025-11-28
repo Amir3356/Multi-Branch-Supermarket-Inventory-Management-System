@@ -51,4 +51,10 @@ export const { loggedIn, userRefreshed, loggedOut, sessionEnded } = authSlice.ac
 export const selectAuth = (state) => state.auth
 export const selectCurrentUser = (state) => state.auth.user
 export const selectIsLoggedIn = (state) => Boolean(state.auth.token && state.auth.user)
+// The branch the pages show: staff who work at one branch (Pharmacist, Cashier) only ever see theirs; those who cover
+// every branch (Owner, Procurement Officer) see "all"
+export const selectBranchInView = (state) => {
+  const own = state.auth.user?.branchId
+  return own && own !== 'all' ? own : 'all'
+}
 export default authSlice.reducer

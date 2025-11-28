@@ -2,7 +2,6 @@
 
 export const STORAGE_KEYS = {
   settings: 'pharmacare-settings',
-  theme: 'pharmacare-theme',
   notifications: 'pharmacare-notifications',
   auth: 'pharmacare-auth',
   // When this browser was last used (any tab), for the inactivity sign-out

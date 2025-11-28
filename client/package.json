@@ -19,7 +19,6 @@
     "pusher-js": "^8.6.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-is": "^19.3.0",
     "react-redux": "^9.3.0",
     "react-router-dom": "^7.18.4"
   },

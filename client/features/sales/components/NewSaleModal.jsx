@@ -6,12 +6,14 @@ import {
   X
 } from 'lucide-react'
 import { useEscapeKey, useMoneyColumns } from '../../../hooks'
-import { newIdempotencyKey } from '../../../utils'
+import { allocateFifo, newIdempotencyKey, productsInStock } from '../../../utils'
 import { validateSale } from '../services/saleRules'
 
 const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
+// Fields with their own place for an error message
+const FORM_FIELDS = ['branchId', 'customer', 'category', 'key', 'qty']
 
-export default function NewSaleModal({ branches, inventory, categories, formatMoney, onClose, onSave }) {
+export default function NewSaleModal({ branches, inventory, categories, onClose, onSave }) {
   // A cashier's own branch is the only choice, so it starts selected
   const [form, setForm] = useState(() => {
     const active = branches.filter((b) => b.status === 'Active')
@@ -42,8 +44,9 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
     return () => window.removeEventListener('beforeunload', warn)
   }, [isSaving])
 
-  // Only products the chosen branch actually has in stock can be sold there
-  const branchStock = inventory.filter((i) => i.branchId === form.branchId && i.stock > 0 && i.sellingPrice != null)
+  // Only products the chosen branch has in stock (not expired) can be sold there; each is listed once, however many
+  // batches it came in
+  const branchStock = productsInStock(inventory.filter((i) => i.branchId === form.branchId && i.sellingPrice != null))
   const categoryCount = (category) => branchStock.filter((i) => i.category === category).length
   const branchProducts = branchStock
     .filter((i) => i.category === form.category)
@@ -51,6 +54,9 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
   const product = branchProducts.find((i) => i.key === form.key)
   const qty = Number(form.qty)
   const total = product && Number.isInteger(qty) && qty > 0 ? product.sellingPrice * qty : 0
+  // First in, first out: the units come from the batch that arrived earliest, then the next
+  const fromBatches = product && Number.isInteger(qty) && qty > 0 ? allocateFifo(product.batches, qty) : null
+  const expiryOf = (batch) => product?.batches.find((b) => b.batch === batch)?.expiry
 
   const update = (field, value) => {
     setForm((prev) => ({
@@ -85,12 +91,17 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
         product: product.name,
         medId: product.medId,
         qty,
-        unitPrice: product.sellingPrice
+        unitPrice: product.sellingPrice,
+        batches: fromBatches
       }, idempotencyKey)
     } catch (error) {
       // No answer (status 0): the sale may or may not have reached the server, and retrying with the same key is safe
       const message = error.status === 0 ? `${error.message} Tap Complete Sale again: it won’t be recorded twice.` : error.message
-      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : message })
+      // Errors about a field on this form show under it; others (e.g. an expired batch) show at the top
+      const fieldErrors = error.fieldErrors || {}
+      const onForm = Object.fromEntries(Object.entries(fieldErrors).filter(([field]) => FORM_FIELDS.includes(field)))
+      const other = Object.entries(fieldErrors).find(([field]) => !FORM_FIELDS.includes(field))?.[1]
+      setErrors({ ...onForm, form: other || (Object.keys(onForm).length ? undefined : message) })
       submitting.current = false
       setIsSaving(false)
     }
@@ -155,9 +166,7 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
             <select id="sale-product" className={`input-field ${errors.key ? 'error' : ''}`} value={form.key} onChange={(e) => update('key', e.target.value)} disabled={!form.category}>
               <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
               {branchProducts.map((i) => (
-                <option key={i.key} value={i.key}>
-                  {i.name} — {formatMoney(i.sellingPrice)} · {i.stock} in stock
-                </option>
+                <option key={i.key} value={i.key}>{i.name}</option>
               ))}
             </select>
             {errors.key && <span className="error-msg">{errors.key}</span>}
@@ -167,6 +176,11 @@ export default function NewSaleModal({ branches, inventory, categories, formatMo
             <label htmlFor="sale-qty">Quantity *</label>
             <input id="sale-qty" type="number" min="1" max={product?.stock} step="1" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
             {errors.qty && <span className="error-msg">{errors.qty}</span>}
+            {!errors.qty && fromBatches && (
+              <span className="field-hint">
+                From {fromBatches.map((b) => `batch ${b.batch} (expires ${expiryOf(b.batch)}): ${b.qty} ${b.qty === 1 ? 'unit' : 'units'}`).join(', then ')}
+              </span>
+            )}
           </div>
 
           <div className="sale-summary">

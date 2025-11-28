@@ -1,6 +1,6 @@
 import { formatMoneyIn } from '../utils'
 
-// Helpers thunks use to word confirmation messages and audit log entries
+// Helpers thunks use to word confirmation messages
 export const thunkContext = (getState) => {
   const state = getState()
   return {

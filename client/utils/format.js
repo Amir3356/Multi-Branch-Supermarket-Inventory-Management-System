@@ -25,6 +25,4 @@ export const findCatalogProduct = (products, medId, name) =>
 export const isWholeNumber = (value, min, max = Infinity) =>
   Number.isInteger(Number(value)) && value !== '' && Number(value) >= min && Number(value) <= max
 
-export const roundMoney = (value) => Math.round(value * 100) / 100
-
 export const plural = (count, one, many) => (count === 1 ? one : many)

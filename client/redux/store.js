@@ -1,8 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { onUnauthorized, setAuthToken } from '../api/http'
-import { STORAGE_KEYS, writeJson, writeText } from '../utils'
+import { STORAGE_KEYS, writeJson } from '../utils'
 import authReducer, { sessionEnded } from '../features/auth/store/authSlice'
-import uiReducer from '../features/ui/store/uiSlice'
 import settingsReducer from '../features/policy/store/settingsSlice'
 import branchesReducer from '../features/branches/store/branchesSlice'
 import productsReducer from '../features/inventory/store/productsSlice'
@@ -14,14 +13,12 @@ import expensesReducer from '../features/expenses/store/expensesSlice'
 import damagedReducer from '../features/damaged/store/damagedSlice'
 import accountsReducer from '../features/accounts/store/accountsSlice'
 import sessionsReducer from '../features/accounts/store/sessionsSlice'
-import auditLogsReducer from '../features/auditLogs/store/auditLogsSlice'
 import notificationsReducer from '../features/notifications/store/notificationsSlice'
 
-// One store for all shared app data. Mock JSON seeds each slice; the backend will replace it later.
+// One store for all shared app data, loaded from the API
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    ui: uiReducer,
     settings: settingsReducer,
     branches: branchesReducer,
     products: productsReducer,
@@ -33,7 +30,6 @@ export const store = configureStore({
     damaged: damagedReducer,
     accounts: accountsReducer,
     sessions: sessionsReducer,
-    auditLogs: auditLogsReducer,
     notifications: notificationsReducer
   }
 })
@@ -42,7 +38,7 @@ export const store = configureStore({
 setAuthToken(store.getState().auth.token)
 onUnauthorized(() => store.dispatch(sessionEnded()))
 
-// Per-viewer state survives a refresh: sign-in, policy settings, theme, and notification read state
+// Per-viewer state survives a refresh: sign-in, policy settings, and notification read state
 let previous = store.getState()
 store.subscribe(() => {
   const state = store.getState()
@@ -51,7 +47,6 @@ store.subscribe(() => {
     writeJson(STORAGE_KEYS.auth, state.auth.token ? { token: state.auth.token, user: state.auth.user } : null)
   }
   if (state.settings !== previous.settings) writeJson(STORAGE_KEYS.settings, state.settings)
-  if (state.ui.theme !== previous.ui.theme) writeText(STORAGE_KEYS.theme, state.ui.theme)
   if (state.notifications !== previous.notifications) writeJson(STORAGE_KEYS.notifications, state.notifications)
   previous = state
 })

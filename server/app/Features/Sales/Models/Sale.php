@@ -12,11 +12,11 @@ class Sale extends Model
 
     protected $keyType = 'string';
 
-    protected $fillable = ['id', 'branch_id', 'customer', 'category', 'product', 'med_id', 'qty', 'unit_price', 'total', 'status', 'sold_by', 'idempotency_key'];
+    protected $fillable = ['id', 'branch_id', 'customer', 'category', 'product', 'med_id', 'qty', 'batches', 'unit_price', 'total', 'status', 'sold_by', 'idempotency_key'];
 
     protected function casts(): array
     {
-        return ['qty' => 'integer', 'unit_price' => 'decimal:2', 'total' => 'decimal:2'];
+        return ['qty' => 'integer', 'batches' => 'array', 'unit_price' => 'decimal:2', 'total' => 'decimal:2'];
     }
 
     /** The next free id: SL-00001, SL-00002, … */

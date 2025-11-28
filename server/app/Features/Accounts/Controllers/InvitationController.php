@@ -2,6 +2,7 @@
 
 namespace App\Features\Accounts\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Accounts\Models\AccountInvitation;
 use App\Features\Accounts\Requests\AcceptInvitationRequest;
 use App\Features\Accounts\Services\InvitationService;
@@ -34,6 +35,7 @@ class InvitationController
     public function accept(AcceptInvitationRequest $request, string $token): JsonResponse
     {
         $user = $this->invitations->accept($this->usable($token), $request->validated('password'));
+        app(AuditLogger::class)->record('Accounts', 'Invitation accepted', (string) $user->id, "{$user->full_name} ({$user->email}) set a password and signed in for the first time.", $user->branch_id, $user);
 
         return response()->json($this->tokens->issue($user, $request));
     }

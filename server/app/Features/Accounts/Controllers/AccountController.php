@@ -2,6 +2,7 @@
 
 namespace App\Features\Accounts\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Accounts\Models\User;
 use App\Features\Accounts\Repositories\AccountChangeRepository;
 use App\Features\Accounts\Repositories\RoleChangeRepository;
@@ -56,6 +57,8 @@ class AccountController
             return $user;
         }));
 
+        app(AuditLogger::class)->record('Accounts', 'Account invited', (string) $user->id, "{$user->role->label()} account created for {$user->full_name} ({$user->email}); invitation emailed.", $user->branch_id);
+
         return response()->json([
             'message' => "Invitation sent to {$user->email}. {$user->full_name} can sign in after setting a password.",
             'account' => new AccountResource($this->users->withDetails($user)),
@@ -85,6 +88,15 @@ class AccountController
         } elseif (! $account->branch_id) {
             throw ValidationException::withMessages(['branchId' => 'Assign a branch for this role.']);
         }
+        // What changed, in words, for the audit log
+        $changed = collect($account->getDirty())->keys()->map(fn ($field) => match ($field) {
+            'full_name' => 'name → '.$account->full_name,
+            'email' => 'email → '.$account->email,
+            'role' => 'role '.Role::from($account->getOriginal('role') instanceof Role ? $account->getOriginal('role')->value : $account->getOriginal('role'))->label().' → '.$account->role->label(),
+            'branch_id' => 'branch → '.($account->branch_id ?? 'all branches'),
+            'status' => 'status → '.$account->status->value,
+            default => null,
+        })->filter()->implode(', ');
         $emailChanged = $account->isDirty('email');
         $previousRole = $account->isDirty('role') ? $account->getOriginal('role') : null;
         // Kept for access reviews of past periods, like role changes
@@ -121,6 +133,9 @@ class AccountController
             $this->sessions->endAllFor($account, 'Account deactivated');
         }
 
+        $action = $previousStatus ? ($account->status === AccountStatus::Inactive ? 'Account deactivated' : 'Account activated') : ($previousRole ? 'Role changed' : 'Account updated');
+        app(AuditLogger::class)->record('Accounts', $action, (string) $account->id, "{$account->full_name} ({$account->email}): ".($changed ?: 'no changes').'.', $account->branch_id);
+
         $message = "{$account->full_name}'s account was updated.";
         if ($reinvite) {
             $message .= " A new invitation was sent to {$account->email}.";
@@ -145,6 +160,7 @@ class AccountController
         });
         $this->sessions->notifyEnded($open, 'Account deleted');
         $this->sessions->announce('removed');
+        app(AuditLogger::class)->record('Accounts', 'Account deleted', (string) $account->id, "{$account->full_name} ({$account->email}, {$account->role->label()}) was deleted.", $account->branch_id);
 
         return response()->json(['message' => "{$account->full_name}'s account was deleted."]);
     }
@@ -156,6 +172,7 @@ class AccountController
         }
 
         $this->withMail(fn () => DB::transaction(fn () => $this->invitations->send($account, $request->user())));
+        app(AuditLogger::class)->record('Accounts', 'Invitation resent', (string) $account->id, "A new invitation was emailed to {$account->email}.", $account->branch_id);
 
         return response()->json([
             'message' => "A new invitation was sent to {$account->email}.",

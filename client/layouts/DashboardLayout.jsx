@@ -164,7 +164,8 @@ export default function DashboardLayout() {
   const badges = useMemo(() => {
     const scoped = inventory.filter((i) => inScope(i.branchId))
     return {
-      inventoryAlerts: scoped.filter((i) => i.status !== 'In Stock').length + scoped.filter((i) => i.expiringSoon).length,
+      // Low or out-of-stock products (once each, whatever their batches) plus batches expiring soon
+      inventoryAlerts: new Set(scoped.filter((i) => i.status !== 'In Stock').map((i) => `${i.medId}-${i.branchId}`)).size + scoped.filter((i) => i.expiringSoon).length,
       branchCount: branches.length
     }
   }, [inventory, inScope, branches])

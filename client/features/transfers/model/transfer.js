@@ -21,5 +21,3 @@
  * Sent to POST /transfers
  * @typedef {{ from: string, to: string, category: string, product: string, medId?: string, batch: string, expiry?: string, qty: number }} TransferPayload
  */
-
-export const isPending = (transfer) => transfer.status === 'Pending'

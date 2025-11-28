@@ -17,6 +17,8 @@ class SaleResource extends JsonResource
             'product' => $this->product,
             'medId' => $this->med_id,
             'qty' => $this->qty,
+            // [{ batch, qty }] first in, first out; empty for sales recorded before batches were kept
+            'batches' => $this->batches ?? [],
             'unitPrice' => (float) $this->unit_price,
             'total' => (float) $this->total,
             'status' => ucfirst($this->status),

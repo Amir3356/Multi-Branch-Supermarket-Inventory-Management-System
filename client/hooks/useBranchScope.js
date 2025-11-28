@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { selectBranches } from '../features/branches/store/branchesSlice'
-import { selectBranchInView } from '../features/ui/store/uiSlice'
+import { selectBranchInView } from '../features/auth/store/authSlice'
 
 // Which branch the list pages show ("all" or one branch), with helpers for filtering and labels. Staff tied to a
 // branch only see their own; the Owner and the Procurement Officer see every branch.

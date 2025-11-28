@@ -1,7 +1,6 @@
 import { createProcurement, fetchProcurements, receiveProcurement, verifyProcurementPayment } from '../api/procurementsApi'
 import { findCatalogProduct, nextId, yearsFromToday } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
-import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { categoryAdded, productAdded, productUpdated } from '../../inventory/store/productsSlice'
 import { stockReceived } from '../../inventory/store/stockSlice'
 import { procurementBatch, procurementFromApi } from '../model/procurement'
@@ -13,29 +12,26 @@ import { paymentSaved, purchaseSaved } from './purchasesSlice'
 
 // The catalog product a paid order bought; a product new to the catalog is added (selling price set with Add Medicine)
 const productFor = (procurement) => (dispatch, getState) => {
-  const { state, money } = thunkContext(getState)
-  const { id, category, product, purchasePrice } = procurement
+  const { state } = thunkContext(getState)
+  const { category, product, purchasePrice } = procurement
   dispatch(categoryAdded(category))
   let medId = findCatalogProduct(state.products.items, procurement.medId, product)?.id
   if (!medId) {
     medId = nextId(state.products.items, 'MED')
     dispatch(productAdded({ id: medId, name: product, category, purchasePrice, sellingPrice: null, reorderLevel: state.settings.defaultMinStock }))
-    dispatch(logAdded('Product added', 'Inventory', medId, `${product} added to ${category} through purchase ${id} (purchase price ${money(purchasePrice)}).`))
   }
   return medId
 }
 
 // Paid: the product is ready for Add Medicine at the receiving branch, but nothing is in stock yet
-const procurementPaid = (procurement) => (dispatch, getState) => {
-  const { money, branchName } = thunkContext(getState)
+const procurementPaid = (procurement) => (dispatch) => {
   dispatch(productFor(procurement))
-  dispatch(logAdded('Purchase paid', 'Purchase', procurement.id, `${procurement.qty} × ${procurement.product} bought from ${procurement.supplier} for ${branchName(procurement.branchId)} (${money(procurement.total)}), paid through Chapa; waiting to be added to stock.`))
 }
 
 // Added with Add Medicine: the units enter the branch's stock under the batch and expiry date entered then
 const receiveStock = (procurement) => (dispatch) => {
   const medId = dispatch(productFor(procurement))
-  dispatch(stockReceived({ medId, branchId: procurement.branchId, qty: procurement.qty, batch: procurementBatch(procurement), expiry: procurement.expiryDate || yearsFromToday(2) }))
+  dispatch(stockReceived({ medId, branchId: procurement.branchId, qty: procurement.qty, batch: procurementBatch(procurement), expiry: procurement.expiryDate || yearsFromToday(2), receivedAt: procurement.receivedAt }))
 }
 
 // Keeps the browser's copy in step with the API's
@@ -57,7 +53,6 @@ export const addProcurementToStock = (procurement, sellingPrice, { expiryDate })
   const { state, money, branchName } = thunkContext(getState)
   const product = findCatalogProduct(state.products.items, received.medId, received.product)
   dispatch(productUpdated({ id: product.id, changes: { purchasePrice: received.purchasePrice, sellingPrice } }))
-  dispatch(logAdded('Stock added', 'Inventory', received.id, `${received.qty} × ${received.product} (batch ${procurementBatch(received)}) added to ${branchName(received.branchId)}; selling price ${money(sellingPrice)}.`))
   const where = branchName(received.branchId)
   return `${received.qty} × ${received.product} added to ${where ? `${where}'s` : 'your branch’s'} stock as batch ${procurementBatch(received)}, at ${money(sellingPrice)} per unit.`
 }
@@ -77,7 +72,6 @@ export const startProcurement = (data) => async (dispatch, getState) => {
   const { currency } = getState().settings
   const { procurement, checkoutUrl } = await createProcurement({ ...data, currency })
   dispatch(procurementSynced(procurement))
-  dispatch(logAdded('Purchase created', 'Purchase', procurement.id, `${procurement.qty} × ${procurement.product} ordered from ${procurement.supplier}; awaiting Chapa payment.`))
   return { id: procurement.id, checkoutUrl }
 }
 

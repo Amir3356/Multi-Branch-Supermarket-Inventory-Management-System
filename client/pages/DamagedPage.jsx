@@ -14,7 +14,7 @@ export default function DamagedPage() {
   const dispatch = useDispatch()
   const formatMoney = useFormatMoney()
   const { moneyHeader, formatAmount } = useMoneyColumns()
-  const { branches, branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
+  const { branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const damaged = useSelector(selectDamaged).filter((d) => inScope(d.branchId))
   const inventory = useSelector(selectInventory)
   const categories = useSelector(selectCategories)

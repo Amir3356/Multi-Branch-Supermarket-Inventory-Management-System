@@ -100,8 +100,26 @@ export function topSellingSlices(sales, range, limit = 8) {
     row.qty += s.qty
     byProduct.set(s.product, row)
   }
-  const ranked = [...byProduct.values()].sort((a, b) => b.value - a.value)
+  return topSlices([...byProduct.values()], limit)
+}
+
+/** The largest `limit - 1` rows as they are, the rest added together as "Other (n products)" */
+export function topSlices(rows, limit = 8) {
+  const ranked = [...rows].sort((a, b) => b.value - a.value)
   if (ranked.length <= limit) return ranked
   const rest = ranked.slice(limit - 1)
   return [...ranked.slice(0, limit - 1), { label: `Other (${rest.length} products)`, value: sum(rest, (r) => r.value), qty: sum(rest, (r) => r.qty) }]
 }
+
+// The Owner's chart
+
+/** Sales, purchases and expenses per column of the period, from the server's per-day totals */
+export const moneyOverTime = (daily, range) =>
+  periodBuckets(range).map((b) => {
+    const days = daily.filter((d) => inPeriod(d.date, [b.from, b.to]))
+    return {
+      label: b.label,
+      title: b.from === b.to ? b.from : `${b.from} – ${b.to}`,
+      values: [sum(days, (d) => d.sales), sum(days, (d) => d.purchases), sum(days, (d) => d.expenses)]
+    }
+  })

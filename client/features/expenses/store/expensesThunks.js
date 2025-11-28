@@ -1,5 +1,4 @@
 import { thunkContext } from '../../../redux/thunkHelpers'
-import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { createExpense, destroyExpense, fetchExpenses } from '../api/expensesApi'
 import { toExpensePayload } from '../model/expense'
 import { expensesLoaded } from './expensesSlice'
@@ -15,7 +14,6 @@ export const recordExpense = (form) => async (dispatch, getState) => {
   const { expense } = await createExpense(toExpensePayload(form))
   await dispatch(loadExpenses())
   const { money } = thunkContext(getState)
-  dispatch(logAdded('Expense recorded', 'Expenses', expense.id, `${expense.category}${expense.description ? ` (${expense.description})` : ''}: ${money(expense.amount)} on ${expense.date}.`))
   return `${expense.category} expense of ${money(expense.amount)} recorded.`
 }
 
@@ -23,6 +21,5 @@ export const deleteExpense = (expense) => async (dispatch, getState) => {
   await destroyExpense(expense.id)
   await dispatch(loadExpenses())
   const { money } = thunkContext(getState)
-  dispatch(logAdded('Expense deleted', 'Expenses', expense.id, `${expense.category} expense of ${money(expense.amount)} on ${expense.date} was deleted.`))
   return `${expense.category} expense of ${money(expense.amount)} deleted.`
 }

@@ -2,6 +2,7 @@
 
 namespace App\Features\Sales\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Sales\Models\Sale;
 use App\Features\Sales\Repositories\SaleRepository;
 use App\Features\Sales\Requests\StoreSaleRequest;
@@ -36,6 +37,7 @@ class SaleController
             'product' => $data['product'],
             'med_id' => $data['medId'] ?? null,
             'qty' => $data['qty'],
+            'batches' => array_map(fn ($b) => ['batch' => $b['batch'], 'qty' => (int) $b['qty']], $data['batches']),
             'unit_price' => $unitPrice,
             'total' => round($unitPrice * $data['qty'], 2),
             'status' => 'paid',
@@ -52,6 +54,8 @@ class SaleController
 
         if ($created) {
             $this->live->recorded($sale);
+            $from = collect($sale->batches ?? [])->map(fn ($b) => "{$b['batch']} × {$b['qty']}")->implode(', ');
+            app(AuditLogger::class)->record('Sales', 'Sale recorded', $sale->id, "{$sale->qty} × {$sale->product} sold to {$sale->customer} for ".AuditLogger::money($sale->total).($from ? " (batches {$from})" : '').'.', $sale->branch_id);
         }
 
         return response()->json([

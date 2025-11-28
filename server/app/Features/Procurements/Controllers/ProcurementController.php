@@ -2,6 +2,7 @@
 
 namespace App\Features\Procurements\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Procurements\Models\Procurement;
 use App\Features\Procurements\Repositories\ProcurementRepository;
 use App\Features\Procurements\Requests\StoreProcurementRequest;
@@ -27,9 +28,9 @@ class ProcurementController
         private ProductBroadcaster $catalog,
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return ProcurementResource::collection($this->procurements->latest());
+        return ProcurementResource::collection($this->procurements->visibleTo($request->user()));
     }
 
     // Saves the order as Pending and hands back Chapa's checkout page; stock arrives once the payment is verified
@@ -43,6 +44,8 @@ class ProcurementController
             $this->procurements->delete($procurement); // nothing to pay for, so don't keep an order that can never be settled
             throw $e;
         }
+
+        app(AuditLogger::class)->record('Procurement', 'Procurement created', $procurement->id, "{$procurement->qty} × {$procurement->product} from {$procurement->supplier} for ".AuditLogger::money($procurement->total, $procurement->currency).'; awaiting Chapa payment.', $procurement->branch_id);
 
         // New Pending order: shows on other screens (e.g. the Owner's) right away
         $this->live->changed($procurement);
@@ -85,6 +88,7 @@ class ProcurementController
         });
         $this->live->changed($received);
         $this->catalog->changed();
+        app(AuditLogger::class)->record('Procurement', 'Stock added', $received->id, "{$received->qty} × {$received->product} added as batch {$received->batch} (expires {$data['expiryDate']}), selling at ".AuditLogger::money($data['sellingPrice']).'.', $received->branch_id);
 
         return response()->json([
             'message' => "{$received->qty} × {$received->product} (batch {$received->batch}) added to stock.",

@@ -2,6 +2,7 @@
 
 namespace App\Features\Procurements\Services;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Accounts\Models\User;
 use App\Features\Procurements\Models\Procurement;
 use App\Features\Procurements\Repositories\ProcurementRepository;
@@ -59,11 +60,13 @@ class ProcurementPayments
             return $procurement; // not paid yet
         }
 
-        $synced = DB::transaction(function () use ($procurement, $transaction) {
+        $changed = false;
+        $synced = DB::transaction(function () use ($procurement, $transaction, &$changed) {
             $procurement = $this->procurements->lockForUpdate($procurement);
             if (! $procurement->isPending()) {
                 return $procurement;
             }
+            $changed = true;
 
             $status = $transaction['status'] ?? null;
             $amountMatches = round((float) ($transaction['amount'] ?? 0), 2) >= round((float) $procurement->total, 2)
@@ -82,6 +85,14 @@ class ProcurementPayments
 
             return $procurement;
         });
+
+        // Recorded once, by whichever check saw the change: the Procurement Officer's screen, Chapa's callback or the
+        // scheduled check
+        if ($changed && ! $synced->isPending()) {
+            app(AuditLogger::class)->record('Procurement', $synced->status === 'paid' ? 'Payment confirmed' : 'Payment failed', $synced->id,
+                ($synced->status === 'paid' ? 'Chapa confirmed payment of ' : 'Chapa payment failed for ').AuditLogger::money($synced->total, $synced->currency)." ({$synced->qty} × {$synced->product}).",
+                $synced->branch_id, null, request()->user() ? null : 'Chapa');
+        }
 
         // Paid or Failed now: tell the receiving branch's screens, so a paid order's stock shows up without reloading
         if (! $synced->isPending()) {

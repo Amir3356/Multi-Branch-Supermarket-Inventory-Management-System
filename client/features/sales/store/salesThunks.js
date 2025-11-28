@@ -1,6 +1,5 @@
 import { findCatalogProduct } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
-import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { stockAdjusted } from '../../inventory/store/stockSlice'
 import { createSale, fetchSales } from '../api/salesApi'
 import { toSalePayload } from '../model/sale'
@@ -11,12 +10,17 @@ import { saleSaved, saleStockApplied, salesLoaded } from './salesSlice'
 // Each sale takes its units out of its branch's stock once, on every screen
 const syncSaleStock = () => (dispatch, getState) => {
   const state = getState()
-  for (const sale of state.sales.items) {
+  // Oldest first, so sales without recorded batches use up batches in the order they happened
+  for (const sale of [...state.sales.items].reverse()) {
     if (state.sales.appliedIds.includes(sale.id)) continue
     const medId = findCatalogProduct(state.products.items, sale.medId, sale.product)?.id
     // The branch's stock arrives in this browser with its procurements and transfers: try again next sync
     if (!medId || !state.stock.some((row) => row.medId === medId && row.branchId === sale.branchId)) continue
-    dispatch(stockAdjusted({ medId, branchId: sale.branchId, delta: -sale.qty }))
+    // The batches the sale was taken from (FIFO, chosen when it was made); a sale from before batches were recorded
+    // comes off the oldest batches now
+    for (const { batch, qty } of sale.batches?.length ? sale.batches : [{ batch: null, qty: sale.qty }]) {
+      dispatch(stockAdjusted({ medId, branchId: sale.branchId, batch, delta: -qty }))
+    }
     dispatch(saleStockApplied(sale.id))
   }
 }
@@ -40,6 +44,5 @@ export const recordSale = (data, idempotencyKey) => async (dispatch, getState) =
   dispatch(saleSaved(sale))
   dispatch(syncSaleStock())
   const { money, branchName } = thunkContext(getState)
-  dispatch(logAdded('Sale recorded', 'Sales', sale.id, `${sale.qty} × ${sale.product} sold to ${sale.customer} at ${branchName(sale.branchId)} for ${money(sale.total)}.`))
   return { sale, message: `Sale ${sale.id} recorded at ${branchName(sale.branchId) || 'your branch'}: ${sale.qty} × ${sale.product} for ${money(sale.total)}.` }
 }

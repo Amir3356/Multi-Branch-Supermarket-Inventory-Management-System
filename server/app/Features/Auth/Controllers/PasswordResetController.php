@@ -2,6 +2,7 @@
 
 namespace App\Features\Auth\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Accounts\Models\User;
 use App\Features\Accounts\Repositories\UserRepository;
 use App\Features\Auth\Requests\ForgotPasswordRequest;
@@ -48,6 +49,8 @@ class PasswordResetController
         }
 
         $minutes = (int) config('auth.passwords.users.expire');
+        $requester = $this->users->findByEmail($email);
+        app(AuditLogger::class)->record('Sign-in', 'Password reset requested', $requester ? (string) $requester->id : null, "A reset link was emailed to {$email}.", $requester?->branch_id, $requester);
 
         return response()->json([
             'message' => "We sent a password reset link to {$email}. It expires in {$minutes} minutes; if you don't see it, check your spam folder.",
@@ -71,6 +74,8 @@ class PasswordResetController
         if ($status !== Password::PASSWORD_RESET) {
             abort(422, 'This password reset link is invalid or has expired. Request a new one.');
         }
+
+        app(AuditLogger::class)->record('Sign-in', 'Password reset', (string) $resetUser->id, "{$resetUser->full_name} ({$resetUser->email}) set a new password; every other session was signed out.", $resetUser->branch_id, $resetUser);
 
         // A fresh session for this browser, like accepting an invitation
         return response()->json(['message' => 'Your password was reset.'] + $this->tokens->issue($resetUser, $request));

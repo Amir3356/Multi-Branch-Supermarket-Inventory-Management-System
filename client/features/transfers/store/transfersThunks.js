@@ -1,6 +1,5 @@
 import { findCatalogProduct } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
-import { logAdded } from '../../auditLogs/store/auditLogsSlice'
 import { productUpdated } from '../../inventory/store/productsSlice'
 import { stockAdjusted, stockReceived } from '../../inventory/store/stockSlice'
 import { createTransfer, fetchTransfers, receiveTransfer } from '../api/transfersApi'
@@ -22,12 +21,13 @@ const syncTransferStock = () => (dispatch, getState) => {
     if (!sentIds.includes(transfer.id)) {
       // The sending branch's stock arrives in this browser with its procurements: try again next sync
       if (!state.stock.some((row) => row.medId === medId && row.branchId === transfer.from)) continue
-      dispatch(stockAdjusted({ medId, branchId: transfer.from, delta: -transfer.qty }))
+      // The units leave the batch the sender picked
+      dispatch(stockAdjusted({ medId, branchId: transfer.from, batch: transfer.batch, delta: -transfer.qty }))
       dispatch(transferSentApplied(transfer.id))
     }
     if (transfer.status === 'Received' && !receivedIds.includes(transfer.id)) {
       // The receiving branch holds it under its own new batch number (the sender's stays on the transfer for tracing)
-      dispatch(stockReceived({ medId, branchId: transfer.to, qty: transfer.qty, batch: transfer.receivedBatch || transfer.batch, expiry: transfer.expiry }))
+      dispatch(stockReceived({ medId, branchId: transfer.to, qty: transfer.qty, batch: transfer.receivedBatch || transfer.batch, expiry: transfer.expiry, receivedAt: transfer.receivedAt }))
       dispatch(transferReceivedApplied(transfer.id))
     }
   }
@@ -47,12 +47,10 @@ export const transferPushed = (transfer) => (dispatch) => {
 
 // Inventory Officer: send stock to another branch. It leaves this branch now and is Pending until the receiving
 // branch adds it with Add Medicine.
-export const sendTransfer = ({ medId, expiry, ...data }) => async (dispatch, getState) => {
+export const sendTransfer = ({ medId, expiry, ...data }) => async (dispatch) => {
   const { transfer, message } = await createTransfer({ ...data, medId, expiry })
   dispatch(transferSaved(transfer))
   dispatch(syncTransferStock())
-  const { branchName } = thunkContext(getState)
-  dispatch(logAdded('Stock sent', 'Stock Transfers', transfer.id, `${transfer.qty} × ${transfer.product} (batch ${transfer.batch}) sent from ${branchName(transfer.from)} to ${branchName(transfer.to)}; pending until they add it.`))
   return message
 }
 
@@ -66,6 +64,5 @@ export const receiveTransferToStock = (transfer, sellingPrice) => async (dispatc
   const { state, money, branchName } = thunkContext(getState)
   const product = productOf(state, received)
   if (product) dispatch(productUpdated({ id: product.id, changes: { sellingPrice } }))
-  dispatch(logAdded('Transfer received', 'Stock Transfers', received.id, `${received.qty} × ${received.product} from ${branchName(received.from)} (their batch ${received.batch}) added to ${branchName(received.to)}'s stock as batch ${received.receivedBatch}; selling price ${money(sellingPrice)}.`))
   return `${received.qty} × ${received.product} from ${branchName(received.from) || 'the other branch'} added to stock as batch ${received.receivedBatch || received.batch}, at ${money(sellingPrice)} per unit.`
 }

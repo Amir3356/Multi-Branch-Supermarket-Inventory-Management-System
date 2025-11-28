@@ -2,6 +2,7 @@
 
 namespace App\Features\Branches\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Branches\Models\Branch;
 use App\Features\Branches\Repositories\BranchRepository;
 use App\Features\Branches\Requests\BranchRequest;
@@ -23,6 +24,7 @@ class BranchController
     public function store(BranchRequest $request): JsonResponse
     {
         $branch = $this->branches->create($request->validated());
+        app(AuditLogger::class)->record('Branches', 'Branch added', $branch->id, "{$branch->name} added at {$branch->location} ({$branch->status}).", $branch->id);
 
         $this->live->changed('added');
 
@@ -34,7 +36,11 @@ class BranchController
 
     public function update(BranchRequest $request, Branch $branch): JsonResponse
     {
+        $before = $branch->only(['name', 'location', 'status']);
         $this->branches->update($branch, $request->validated());
+        $changes = collect($before)->filter(fn ($old, $field) => (string) $old !== (string) $branch->{$field})
+            ->map(fn ($old, $field) => "{$field} “{$old}” → “{$branch->{$field}}”")->implode(', ');
+        app(AuditLogger::class)->record('Branches', 'Branch updated', $branch->id, "{$branch->name}: ".($changes ?: 'no changes').'.', $branch->id);
 
         $this->live->changed('updated');
 
@@ -56,6 +62,7 @@ class BranchController
         }
 
         $this->branches->delete($branch);
+        app(AuditLogger::class)->record('Branches', 'Branch deleted', $branch->id, "{$branch->name} ({$branch->location}) was deleted.");
         $this->live->changed('deleted');
 
         return response()->json(['message' => "{$branch->name} was deleted."]);

@@ -2,6 +2,7 @@
 
 namespace App\Features\Procurements\Repositories;
 
+use App\Features\Accounts\Models\User;
 use App\Features\Procurements\Models\Procurement;
 use App\Shared\Services\BatchNumbers;
 use Illuminate\Support\Collection;
@@ -13,10 +14,13 @@ class ProcurementRepository
 {
     public function __construct(private BatchNumbers $batchNumbers) {}
 
-    /** Newest first. */
-    public function latest(): Collection
+    /** Newest first: every branch for those who cover all branches, otherwise the user's own branch */
+    public function visibleTo(User $user): Collection
     {
-        return Procurement::latest()->get();
+        return Procurement::query()
+            ->when(! $user->coversAllBranches(), fn ($query) => $query->where('branch_id', $user->branch_id))
+            ->latest()
+            ->get();
     }
 
     /** A Pending order with the next free id (PO-00001, …) and a unique Chapa transaction reference. */

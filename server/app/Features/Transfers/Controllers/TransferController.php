@@ -2,6 +2,7 @@
 
 namespace App\Features\Transfers\Controllers;
 
+use App\Features\AuditLogs\Services\AuditLogger;
 use App\Features\Transfers\Models\StockTransfer;
 use App\Features\Transfers\Repositories\TransferRepository;
 use App\Features\Transfers\Requests\StoreTransferRequest;
@@ -45,6 +46,7 @@ class TransferController
             'sent_by' => $request->user()->id,
         ]);
         $this->live->changed($transfer);
+        app(AuditLogger::class)->record('Stock Transfers', 'Stock sent', $transfer->id, "{$transfer->qty} × {$transfer->product} (batch {$transfer->batch}) sent from ".AuditLogger::branchName($transfer->from_branch_id).' to '.AuditLogger::branchName($transfer->to_branch_id).'.', $transfer->from_branch_id);
 
         return response()->json([
             'message' => "Transfer {$transfer->id} sent: {$transfer->qty} × {$transfer->product}. It reaches the other branch's stock once their Inventory Officer adds it.",
@@ -76,6 +78,7 @@ class TransferController
         });
         $this->live->changed($received);
         $this->catalog->changed();
+        app(AuditLogger::class)->record('Stock Transfers', 'Transfer received', $received->id, "{$received->qty} × {$received->product} from ".AuditLogger::branchName($received->from_branch_id)." added as batch {$received->received_batch}, selling at ".AuditLogger::money($sellingPrice).'.', $received->to_branch_id);
 
         return response()->json([
             'message' => "{$received->qty} × {$received->product} added to stock as batch {$received->received_batch}.",

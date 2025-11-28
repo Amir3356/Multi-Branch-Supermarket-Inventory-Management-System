@@ -5,14 +5,13 @@ import {
   X
 } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
-import { procurementBatch } from '../../purchases/model/procurement'
-import { sameText } from '../../../utils'
+import { fifoBatches, productsInStock } from '../../../utils'
 import { validateTransfer } from '../services/transferRules'
 
 const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', batch: '', qty: '' }
 
 // assignedBranchId: staff always send from their own branch (shown read-only); the Owner (null) picks any branch
-export default function NewTransferModal({ branches, assignedBranchId, inventory, purchases, categories, maxQty, onClose, onSave }) {
+export default function NewTransferModal({ branches, assignedBranchId, inventory, categories, maxQty, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_TRANSFER_FORM, from: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
   const [isSaving, setIsSaving] = useState(false)
@@ -20,23 +19,17 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
 
   useEscapeKey(onClose)
 
-  // Products come from the sending branch's stock
-  const sourceStock = inventory.filter((i) => i.branchId === form.from && i.stock > 0)
+  // Products come from the sending branch's stock, each listed once however many batches it came in
+  const sourceStock = productsInStock(inventory.filter((i) => i.branchId === form.from))
   const categoryCount = (category) => sourceStock.filter((i) => i.category === category).length
   const sourceProducts = sourceStock.filter((i) => i.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
   const product = sourceProducts.find((i) => i.key === form.key)
-  const destinationEntry = product && inventory.find((i) => i.branchId === form.to && i.medId === product.medId)
-  // The batches this product arrived in at the sending branch (one per paid procurement), plus the row's own batch
-  const batches = product
-    ? [...new Set([
-        product.batch,
-        ...purchases
-          .filter((p) => p.status === 'Paid' && p.branchId === form.from && (p.medId ? p.medId === product.medId : sameText(p.product, product.name)))
-          .map(procurementBatch)
-      ].filter(Boolean))]
-    : []
+  // Its batches with units left and not expired, oldest first (the one to move first)
+  const batches = product ? fifoBatches(product.batches) : []
+  const batchRow = batches.find((b) => b.batch === form.batch)
+  const destinationStock = product ? (inventory.find((i) => i.branchId === form.to && i.medId === product.medId)?.productStock || 0) : 0
   const qty = Number(form.qty)
-  const validQty = product && Number.isInteger(qty) && qty > 0 && qty <= product.stock ? qty : 0
+  const validQty = batchRow && Number.isInteger(qty) && qty > 0 && qty <= batchRow.stock ? qty : 0
 
   const update = (field, value) => {
     setForm((prev) => ({
@@ -45,8 +38,9 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
       // Changing the sending branch or category resets the product picked from its stock
       ...(field === 'from' ? { category: '', key: '', qty: '' } : {}),
       ...(field === 'category' ? { key: '', qty: '' } : {}),
-      // A product starts on its stock row's batch
-      ...(field === 'key' ? { batch: inventory.find((i) => i.key === value)?.batch || '', qty: '' } : {})
+      // A product starts on its oldest batch (first in, first out)
+      ...(field === 'key' ? { batch: fifoBatches(sourceStock.find((i) => i.key === value)?.batches || [])[0]?.batch || '', qty: '' } : {}),
+      ...(field === 'batch' ? { qty: '' } : {})
     }))
     setErrors((prev) => ({
       ...prev,
@@ -59,7 +53,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newErrors = validateTransfer(form, product, qty, maxQty)
+    const newErrors = validateTransfer(form, product, batchRow, qty, maxQty)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
     setIsSaving(true)
@@ -72,7 +66,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
         product: product.name,
         medId: product.medId,
         batch: form.batch,
-        expiry: product.expiry,
+        expiry: batchRow.expiry,
         qty
       })
     } catch (error) {
@@ -163,8 +157,10 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
             <label htmlFor="transfer-batch">Batch Number *</label>
             <select id="transfer-batch" className={`input-field ${errors.batch ? 'error' : ''}`} value={form.batch} onChange={(e) => update('batch', e.target.value)} disabled={!product}>
               <option value="">{product ? 'Select batch…' : 'Select a product first'}</option>
-              {batches.map((b) => (
-                <option key={b} value={b}>{b}</option>
+              {batches.map((b, index) => (
+                <option key={b.batch} value={b.batch}>
+                  {b.batch} · {b.stock} {b.stock === 1 ? 'unit' : 'units'} · expires {b.expiry}{index === 0 ? ' · oldest' : ''}
+                </option>
               ))}
             </select>
             {errors.batch && <span className="error-msg">{errors.batch}</span>}
@@ -172,14 +168,14 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
 
           <div className="form-group">
             <label htmlFor="transfer-qty">Quantity *</label>
-            <input id="transfer-qty" type="number" min="1" max={product ? Math.min(product.stock, maxQty) : undefined} step="1" placeholder="Units to move" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
+            <input id="transfer-qty" type="number" min="1" max={batchRow ? Math.min(batchRow.stock, maxQty) : undefined} step="1" placeholder="Units to move" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
             {errors.qty && <span className="error-msg">{errors.qty}</span>}
           </div>
 
           <div className="sale-summary">
-            <div><small>Available at Source</small><strong>{product ? `${product.stock} units` : '—'}</strong></div>
-            <div><small>Source After</small><strong>{product ? `${product.stock - validQty} units` : '—'}</strong></div>
-            <div><small>Destination After</small><strong>{product && form.to ? `${(destinationEntry?.stock || 0) + validQty} units` : '—'}</strong></div>
+            <div><small>Available in Batch</small><strong>{batchRow ? `${batchRow.stock} units` : '—'}</strong></div>
+            <div><small>Source After</small><strong>{product ? `${product.productStock - validQty} units` : '—'}</strong></div>
+            <div><small>Destination After</small><strong>{product && form.to ? `${destinationStock + validQty} units` : '—'}</strong></div>
           </div>
 
           <div className="modal-actions">

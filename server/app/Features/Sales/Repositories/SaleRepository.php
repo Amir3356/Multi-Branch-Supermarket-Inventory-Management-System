@@ -20,6 +20,23 @@ class SaleRepository
             ->get();
     }
 
+    /**
+     * Each batch's expiry date (YYYY-MM-DD, or null when none was recorded) at a branch, for the batches given. A batch
+     * is in a branch's stock once its procurement was added there (Add Medicine) or a transfer was received there under
+     * it; batches missing from the result never arrived at that branch.
+     */
+    public function batchExpiries(string $branchId, array $batches): array
+    {
+        $fromProcurements = DB::table('procurements')
+            ->where('branch_id', $branchId)->whereNotNull('received_at')->whereIn('batch', $batches)
+            ->pluck('expiry_date', 'batch');
+        $fromTransfers = DB::table('stock_transfers')
+            ->where('to_branch_id', $branchId)->where('status', 'received')->whereIn('received_batch', $batches)
+            ->pluck('expiry_date', 'received_batch');
+
+        return $fromTransfers->merge($fromProcurements)->map(fn ($date) => $date ? substr((string) $date, 0, 10) : null)->all();
+    }
+
     /** The sale this cashier already recorded with this idempotency key, if any */
     public function findByIdempotencyKey(int $userId, string $key): ?Sale
     {
