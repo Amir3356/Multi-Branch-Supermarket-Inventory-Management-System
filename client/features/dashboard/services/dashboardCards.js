@@ -55,10 +55,12 @@ function procurementOfficerCards({ purchases }, { money, period }) {
 function ownerCards({ totals, now }, { money, period }) {
   const profitable = totals.netProfit >= 0
   return [
-    { group: 'period', title: 'Total Sales', icon: 'sales', tone: 'teal', value: money(totals.sales), chip: `${plural(totals.salesCount, 'sale', 'sales')} · ${plural(totals.unitsSold, 'unit', 'units')}`, chipTone: 'positive' },
+    { group: 'period', title: 'Revenue', icon: 'sales', tone: 'teal', value: money(totals.sales), chip: `${plural(totals.salesCount, 'sale', 'sales')} · ${plural(totals.unitsSold, 'unit', 'units')}`, chipTone: 'positive' },
     { group: 'period', title: 'Total Purchases', icon: 'procurement', tone: 'cyan', value: money(totals.purchases), chip: `${plural(totals.purchasesCount, 'paid order', 'paid orders')} · ${period.name}` },
     { group: 'period', title: 'Total Expenses', icon: 'wallet', tone: 'warning', value: money(totals.expenses), chip: `${plural(totals.expensesCount, 'expense', 'expenses')} · ${period.name}`, chipTone: 'negative' },
-    { group: 'period', title: 'Net Profit (est.)', icon: 'money', tone: profitable ? 'teal' : 'danger', value: money(totals.netProfit), chip: `Cost of goods sold ${money(totals.costOfSales)}`, chipTone: profitable ? 'positive' : 'negative' },
+    { group: 'period', title: 'Damage Loss', icon: 'damaged', tone: 'danger', value: money(totals.damageLoss), chip: `${plural(totals.damagedUnits, 'unit', 'units')} written off · ${period.name}`, chipTone: totals.damageLoss ? 'negative' : 'neutral' },
+    // A loss shows as Net Loss with the amount lost, rather than a negative profit
+    { group: 'period', title: profitable ? 'Net Profit (est.)' : 'Net Loss (est.)', icon: 'money', tone: profitable ? 'teal' : 'danger', value: money(Math.abs(totals.netProfit)), hint: 'Revenue − what the sold items cost to buy − Total Expenses − Damage Loss. Estimated: each item is costed at its latest purchase price.', chip: `Cost of items sold ${money(totals.costOfSales)}`, chipTone: profitable ? 'positive' : 'negative' },
     { group: 'now', title: 'Active Branches', icon: 'branch', tone: 'cyan', value: now.activeBranches, chip: `${now.totalBranches} in total` },
     { group: 'now', title: 'Active Staff', icon: 'staff', tone: 'teal', value: now.activeStaff, chip: now.invitedStaff ? `${plural(now.invitedStaff, 'invitation', 'invitations')} not accepted yet` : 'Every invitation accepted', chipTone: now.invitedStaff ? 'negative' : 'positive' },
     { group: 'now', title: 'Awaiting Payment', icon: 'card', tone: 'warning', value: now.awaitingPayment, chip: now.awaitingPayment ? `${money(now.awaitingPaymentAmount)} to pay on Chapa` : 'Nothing to pay', chipTone: now.awaitingPayment ? 'negative' : 'neutral' }

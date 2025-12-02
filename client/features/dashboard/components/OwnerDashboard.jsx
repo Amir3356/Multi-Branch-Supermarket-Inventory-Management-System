@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Building2, CreditCard, DollarSign, PackageCheck, ShoppingCart, Users, Wallet } from 'lucide-react'
+import { Building2, CreditCard, DollarSign, PackageCheck, PackageX, ShoppingCart, Users, Wallet } from 'lucide-react'
 import { BranchTag, EmptyRow } from '../../../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../../../hooks'
 import { realtime } from '../../../api/realtime'
@@ -10,7 +10,7 @@ import { usePeriod } from '../hooks/usePeriod'
 import { BarChart, ChartCard, PieChart } from './Charts'
 import { CardGrid, DashboardSection, PeriodError, PeriodPicker } from './DashboardParts'
 
-const ICONS = { sales: ShoppingCart, procurement: PackageCheck, wallet: Wallet, money: DollarSign, branch: Building2, staff: Users, card: CreditCard }
+const ICONS = { sales: ShoppingCart, procurement: PackageCheck, wallet: Wallet, damaged: PackageX, money: DollarSign, branch: Building2, staff: Users, card: CreditCard }
 
 // One colour per pie slice, the last (grey) for Other
 const PIE_TONES = ['teal', 'cyan', 'violet', 'amber', 'rose', 'green', 'orange', 'slate']
@@ -93,17 +93,17 @@ export default function OwnerDashboard() {
           {summary && (
             <>
               <DashboardSection id="owner-money-title" title="Money In & Out" description={`${period.name} · ${scope}`}>
-                <CardGrid className="dashboard-stock-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'period')} />
+                <CardGrid className="dashboard-money-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'period')} />
                 <div className="charts-grid">
-                  <ChartCard title="Sales, Purchases and Expenses" subtitle={period.name}>
+                  <ChartCard title="Revenue, Purchases and Expenses" subtitle={period.name}>
                     <BarChart
                       columns={moneyOverTime(summary.daily, period.range)}
-                      series={[{ label: 'Sales', tone: 'teal' }, { label: 'Purchases', tone: 'cyan' }, { label: 'Expenses', tone: 'amber' }]}
+                      series={[{ label: 'Revenue', tone: 'teal' }, { label: 'Purchases', tone: 'cyan' }, { label: 'Expenses', tone: 'amber' }]}
                       format={shortMoney}
                       emptyText="No sales, purchases or expenses in this period."
                     />
                   </ChartCard>
-                  <ChartCard title="Top Selling Products" subtitle={`Share of sales · ${period.name}`}>
+                  <ChartCard title="Top Selling Products" subtitle={`Share of revenue · ${period.name}`}>
                     <PieChart
                       items={topSlices(summary.topProducts.map((p) => ({ label: p.product, value: p.total, qty: p.qty }))).map((p, index) => ({
                         ...p,
@@ -117,16 +117,16 @@ export default function OwnerDashboard() {
                 </div>
               </DashboardSection>
 
-              <DashboardSection id="owner-branches-title" title="Branch Performance" description={`Every branch side by side · ${period.name}. Net profit (an estimate) is sales minus the cost of the goods sold and the branch's expenses.`}>
+              <DashboardSection id="owner-branches-title" title="Branch Performance" description={`Every branch side by side · ${period.name}. Net profit (an estimate) is sales minus what the sold items cost to buy, the branch's expenses and its damage loss.`}>
                 <div className="table-responsive">
                   <table className="data-table">
                     <thead>
                       <tr>
                         <th>Branch</th>
                         <th>{moneyHeader('Sales')}</th>
-                        <th>Transactions</th>
                         <th>{moneyHeader('Purchases')}</th>
                         <th>{moneyHeader('Expenses')}</th>
+                        <th>{moneyHeader('Damage Loss')}</th>
                         <th>{moneyHeader('Net Profit')}</th>
                         <th>Status</th>
                       </tr>
@@ -136,9 +136,9 @@ export default function OwnerDashboard() {
                         <tr key={b.id}>
                           <td><BranchTag branch={branchById(b.id) || { id: b.id, name: b.name }} /></td>
                           <td className="fw-600">{formatAmount(b.sales)}</td>
-                          <td>{b.salesCount.toLocaleString()}</td>
                           <td>{formatAmount(b.purchases)}</td>
                           <td>{formatAmount(b.expenses)}</td>
+                          <td className={b.damageLoss ? 'amount-negative' : undefined}>{formatAmount(b.damageLoss)}</td>
                           <td className={`fw-600 ${b.netProfit < 0 ? 'amount-negative' : 'amount-positive'}`}>{formatAmount(b.netProfit)}</td>
                           <td>{b.status}</td>
                         </tr>

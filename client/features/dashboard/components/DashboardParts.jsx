@@ -59,7 +59,7 @@ export function CardGrid({ cards, icons, className }) {
   return (
     <div className={className}>
       {cards.map((card) => (
-        <StatCard key={card.title} className={card.wide ? 'wide' : ''} title={card.title} icon={icons[card.icon] || Package} tone={card.tone} value={card.value} chip={card.chip} chipTone={card.chipTone} />
+        <StatCard key={card.title} className={card.wide ? 'wide' : ''} title={card.title} icon={icons[card.icon] || Package} tone={card.tone} hint={card.hint} value={card.value} chip={card.chip} chipTone={card.chipTone} />
       ))}
     </div>
   )

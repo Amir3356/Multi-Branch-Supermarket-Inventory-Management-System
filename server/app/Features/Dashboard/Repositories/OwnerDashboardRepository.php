@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * The Owner's dashboard figures, worked out in the database for a period (calendar days in the pharmacy's time zone)
  * and optionally one branch. Sales count by when they were made, purchases by order date (paid orders only, as on the
- * Procurement Officer's dashboard), expenses by their expense date.
+ * Procurement Officer's dashboard), expenses by their expense date, damaged stock by the day it was written off.
  */
 class OwnerDashboardRepository
 {
@@ -32,11 +32,14 @@ class OwnerDashboardRepository
         $sales = fn () => $this->inPeriod(DB::table('sales'), 'sales.created_at')->when($branchId, fn ($q) => $q->where('sales.branch_id', $branchId));
         $purchases = fn () => $this->inPeriod(DB::table('procurements'), 'created_at')->where('status', 'paid')->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
         $expenses = fn () => DB::table('expenses')->whereBetween('expense_date', [$from, $to])->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
+        $damaged = fn () => DB::table('damaged_items')->whereBetween('damage_date', [$from, $to])->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
 
         // Cost of what was sold: units × the product's purchase price (its latest, the one Add Medicine recorded)
         $costOfSales = (float) $sales()->leftJoin('products', 'products.id', '=', 'sales.med_id')->sum(DB::raw('sales.qty * coalesce(products.purchase_price, 0)'));
         $salesTotal = (float) $sales()->sum('total');
         $expensesTotal = (float) $expenses()->sum('amount');
+        // What written-off stock cost to buy: it was paid for and can't be sold
+        $damageLoss = (float) $damaged()->sum('loss_value');
 
         return [
             'totals' => [
@@ -47,9 +50,11 @@ class OwnerDashboardRepository
                 'purchasesCount' => $purchases()->count(),
                 'expenses' => $expensesTotal,
                 'expensesCount' => $expenses()->count(),
+                'damageLoss' => $damageLoss,
+                'damagedUnits' => (int) $damaged()->sum('qty'),
                 'costOfSales' => $costOfSales,
                 'grossProfit' => $salesTotal - $costOfSales,
-                'netProfit' => $salesTotal - $costOfSales - $expensesTotal,
+                'netProfit' => $salesTotal - $costOfSales - $expensesTotal - $damageLoss,
             ],
             'now' => $this->rightNow($branchId),
             'daily' => $this->daily($sales(), $purchases(), $expenses()),
@@ -99,11 +104,14 @@ class OwnerDashboardRepository
             ->selectRaw('branch_id, sum(total) as total')->groupBy('branch_id')->pluck('total', 'branch_id');
         $expenses = DB::table('expenses')->whereBetween('expense_date', [$from, $to])
             ->selectRaw('branch_id, sum(amount) as total')->groupBy('branch_id')->pluck('total', 'branch_id');
+        $damaged = DB::table('damaged_items')->whereBetween('damage_date', [$from, $to])
+            ->selectRaw('branch_id, sum(loss_value) as total')->groupBy('branch_id')->pluck('total', 'branch_id');
 
-        return DB::table('branches')->orderBy('name')->get(['id', 'name', 'status'])->map(function ($b) use ($sales, $purchases, $expenses) {
+        return DB::table('branches')->orderBy('name')->get(['id', 'name', 'status'])->map(function ($b) use ($sales, $purchases, $expenses, $damaged) {
             $sold = (float) ($sales[$b->id]->total ?? 0);
             $cost = (float) ($sales[$b->id]->cost ?? 0);
             $spent = (float) ($expenses[$b->id] ?? 0);
+            $lost = (float) ($damaged[$b->id] ?? 0);
 
             return [
                 'id' => $b->id,
@@ -113,7 +121,8 @@ class OwnerDashboardRepository
                 'salesCount' => (int) ($sales[$b->id]->count ?? 0),
                 'purchases' => (float) ($purchases[$b->id] ?? 0),
                 'expenses' => $spent,
-                'netProfit' => $sold - $cost - $spent,
+                'damageLoss' => $lost,
+                'netProfit' => $sold - $cost - $spent - $lost,
             ];
         })->all();
     }

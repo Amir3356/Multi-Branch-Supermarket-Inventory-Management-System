@@ -15,6 +15,7 @@ import { loadProcurements, procurementPushed } from '../features/purchases/store
 import { loadPolicy, policyPushed } from '../features/policy/store/policyThunks'
 import { loadTransfers, transferPushed } from '../features/transfers/store/transfersThunks'
 import { loadSales, salePushed } from '../features/sales/store/salesThunks'
+import { damagePushed, loadDamaged } from '../features/damaged/store/damagedThunks'
 import { loadProducts, productsPushed } from '../features/inventory/store/productsThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
@@ -53,14 +54,15 @@ export default function DashboardLayout() {
     dispatch(loadBranches()).catch(() => {})
     // The shared policy decides Low Stock and Expiring Soon on every page
     dispatch(loadPolicy()).catch(() => {})
-    // Stock is built in order: the catalog first, then procurements bring stock in, then transfers and sales move it
+    // Stock is built in order: the catalog first, then procurements bring stock in, then transfers, sales and damage move it
     dispatch(loadProducts()).catch(() => {})
       .finally(() => dispatch(loadProcurements()).catch(() => {}))
       .finally(() => dispatch(loadTransfers()).catch(() => {}))
       .finally(() => dispatch(loadSales()).catch(() => {}))
+      .finally(() => dispatch(loadDamaged()).catch(() => {}))
   }, [sessionChecked, dispatch])
 
-  // Live updates per branch: procurements, transfers and sales change this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
+  // Live updates per branch: procurements, transfers, sales and damage change this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
   // Procurement Officer) to all of them. After a dropped connection, catch up once.
   const liveBranchIds = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId]).filter(Boolean).join(' ')
   useEffect(() => {
@@ -71,7 +73,8 @@ export default function DashboardLayout() {
       echo.private(`branch.${id}.procurements`).listen('.procurement.changed', (event) => dispatch(procurementPushed(event.procurement)))
       echo.private(`branch.${id}.transfers`).listen('.transfer.changed', (event) => dispatch(transferPushed(event.transfer)))
       echo.private(`branch.${id}.sales`).listen('.sale.recorded', (event) => dispatch(salePushed(event.sale)))
-      channels.push(`branch.${id}.procurements`, `branch.${id}.transfers`, `branch.${id}.sales`)
+      echo.private(`branch.${id}.damaged`).listen('.damage.recorded', (event) => dispatch(damagePushed(event.damagedItem)))
+      channels.push(`branch.${id}.procurements`, `branch.${id}.transfers`, `branch.${id}.sales`, `branch.${id}.damaged`)
     }
     // The policy is shared by every branch; branch changes (added, renamed, deactivated, deleted) reach everyone too
     echo.private('policy').listen('.policy.changed', (event) => dispatch(policyPushed(event.policy)))
@@ -88,6 +91,7 @@ export default function DashboardLayout() {
         dispatch(loadProcurements()).catch(() => {})
           .finally(() => dispatch(loadTransfers()).catch(() => {}))
           .finally(() => dispatch(loadSales()).catch(() => {}))
+          .finally(() => dispatch(loadDamaged()).catch(() => {}))
       }
       wasConnected = connected
     })

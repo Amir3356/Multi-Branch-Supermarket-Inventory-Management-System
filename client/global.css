@@ -790,6 +790,8 @@ a.nav-item {
 }
 
 .dashboard-period-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Owner's money cards: Revenue, Purchases, Expenses, Damage Loss and Net Profit share one row when there is room */
+.dashboard-money-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1.25rem; }
 .dashboard-three-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .dashboard-stock-grid .stat-card.wide { grid-column: span 2; }
 .dashboard-section .stat-value { font-variant-numeric: tabular-nums; }
@@ -838,6 +840,17 @@ a.nav-item {
   font-weight: 600;
   color: var(--text-muted);
 }
+
+.stat-hint {
+  display: inline-flex;
+  vertical-align: -2px;
+  margin-left: 0.35rem;
+  cursor: help;
+  border-radius: var(--radius-sm);
+}
+
+.stat-hint:hover,
+.stat-hint:focus-visible { color: var(--primary-cyan); }
 
 .stat-icon-wrapper {
   width: 40px;

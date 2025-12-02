@@ -56,7 +56,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
       { accessorKey: 'stock', header: 'Current Stock', sortFn: 'basic', cell: (info) => `${info.getValue()} units` },
       { accessorKey: 'purchasePrice', header: moneyHeader('Unit Purchase Price'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
       // The whole quantity's purchase cost: Current Stock × unit purchase price
-      { id: 'totalCost', accessorFn: (row) => row.stock * (row.purchasePrice || 0), header: moneyHeader('Total Cost'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
+      { id: 'totalCost', accessorFn: (row) => row.stock * (row.purchasePrice || 0), header: moneyHeader('Stock Value'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
       { accessorKey: 'sellingPrice', header: moneyHeader('Unit Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
       // What the row's whole stock would sell for: Current Stock × Unit Selling Price (Not set until it has a price)
       { id: 'totalSellingPrice', accessorFn: (row) => (row.sellingPrice == null ? undefined : row.stock * row.sellingPrice), header: moneyHeader('Total Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },

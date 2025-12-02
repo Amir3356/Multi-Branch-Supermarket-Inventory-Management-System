@@ -3,15 +3,7 @@ import { useState } from 'react'
 import { PackageX, X } from 'lucide-react'
 import { useEscapeKey } from '../../../hooks'
 import { validateDamage } from '../services/damageRules'
-
-const DAMAGE_REASONS = [
-  'Broken / crushed packaging',
-  'Water damage',
-  'Contaminated',
-  'Temperature damage (cold chain)',
-  'Defective item',
-  'Other'
-]
+import { DAMAGE_REASONS } from '../model/damageRecord'
 
 const EMPTY_DAMAGE_FORM = { category: '', productName: '', batchKey: '', qty: '', reason: '' }
 
@@ -19,6 +11,7 @@ const EMPTY_DAMAGE_FORM = { category: '', productName: '', batchKey: '', qty: ''
 export default function RecordDamageModal({ inventory, categories, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_DAMAGE_FORM)
   const [errors, setErrors] = useState({})
+  const [isSaving, setIsSaving] = useState(false)
 
   useEscapeKey(onClose)
 
@@ -55,22 +48,20 @@ export default function RecordDamageModal({ inventory, categories, formatMoney, 
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const newErrors = validateDamage(form, product, qty)
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
 
-    onSave({
-      branchId: product.branchId,
-      medId: product.medId,
-      product: product.name,
-      category: product.category,
-      batch: product.batch,
-      qty,
-      reason: form.reason,
-      lossValue: Math.round(lossValue * 100) / 100
-    })
+    // The server works out the loss value itself, from the product's purchase price
+    setIsSaving(true)
+    try {
+      await onSave({ medId: product.medId, product: product.name, category: product.category, batch: product.batch, qty, reason: form.reason })
+    } catch (error) {
+      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : error.message })
+      setIsSaving(false)
+    }
   }
 
   return createPortal(
@@ -195,12 +186,14 @@ export default function RecordDamageModal({ inventory, categories, formatMoney, 
             <div><small>Loss Value</small><strong className="negative-text">{formatMoney(lossValue)}</strong></div>
           </div>
 
+          {errors.form && <span className="error-msg" role="alert">{errors.form}</span>}
+
           <div className="modal-actions">
-            <button type="button" className="secondary-action-btn" onClick={onClose}>
+            <button type="button" className="secondary-action-btn" onClick={onClose} disabled={isSaving}>
               Cancel
             </button>
-            <button type="submit" className="danger-action-btn">
-              <PackageX size={16} /> Record Damage
+            <button type="submit" className="danger-action-btn" disabled={isSaving}>
+              <PackageX size={16} /> {isSaving ? 'Recording…' : 'Record Damage'}
             </button>
           </div>
         </form>

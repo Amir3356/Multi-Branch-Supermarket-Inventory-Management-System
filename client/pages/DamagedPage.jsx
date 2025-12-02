@@ -21,8 +21,9 @@ export default function DamagedPage() {
   const [showRecordDamage, setShowRecordDamage] = useState(false)
   const [notice, setNotice] = useState(null)
 
-  const handleRecordDamage = (data) => {
-    setNotice({ type: 'success', text: dispatch(recordDamage(data)) })
+  // Errors are shown in the form (it catches them)
+  const handleRecordDamage = async (data) => {
+    setNotice({ type: 'success', text: await dispatch(recordDamage(data)) })
     setShowRecordDamage(false)
   }
 
