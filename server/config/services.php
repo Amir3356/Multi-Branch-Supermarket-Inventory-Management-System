@@ -37,6 +37,14 @@ return [
         'base_url' => env('CHAPA_BASE_URL', 'https://api.chapa.co/v1'),
     ],
 
+    // AI Assistance: OpenRouter's OpenAI-compatible chat completions. The key never leaves the server.
+    'openrouter' => [
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
+        'model' => env('OPENROUTER_MODEL', 'apodex/apodex-1.1-mini:free'),
+        'timeout' => (int) env('OPENROUTER_TIMEOUT', 120),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

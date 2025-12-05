@@ -35,10 +35,10 @@ enum Role: string
     public function sections(): array
     {
         return match ($this) {
-            self::Owner => ['dashboard', 'accounts', 'branches', 'auditLogs', 'reports'],
-            self::Pharmacist => ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications'],
-            self::Cashier => ['dashboard', 'sales', 'reports'],
-            self::PurchaseOfficer => ['dashboard', 'purchases', 'reports'],
+            self::Owner => ['dashboard', 'accounts', 'branches', 'auditLogs', 'reports', 'aiAssistance'],
+            self::Pharmacist => ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications', 'aiAssistance'],
+            self::Cashier => ['dashboard', 'sales', 'reports', 'aiAssistance'],
+            self::PurchaseOfficer => ['dashboard', 'purchases', 'reports', 'aiAssistance'],
         };
     }
 

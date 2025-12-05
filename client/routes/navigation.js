@@ -10,7 +10,8 @@ import {
   BarChart3,
   FileText,
   Building2,
-  Settings
+  Settings,
+  Sparkles
 } from 'lucide-react'
 import { PATHS } from './paths'
 
@@ -39,6 +40,12 @@ export const NAV_GROUPS = [
     items: [
       { section: 'reports', path: PATHS.reports, label: 'Reports', icon: BarChart3 },
       { section: 'auditLogs', path: PATHS.auditLogs, label: 'Audit Logs', icon: FileText }
+    ]
+  },
+  {
+    title: 'AI ASSISTANCE',
+    items: [
+      { section: 'aiAssistance', path: PATHS.aiAssistance, label: 'AI Assistance', icon: Sparkles }
     ]
   },
   {

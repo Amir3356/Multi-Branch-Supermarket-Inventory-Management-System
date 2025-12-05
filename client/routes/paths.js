@@ -16,9 +16,14 @@ export const PATHS = {
   auditLogs: '/audit-logs',
   branches: '/branches',
   policy: '/policy',
-  notifications: '/notifications'
+  notifications: '/notifications',
+  aiAssistance: '/ai-assistance'
 }
 
 // RBAC: the API sends each user's allowed `sections` (keys of PATHS); the first is their home page
-export const canOpen = (user, section) => Boolean(user?.sections?.includes(section))
+export const canOpen = (user, section) => {
+  if (!user) return false
+  if (section === 'aiAssistance') return true
+  return Boolean(user?.sections?.includes(section))
+}
 export const homePathFor = (user) => PATHS[user?.homeSection] || PATHS.login

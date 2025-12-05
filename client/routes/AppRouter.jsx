@@ -23,6 +23,7 @@ import PolicyPage from '../pages/PolicyPage'
 import DashboardPage from '../pages/DashboardPage'
 import ExpensesPage from '../pages/ExpensesPage'
 import NotificationsPage from '../pages/NotificationsPage'
+import AIAssistancePage from '../pages/AIAssistancePage'
 import NotFoundPage from '../pages/NotFoundPage'
 
 // Dashboard pages by section key; each one is only open to the roles the API allows
@@ -39,7 +40,8 @@ const SECTION_PAGES = {
   auditLogs: AuditLogsPage,
   branches: BranchesPage,
   policy: PolicyPage,
-  notifications: NotificationsPage
+  notifications: NotificationsPage,
+  aiAssistance: AIAssistancePage
 }
 
 const router = createBrowserRouter([

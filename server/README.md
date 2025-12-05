@@ -56,10 +56,10 @@ A feature's Blade views are namespaced by folder name, so `app/Features/Accounts
 
 | Role | Sections (first = landing page) |
 | --- | --- |
-| Owner | Account Provision, Branches, Audit Logs, Reports |
-| Pharmacist (Inventory Officer) | Dashboard, Inventory, Stock Transfers, Damaged, Policy, Reports, Notifications |
-| Cashier | Sales, Reports |
-| Procurement Officer | Procurement (every branch), Reports |
+| Owner | Account Provision, Branches, Audit Logs, Reports, AI Assistance |
+| Pharmacist (Inventory Officer) | Dashboard, Inventory, Stock Transfers, Damaged, Policy, Reports, Notifications, AI Assistance |
+| Cashier | Sales, Reports, AI Assistance |
+| Procurement Officer | Procurement (every branch), Reports, AI Assistance |
 
 `Role::sections()` is the single source: `/api/auth/me` returns it and the client builds the sidebar and route guards from it. Protect new endpoints with the same roles, e.g. `Route::middleware(['auth:sanctum', 'role:cashier'])`.
 
