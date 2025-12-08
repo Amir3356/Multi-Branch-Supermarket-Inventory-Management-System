@@ -107,7 +107,10 @@ class OpenRouterClient
 
     private function payload(array $messages, array $options): array
     {
-        return ['model' => config('services.openrouter.model'), 'messages' => $messages, ...$options];
+        // The model thinks before answering unless OPENROUTER_REASONING=false (several times faster, less careful)
+        $reasoning = config('services.openrouter.reasoning') ? [] : ['reasoning' => ['enabled' => false]];
+
+        return ['model' => config('services.openrouter.model'), 'messages' => $messages, ...$reasoning, ...$options];
     }
 
     private function send(array $payload, bool $stream = false): Response

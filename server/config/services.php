@@ -42,7 +42,9 @@ return [
         'api_key' => env('OPENROUTER_API_KEY'),
         'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
         'model' => env('OPENROUTER_MODEL', 'apodex/apodex-1.1-mini:free'),
-        'timeout' => (int) env('OPENROUTER_TIMEOUT', 120),
+        'timeout' => (int) env('OPENROUTER_TIMEOUT', 60),
+        // Let the model think before answering: better on hard questions, but several times slower
+        'reasoning' => (bool) env('OPENROUTER_REASONING', true),
     ],
 
     'slack' => [

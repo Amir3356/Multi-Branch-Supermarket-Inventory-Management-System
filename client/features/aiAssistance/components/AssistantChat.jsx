@@ -31,8 +31,8 @@ function AnswerText({ text }) {
   )
 }
 
-// Chat with the role's assistant. `storageKey` keeps the conversation for this browser tab; `draft` ({ text }) fills the box from outside.
-export default function AssistantChat({ suggestions, storageKey, draft }) {
+// Chat with the role's assistant. `storageKey` keeps the conversation for this browser tab.
+export default function AssistantChat({ suggestions, storageKey }) {
   const [messages, setMessages] = useState(() => {
     try {
       return JSON.parse(sessionStorage.getItem(storageKey)) || []
@@ -43,14 +43,7 @@ export default function AssistantChat({ suggestions, storageKey, draft }) {
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(null)
-  // A recommendation's "Ask about this" puts its question in the box
-  const [shownDraft, setShownDraft] = useState(draft)
-  if (draft !== shownDraft) {
-    setShownDraft(draft)
-    if (draft) setInput(draft.text)
-  }
   const listRef = useRef(null)
-  const inputRef = useRef(null)
 
   useEffect(() => {
     try {
@@ -63,10 +56,6 @@ export default function AssistantChat({ suggestions, storageKey, draft }) {
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, sending])
-
-  useEffect(() => {
-    if (draft) inputRef.current?.focus()
-  }, [draft])
 
   const send = async (text) => {
     const question = text.trim()
@@ -144,7 +133,6 @@ export default function AssistantChat({ suggestions, storageKey, draft }) {
         }}
       >
         <textarea
-          ref={inputRef}
           value={input}
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={handleKeyDown}

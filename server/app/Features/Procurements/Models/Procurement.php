@@ -4,6 +4,7 @@ namespace App\Features\Procurements\Models;
 
 use App\Features\Accounts\Models\User;
 use App\Features\Branches\Models\Branch;
+use App\Shared\Services\Sequences;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -30,14 +31,10 @@ class Procurement extends Model
         ];
     }
 
-    /** The next free id: PO-00001, PO-00002, … */
+    /** The next free id (PO-00001, …): call inside the transaction that saves it */
     public static function nextId(): string
     {
-        $highest = static::pluck('id')
-            ->map(fn (string $id) => (int) substr($id, 3))
-            ->max() ?? 0;
-
-        return sprintf('PO-%05d', $highest + 1);
+        return sprintf('PO-%05d', app(Sequences::class)->next('procurements'));
     }
 
     /** Paid, and its Inventory Officer hasn't added the stock yet */

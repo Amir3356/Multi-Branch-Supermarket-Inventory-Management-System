@@ -3,6 +3,7 @@
 namespace App\Features\Branches\Models;
 
 use App\Features\Accounts\Models\User;
+use App\Shared\Services\Sequences;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -14,14 +15,10 @@ class Branch extends Model
 
     protected $fillable = ['id', 'name', 'location', 'status'];
 
-    /** The next free id: BR-01, BR-02, … */
+    /** The next free id (BR-01, …): call inside the transaction that saves it */
     public static function nextId(): string
     {
-        $highest = static::pluck('id')
-            ->map(fn (string $id) => (int) substr($id, 3))
-            ->max() ?? 0;
-
-        return sprintf('BR-%02d', $highest + 1);
+        return sprintf('BR-%02d', app(Sequences::class)->next('branches'));
     }
 
     public function staff(): HasMany

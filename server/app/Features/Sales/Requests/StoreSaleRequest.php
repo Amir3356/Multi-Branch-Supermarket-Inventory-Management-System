@@ -2,7 +2,7 @@
 
 namespace App\Features\Sales\Requests;
 
-use App\Features\Sales\Repositories\SaleRepository;
+use App\Features\Stock\Repositories\StockRepository;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -59,7 +59,7 @@ class StoreSaleRequest extends FormRequest
                 return;
             }
             $batches = array_column($this->input('batches'), 'batch');
-            $expiries = app(SaleRepository::class)->batchExpiries($this->input('branchId'), $batches);
+            $expiries = app(StockRepository::class)->batchExpiries($this->input('branchId'), $this->input('product'), $batches);
             $today = now(config('pharmacy.timezone'))->toDateString();
             foreach ($batches as $batch) {
                 if (! array_key_exists($batch, $expiries)) {

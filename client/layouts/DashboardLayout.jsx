@@ -17,6 +17,7 @@ import { loadTransfers, transferPushed } from '../features/transfers/store/trans
 import { loadSales, salePushed } from '../features/sales/store/salesThunks'
 import { damagePushed, loadDamaged } from '../features/damaged/store/damagedThunks'
 import { loadProducts, productsPushed } from '../features/inventory/store/productsThunks'
+import { loadStock, stockPushed } from '../features/inventory/store/stockThunks'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
 
@@ -47,22 +48,23 @@ export default function DashboardLayout() {
       })
   }, [dispatch])
 
-  // Then the branch list every page labels with, and the stock movements every branch's inventory is built from;
-  // after that, changes arrive over the WebSocket (below)
+  // Then the branch list every page labels with, the records each page lists, and each branch's stock as the server
+  // holds it; after that, changes arrive over the WebSocket (below)
   useEffect(() => {
     if (!sessionChecked) return
     dispatch(loadBranches()).catch(() => {})
     // The shared policy decides Low Stock and Expiring Soon on every page
     dispatch(loadPolicy()).catch(() => {})
-    // Stock is built in order: the catalog first, then procurements bring stock in, then transfers, sales and damage move it
+    // The catalog first (with products new from paid orders), so stock batches find their products
     dispatch(loadProducts()).catch(() => {})
       .finally(() => dispatch(loadProcurements()).catch(() => {}))
-      .finally(() => dispatch(loadTransfers()).catch(() => {}))
-      .finally(() => dispatch(loadSales()).catch(() => {}))
-      .finally(() => dispatch(loadDamaged()).catch(() => {}))
+      .finally(() => dispatch(loadStock()).catch(() => {}))
+    dispatch(loadTransfers()).catch(() => {})
+    dispatch(loadSales()).catch(() => {})
+    dispatch(loadDamaged()).catch(() => {})
   }, [sessionChecked, dispatch])
 
-  // Live updates per branch: procurements, transfers, sales and damage change this screen's Inventory and lists at once. Staff listen to their own branch; those who cover every branch (Owner,
+  // Live updates per branch: stock (whatever moved it) and the procurement, transfer, sale and damage lists. Staff listen to their own branch; those who cover every branch (Owner,
   // Procurement Officer) to all of them. After a dropped connection, catch up once.
   const liveBranchIds = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId]).filter(Boolean).join(' ')
   useEffect(() => {
@@ -74,7 +76,8 @@ export default function DashboardLayout() {
       echo.private(`branch.${id}.transfers`).listen('.transfer.changed', (event) => dispatch(transferPushed(event.transfer)))
       echo.private(`branch.${id}.sales`).listen('.sale.recorded', (event) => dispatch(salePushed(event.sale)))
       echo.private(`branch.${id}.damaged`).listen('.damage.recorded', (event) => dispatch(damagePushed(event.damagedItem)))
-      channels.push(`branch.${id}.procurements`, `branch.${id}.transfers`, `branch.${id}.sales`, `branch.${id}.damaged`)
+      echo.private(`branch.${id}.stock`).listen('.stock.changed', (event) => dispatch(stockPushed(event.batches)))
+      channels.push(`branch.${id}.procurements`, `branch.${id}.transfers`, `branch.${id}.sales`, `branch.${id}.damaged`, `branch.${id}.stock`)
     }
     // The policy is shared by every branch; branch changes (added, renamed, deactivated, deleted) reach everyone too
     echo.private('policy').listen('.policy.changed', (event) => dispatch(policyPushed(event.policy)))
@@ -88,10 +91,11 @@ export default function DashboardLayout() {
         dispatch(loadPolicy()).catch(() => {})
         dispatch(loadBranches()).catch(() => {})
         dispatch(loadProducts()).catch(() => {})
-        dispatch(loadProcurements()).catch(() => {})
-          .finally(() => dispatch(loadTransfers()).catch(() => {}))
-          .finally(() => dispatch(loadSales()).catch(() => {}))
-          .finally(() => dispatch(loadDamaged()).catch(() => {}))
+          .finally(() => dispatch(loadProcurements()).catch(() => {}))
+          .finally(() => dispatch(loadStock()).catch(() => {}))
+        dispatch(loadTransfers()).catch(() => {})
+        dispatch(loadSales()).catch(() => {})
+        dispatch(loadDamaged()).catch(() => {})
       }
       wasConnected = connected
     })

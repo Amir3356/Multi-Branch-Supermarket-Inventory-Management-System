@@ -5,6 +5,7 @@ namespace App\Features\AiAssistance\Repositories;
 use App\Features\Accounts\Models\User;
 use App\Features\Dashboard\Repositories\OwnerDashboardRepository;
 use App\Features\Policies\Repositories\PolicyRepository;
+use App\Features\Stock\Models\StockBatch;
 use App\Shared\Enums\Role;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -36,7 +37,6 @@ class RoleSnapshot
     private Collection $stock;
 
     public function __construct(
-        private StockLedger $ledger,
         private PolicyRepository $policies,
         private OwnerDashboardRepository $ownerDashboard,
     ) {}
@@ -194,7 +194,8 @@ class RoleSnapshot
     /** One entry per product at a branch: total units (empty batches count as 0) and its batches */
     private function stockByProduct(): Collection
     {
-        return $this->ledger->batches()
+        return StockBatch::all()
+            ->map(fn (StockBatch $b) => ['branchId' => $b->branch_id, 'product' => $b->product, 'category' => $b->category, 'batch' => $b->batch, 'expiry' => $b->expiry_date?->toDateString(), 'stock' => $b->units])
             ->groupBy(fn ($b) => $b['branchId'].'|'.mb_strtolower(trim($b['product'])))
             ->map(fn (Collection $batches) => [
                 'branchId' => $batches->first()['branchId'],

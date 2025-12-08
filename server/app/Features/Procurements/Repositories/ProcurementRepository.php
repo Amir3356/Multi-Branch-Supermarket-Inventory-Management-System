@@ -4,6 +4,7 @@ namespace App\Features\Procurements\Repositories;
 
 use App\Features\Accounts\Models\User;
 use App\Features\Procurements\Models\Procurement;
+use App\Features\Stock\Repositories\StockRepository;
 use App\Shared\Services\BatchNumbers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 // Every database read and write for procurements
 class ProcurementRepository
 {
-    public function __construct(private BatchNumbers $batchNumbers) {}
+    public function __construct(private BatchNumbers $batchNumbers, private StockRepository $stock) {}
 
     /** Newest first: every branch for those who cover all branches, otherwise the user's own branch */
     public function visibleTo(User $user): Collection
@@ -73,6 +74,7 @@ class ProcurementRepository
     public function markReceived(Procurement $procurement, int $receivedBy, string $expiryDate): Procurement
     {
         $procurement->update(['received_at' => now(), 'received_by' => $receivedBy, 'batch' => $this->batchNumbers->next(), 'expiry_date' => $expiryDate]);
+        $this->stock->add($procurement->branch_id, $procurement->product, $procurement->category, $procurement->med_id, $procurement->batch, $expiryDate, $procurement->qty, $procurement->received_at);
 
         return $procurement;
     }

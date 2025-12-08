@@ -1,14 +1,13 @@
 import { createProcurement, fetchProcurements, receiveProcurement, verifyProcurementPayment } from '../api/procurementsApi'
-import { findCatalogProduct, nextId, yearsFromToday } from '../../../utils'
+import { findCatalogProduct, nextId } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { categoryAdded, productAdded, productUpdated } from '../../inventory/store/productsSlice'
-import { stockReceived } from '../../inventory/store/stockSlice'
+import { refreshStock } from '../../inventory/store/stockThunks'
 import { procurementBatch, procurementFromApi } from '../model/procurement'
 import { paymentSaved, purchaseSaved } from './purchasesSlice'
 
 // Procurements live on the server and are paid through Chapa. Paying puts the product in the catalog; its stock enters
-// the receiving branch's Inventory only when that branch's Inventory Officer adds it (Add Medicine). Each step happens
-// the first time this browser sees it, so loading the list again never double-counts.
+// the receiving branch's Inventory (on the server) only when that branch's Inventory Officer adds it (Add Medicine).
 
 // The catalog product a paid order bought; a product new to the catalog is added (selling price set with Add Medicine)
 const productFor = (procurement) => (dispatch, getState) => {
@@ -28,12 +27,6 @@ const procurementPaid = (procurement) => (dispatch) => {
   dispatch(productFor(procurement))
 }
 
-// Added with Add Medicine: the units enter the branch's stock under the batch and expiry date entered then
-const receiveStock = (procurement) => (dispatch) => {
-  const medId = dispatch(productFor(procurement))
-  dispatch(stockReceived({ medId, branchId: procurement.branchId, qty: procurement.qty, batch: procurementBatch(procurement), expiry: procurement.expiryDate || yearsFromToday(2), receivedAt: procurement.receivedAt }))
-}
-
 // Keeps the browser's copy in step with the API's
 const procurementSynced = (apiProcurement) => (dispatch, getState) => {
   const { procurement, payment } = procurementFromApi(apiProcurement)
@@ -41,7 +34,8 @@ const procurementSynced = (apiProcurement) => (dispatch, getState) => {
   dispatch(purchaseSaved(procurement))
   if (payment) dispatch(paymentSaved(payment))
   if (procurement.status === 'Paid' && known?.status !== 'Paid') dispatch(procurementPaid(procurement))
-  if (procurement.receivedAt && !known?.receivedAt) dispatch(receiveStock(procurement))
+  // Added with Add Medicine: the product is in the catalog (its units are in the server's stock)
+  if (procurement.receivedAt && !known?.receivedAt) dispatch(productFor(procurement))
 }
 
 // Inventory Officer (Add Medicine): add a paid order's stock to their branch with the expiry on the package (the server
@@ -50,6 +44,7 @@ export const addProcurementToStock = (procurement, sellingPrice, { expiryDate })
   // The server saves the product's shared prices too (this order's unit cost, and the selling price)
   const { procurement: received } = await receiveProcurement(procurement.id, { expiryDate, sellingPrice })
   dispatch(procurementSynced(received))
+  dispatch(refreshStock())
   const { state, money, branchName } = thunkContext(getState)
   const product = findCatalogProduct(state.products.items, received.medId, received.product)
   dispatch(productUpdated({ id: product.id, changes: { purchasePrice: received.purchasePrice, sellingPrice } }))

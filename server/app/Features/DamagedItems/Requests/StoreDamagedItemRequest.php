@@ -3,7 +3,7 @@
 namespace App\Features\DamagedItems\Requests;
 
 use App\Features\DamagedItems\Models\DamagedItem;
-use App\Features\Sales\Repositories\SaleRepository;
+use App\Features\Stock\Repositories\StockRepository;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -28,11 +28,11 @@ class StoreDamagedItemRequest extends FormRequest
         return [
             function (Validator $validator) {
                 $branchId = $this->user()->branch_id;
-                if (! $branchId || $validator->errors()->has('batch')) {
+                if (! $branchId || $validator->errors()->hasAny(['batch', 'product'])) {
                     return;
                 }
                 // The same check a sale gets: the batch must have been added to this branch's stock
-                if (! array_key_exists($this->input('batch'), app(SaleRepository::class)->batchExpiries($branchId, [$this->input('batch')]))) {
+                if (! array_key_exists($this->input('batch'), app(StockRepository::class)->batchExpiries($branchId, (string) $this->input('product'), [$this->input('batch')]))) {
                     $validator->errors()->add('batchKey', "Batch {$this->input('batch')} isn’t in stock at your branch.");
                 }
             },

@@ -3,6 +3,7 @@
 namespace App\Features\Transfers\Models;
 
 use App\Features\Accounts\Models\User;
+use App\Shared\Services\Sequences;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -19,12 +20,10 @@ class StockTransfer extends Model
         return ['qty' => 'integer', 'expiry_date' => 'date', 'received_at' => 'datetime'];
     }
 
-    /** The next free id: TRF-00001, TRF-00002, … */
+    /** The next free id (TRF-00001, …): call inside the transaction that saves it */
     public static function nextId(): string
     {
-        $highest = static::pluck('id')->map(fn (string $id) => (int) substr($id, 4))->max() ?? 0;
-
-        return sprintf('TRF-%05d', $highest + 1);
+        return sprintf('TRF-%05d', app(Sequences::class)->next('stock_transfers'));
     }
 
     public function isInTransit(): bool

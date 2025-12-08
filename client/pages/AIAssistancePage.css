@@ -1,148 +1,5 @@
-/* AIAssistancePage.css - recommendations (left) and the assistant chat (right); stacked on narrow screens */
-.ai-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-@media (max-width: 1100px) {
-  .ai-layout { grid-template-columns: minmax(0, 1fr); }
-}
-
-.ai-status {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--text-dim);
-  font-size: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-.ai-summary {
-  color: var(--text-main);
-  font-size: 0.98rem;
-  line-height: 1.6;
-  margin-bottom: 0.4rem;
-  max-width: 70ch;
-}
-
-.ai-retry { margin-top: 1rem; }
-
-/* Recommendation cards */
-.ai-rec-list {
-  list-style: none;
-  display: grid;
-  gap: 0.85rem;
-}
-
-.ai-rec-card {
-  --accent: var(--primary-cyan);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.15rem;
-  animation: fadeIn 0.25s ease both;
-}
-
-.ai-rec-card.priority-high { --accent: #fb7185; }
-.ai-rec-card.priority-medium { --accent: #f59e0b; }
-.ai-rec-card.priority-low { --accent: var(--text-dim); }
-
-.ai-rec-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.45rem;
-}
-
-.ai-priority {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent, var(--primary-cyan));
-}
-
-.ai-priority.priority-high { color: #fb7185; }
-.ai-priority.priority-medium { color: #f59e0b; }
-.ai-priority.priority-low { color: var(--text-muted); }
-
-.ai-category {
-  padding: 0.12rem 0.55rem;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.ai-rec-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.35;
-}
-
-.ai-rec-detail {
-  margin-top: 0.35rem;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  line-height: 1.55;
-}
-
-.ai-rec-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-top: 0.75rem;
-}
-
-.ai-rec-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--text-main);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.ai-ask-btn { font-size: 0.8rem; }
-
-.ai-rec-empty {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.25rem;
-  border: 1px dashed var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--primary-emerald);
-  font-size: 0.9rem;
-}
-
-/* Loading placeholders */
-.ai-skeleton { display: grid; gap: 0.6rem; border-left-color: var(--border-subtle); }
-
-.ai-skeleton-line {
-  display: block;
-  height: 0.75rem;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
-  background-size: 200% 100%;
-  animation: ai-shimmer 1.4s ease-in-out infinite;
-}
-
-.ai-skeleton-line.short { width: 30%; }
-
-@keyframes ai-shimmer {
-  from { background-position: 100% 0; }
-  to { background-position: -100% 0; }
-}
-
+/* AIAssistancePage.css - the assistant chat, full width of the page */
+/* "Thinking…" spinner */
 .ai-spin { animation: ai-rotate 1s linear infinite; }
 
 @keyframes ai-rotate {
@@ -151,20 +8,14 @@
 
 /* Chat */
 .ai-chat {
-  position: sticky;
-  top: 1rem;
   display: flex;
   flex-direction: column;
-  height: min(640px, calc(100vh - 8rem));
-  min-height: 420px;
+  height: calc(100vh - 14rem);
+  min-height: 480px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-}
-
-@media (max-width: 1100px) {
-  .ai-chat { position: static; height: 560px; }
 }
 
 .ai-chat-header {
@@ -203,7 +54,7 @@
 
 .ai-suggestions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -226,7 +77,7 @@
 }
 
 .ai-message {
-  max-width: 88%;
+  max-width: min(75%, 80ch);
   padding: 0.65rem 0.9rem;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
@@ -308,5 +159,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ai-rec-card, .ai-skeleton-line, .ai-spin { animation: none; }
+  .ai-spin { animation: none; }
+}
+
+@media (max-width: 700px) {
+  .ai-message { max-width: 92%; }
 }

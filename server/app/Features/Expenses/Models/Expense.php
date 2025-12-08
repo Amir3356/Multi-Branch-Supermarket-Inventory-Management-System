@@ -3,6 +3,7 @@
 namespace App\Features\Expenses\Models;
 
 use App\Features\Accounts\Models\User;
+use App\Shared\Services\Sequences;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -33,12 +34,10 @@ class Expense extends Model
         return ['amount' => 'decimal:2', 'expense_date' => 'date'];
     }
 
-    /** The next free id: EXP-00001, EXP-00002, … */
+    /** The next free id (EXP-00001, …): call inside the transaction that saves it */
     public static function nextId(): string
     {
-        $highest = static::pluck('id')->map(fn (string $id) => (int) substr($id, 4))->max() ?? 0;
-
-        return sprintf('EXP-%05d', $highest + 1);
+        return sprintf('EXP-%05d', app(Sequences::class)->next('expenses'));
     }
 
     public function recorder(): BelongsTo

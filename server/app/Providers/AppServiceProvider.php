@@ -11,6 +11,7 @@ use App\Features\Procurements\Services\ChapaClient;
 use App\Features\Procurements\Services\FakeChapaClient;
 use App\Features\Sessions\Models\SessionToken;
 use App\Features\Sessions\Services\SessionService;
+use App\Features\Stock\Services\StockBroadcaster;
 use Laravel\Sanctum\Events\TokenAuthenticated;
 use Laravel\Sanctum\Sanctum;
 
@@ -23,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request, so several session changes in a request send a single live update
         $this->app->scoped(SessionService::class);
+
+        // One per request, so every batch a request changes is announced once, after it commits
+        $this->app->scoped(StockBroadcaster::class);
 
         // CHAPA_MODE=fake: a pretend checkout on this server, for local development without working Chapa keys
         $this->app->bind(ChapaClient::class, fn () => config('services.chapa.mode') === 'fake' ? new FakeChapaClient : new ChapaClient);

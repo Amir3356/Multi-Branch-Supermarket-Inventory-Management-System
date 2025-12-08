@@ -45,7 +45,10 @@ export default function EditInventoryModal({ item, branchName, formatMoney, onCl
         sellingPrice: Math.round(sellingPrice * 100) / 100
       })
     } catch (error) {
-      setErrors({ sellingPrice: error.fieldErrors?.sellingPrice || error.message })
+      // Stock changed since this opened (409) or a stock/expiry problem shows by those fields; anything else by the price
+      const fields = error.fieldErrors || {}
+      const stockMessage = fields.stock || (error.status === 409 ? error.message : undefined)
+      setErrors({ stock: stockMessage, expiry: fields.expiry, sellingPrice: fields.sellingPrice || (stockMessage || fields.expiry ? undefined : error.message) })
     }
   }
 
