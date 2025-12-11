@@ -17,6 +17,7 @@ import PurchasePage from '../pages/PurchasePage'
 import StockTransfersPage from '../pages/StockTransfersPage'
 import DamagedPage from '../pages/DamagedPage'
 import ReportsPage from '../pages/ReportsPage'
+import UserReportPage from '../pages/UserReportPage'
 import AuditLogsPage from '../pages/AuditLogsPage'
 import BranchesPage from '../pages/BranchesPage'
 import PolicyPage from '../pages/PolicyPage'
@@ -37,6 +38,7 @@ const SECTION_PAGES = {
   damaged: DamagedPage,
   expenses: ExpensesPage,
   reports: ReportsPage,
+  userReports: UserReportPage,
   auditLogs: AuditLogsPage,
   branches: BranchesPage,
   policy: PolicyPage,

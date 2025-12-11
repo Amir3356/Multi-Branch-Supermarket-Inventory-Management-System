@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LogOut, Pill, User } from 'lucide-react'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { ChevronDown, LogOut, Pill, User } from 'lucide-react'
 import { useBranchScope } from '../hooks'
 import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
@@ -30,11 +30,47 @@ export default function DashboardLayout() {
   const inventory = useSelector(selectInventory)
   const { branches, inScope } = useBranchScope()
 
+  const location = useLocation()
+  const [openSections, setOpenSections] = useState({})
+
   // Only the sections this role may open; groups left empty are hidden
   const navGroups = useMemo(
-    () => NAV_GROUPS.map((group) => ({ ...group, items: group.items.filter((item) => canOpen(user, item.section)) })).filter((group) => group.items.length),
+    () =>
+      NAV_GROUPS.map((group) => {
+        const items = group.items
+          .filter((item) => canOpen(user, item.section) || item.children?.some((child) => canOpen(user, child.section)))
+          .map((item) => {
+            if (item.children) {
+              const allowedChildren = item.children.filter((child) => canOpen(user, child.section))
+              return {
+                ...item,
+                children: allowedChildren
+              }
+            }
+            return item
+          })
+        return { ...group, items }
+      }).filter((group) => group.items.length),
     [user]
   )
+
+  const isSectionOpen = (item) => {
+    if (typeof openSections[item.section] === 'boolean') {
+      return openSections[item.section]
+    }
+    return Boolean(
+      item.children?.some((child) => location.pathname === child.path) ||
+      (item.path && location.pathname.startsWith(item.path))
+    )
+  }
+
+  const toggleSection = (sectionKey, item) => {
+    const current = isSectionOpen(item)
+    setOpenSections((prev) => ({
+      ...prev,
+      [sectionKey]: !current
+    }))
+  }
 
   // Check the saved session first, picking up role or branch changes the Owner made since this user signed in. A
   // session that ended meanwhile (e.g. signed out after inactivity while the browser was closed) gets one 401 and
@@ -200,13 +236,58 @@ export default function DashboardLayout() {
           {navGroups.map((group, index) => (
             <div key={group.title}>
               <div className="nav-group-title" style={index ? { marginTop: '1.2rem' } : undefined}>{group.title}</div>
-              {group.items.map(({ path, label, icon: Icon, badge }) => (
-                <NavLink key={path} to={path} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                  <Icon size={18} />
-                  <span>{label}</span>
-                  {badge && badges[badge] ? <span className="nav-badge">{badges[badge]}</span> : null}
-                </NavLink>
-              ))}
+              {group.items.map((item) => {
+                const { path, label, icon: Icon, badge, children } = item
+                const hasChildren = Boolean(children && children.length > 1)
+
+                if (hasChildren) {
+                  const isOpen = isSectionOpen(item)
+                  const isAnyChildActive = children.some((child) => location.pathname === child.path)
+
+                  return (
+                    <div key={item.section} className="nav-collapsible-wrapper">
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(item.section, item)}
+                        className={`nav-item nav-collapsible-trigger ${isAnyChildActive ? 'parent-active' : ''}`}
+                        aria-expanded={isOpen}
+                      >
+                        <Icon size={18} />
+                        <span>{label}</span>
+                        {badge && badges[badge] ? <span className="nav-badge">{badges[badge]}</span> : null}
+                        <ChevronDown size={16} className={`nav-chevron ${isOpen ? 'open' : 'closed'}`} />
+                      </button>
+
+                      {isOpen && (
+                        <div className="nav-submenu">
+                          {children.map((child) => {
+                            const ChildIcon = child.icon || Icon
+                            return (
+                              <NavLink
+                                key={child.path}
+                                to={child.path}
+                                end={child.path === path}
+                                className={({ isActive }) => `nav-subitem ${isActive ? 'active' : ''}`}
+                              >
+                                <ChildIcon size={16} />
+                                <span>{child.label}</span>
+                              </NavLink>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                return (
+                  <NavLink key={path} to={path} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                    <Icon size={18} />
+                    <span>{label}</span>
+                    {badge && badges[badge] ? <span className="nav-badge">{badges[badge]}</span> : null}
+                  </NavLink>
+                )
+              })}
             </div>
           ))}
         </nav>

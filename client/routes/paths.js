@@ -13,6 +13,7 @@ export const PATHS = {
   damaged: '/damaged',
   expenses: '/expenses',
   reports: '/reports',
+  userReports: '/reports/user',
   auditLogs: '/audit-logs',
   branches: '/branches',
   policy: '/policy',
@@ -24,6 +25,9 @@ export const PATHS = {
 export const canOpen = (user, section) => {
   if (!user) return false
   if (section === 'aiAssistance') return true
+  if (section === 'userReports') {
+    return user?.role === 'owner' || Boolean(user?.sections?.includes('userReports'))
+  }
   return Boolean(user?.sections?.includes(section))
 }
 export const homePathFor = (user) => PATHS[user?.homeSection] || PATHS.login

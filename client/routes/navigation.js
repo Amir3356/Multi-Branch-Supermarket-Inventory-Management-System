@@ -11,7 +11,8 @@ import {
   FileText,
   Building2,
   Settings,
-  Sparkles
+  Sparkles,
+  Users
 } from 'lucide-react'
 import { PATHS } from './paths'
 
@@ -38,7 +39,16 @@ export const NAV_GROUPS = [
   {
     title: 'ANALYTICS & AUDIT',
     items: [
-      { section: 'reports', path: PATHS.reports, label: 'Reports', icon: BarChart3 },
+      {
+        section: 'reports',
+        path: PATHS.reports,
+        label: 'Reports',
+        icon: BarChart3,
+        children: [
+          { section: 'reports', path: PATHS.reports, label: 'Overview', icon: BarChart3 },
+          { section: 'userReports', path: PATHS.userReports, label: 'User Report', icon: Users }
+        ]
+      },
       { section: 'auditLogs', path: PATHS.auditLogs, label: 'Audit Logs', icon: FileText }
     ]
   },
