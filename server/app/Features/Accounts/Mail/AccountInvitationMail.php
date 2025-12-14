@@ -12,7 +12,7 @@ class AccountInvitationMail extends Mailable
     public function __construct(
         public User $user,
         public string $link,
-        public int $expiresInHours,
+        public string $expiresIn,
     ) {}
 
     public function envelope(): Envelope

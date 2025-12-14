@@ -1,0 +1,6 @@
+/* UserReportPage.css - the access reviews are this page's only section, so no divider above them */
+.user-report-page > .sessions-section {
+  margin-top: 1.5rem;
+  padding-top: 0;
+  border-top: 0;
+}

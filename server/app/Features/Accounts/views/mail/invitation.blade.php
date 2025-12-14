@@ -9,7 +9,7 @@ Click the button below to choose your password and open your dashboard.
 Set up my account
 </x-mail::button>
 
-This link expires in {{ $expiresInHours }} hours. If it has expired, ask the Owner to resend the invitation.
+This link expires in {{ $expiresIn }}. If it has expired, ask the Owner to resend the invitation.
 
 If you weren't expecting this email, you can ignore it.
 

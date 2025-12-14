@@ -67,7 +67,7 @@ export default function BranchModal({ branch, branches, onClose, onSave }) {
               <Building2 size={20} />
             </div>
             <div>
-              <h2 id="add-branch-title">{isEdit ? 'Edit Branch' : 'Add New Branch'}</h2>
+              <h2 id="add-branch-title">{isEdit ? 'Edit Branch' : 'Create New Branch'}</h2>
               <p className="page-desc">{isEdit ? `Update the details of ${branch.name}.` : 'Register a new pharmacy location in the network.'}</p>
             </div>
           </div>

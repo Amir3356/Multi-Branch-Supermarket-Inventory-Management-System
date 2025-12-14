@@ -14,13 +14,14 @@ use App\Features\Branches\Repositories\BranchRepository;
 use App\Shared\Enums\AccountStatus;
 use App\Shared\Enums\Role;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Access review for a period the Owner picks (today, this week, this month, this quarter, this year or a custom range): a snapshot of every account with its role and last login, flagging what
  * management should look at:
  *  - dormant            active, but no sign-in for ACCESS_REVIEW_DORMANT_DAYS (default 90)
  *  - role_changed       role changed during the period (possible privilege creep)
- *  - stale_invitation   invited ACCESS_REVIEW_STALE_INVITATION_DAYS ago (default 30), never accepted
+ *  - stale_invitation   still invited, but its emailed link no longer works (INVITATION_EXPIRE_MINUTES): resend or delete
  *  - deactivated        blocked but still on file
  *
  * Each account is shown as it was at the end of the period (or now, for the current period): its last sign-in on
@@ -90,7 +91,8 @@ class AccessReviewGenerator
         $dbTimezone = config('app.timezone');
         [$fromDb, $asOfDb] = [$start->setTimezone($dbTimezone), $asOf->setTimezone($dbTimezone)];
         $dormantDays = (int) config('pharmacy.access_review_dormant_days');
-        $staleDays = (int) config('pharmacy.access_review_stale_invitation_days');
+        // Each pending account's latest invitation link: working at $asOf only between when it was sent and when it expires
+        $invitations = DB::table('account_invitations')->get(['user_id', 'created_at', 'expires_at'])->keyBy('user_id');
 
         $changes = $this->roleChanges->betweenByUser($fromDb, $asOfDb);
 
@@ -103,7 +105,7 @@ class AccessReviewGenerator
         $branchNames = $this->branches->namesById();
 
         $rows = $this->users->createdBy($asOfDb)
-            ->map(function (User $user) use ($asOf, $dormantDays, $staleDays, $changes, $lastSignIns, $historyStart, $rolesThen, $statusesThen, $branchesThen, $branchNames) {
+            ->map(function (User $user) use ($asOf, $dormantDays, $invitations, $changes, $lastSignIns, $historyStart, $rolesThen, $statusesThen, $branchesThen, $branchNames) {
                 $role = $rolesThen[$user->id] ?? $user->role;
                 $status = $statusesThen->has($user->id) ? AccountStatus::from($statusesThen[$user->id]) : $user->status;
                 $branchId = $branchesThen->has($user->id) ? $branchesThen[$user->id] : $user->branch_id;
@@ -129,7 +131,11 @@ class AccessReviewGenerator
                 if ($roleChanges) {
                     $flags[] = 'role_changed';
                 }
-                if ($status === AccountStatus::Invited && CarbonImmutable::parse($user->created_at)->diffInDays($asOf) >= $staleDays) {
+                $invitation = $invitations[$user->id] ?? null;
+                $linkWorks = $invitation
+                    && CarbonImmutable::parse($invitation->created_at)->lte($asOf)
+                    && CarbonImmutable::parse($invitation->expires_at)->gt($asOf);
+                if ($status === AccountStatus::Invited && ! $linkWorks) {
                     $flags[] = 'stale_invitation';
                 }
                 if ($status === AccountStatus::Inactive) {

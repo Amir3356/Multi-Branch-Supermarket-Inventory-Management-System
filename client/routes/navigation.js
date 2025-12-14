@@ -45,7 +45,6 @@ export const NAV_GROUPS = [
         label: 'Reports',
         icon: BarChart3,
         children: [
-          { section: 'reports', path: PATHS.reports, label: 'Overview', icon: BarChart3 },
           { section: 'userReports', path: PATHS.userReports, label: 'User Report', icon: Users }
         ]
       },

@@ -14,7 +14,6 @@ import { deleteSession, endSession, loadSessions } from '../features/accounts/st
 import { realtime, watchConnection } from '../api/realtime'
 import AccountModal from '../features/accounts/components/AccountModal'
 import SessionsPanel from '../features/accounts/components/SessionsPanel'
-import AccessReviewsPanel from '../features/accounts/components/AccessReviewsPanel'
 import './AccountProvisionPage.css'
 
 const FALLBACK_REFRESH_MS = 60000
@@ -229,8 +228,6 @@ export default function AccountProvisionPage() {
           </tbody>
         </table>
       </div>
-
-      <AccessReviewsPanel accounts={accounts} onNotice={setNotice} />
 
       <SessionsPanel sessions={sessions} idleAfterMinutes={idleAfterMinutes} signOutAfterMinutes={signOutAfterMinutes} isLive={isLive} branchById={branchById} now={now} onEnd={handleEndSession} onDelete={handleDeleteSession} onSignOut={signOut} />
 

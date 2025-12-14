@@ -1212,6 +1212,29 @@ a.nav-item {
 .tone-orange { --tone: #fb923c; }
 .tone-rose { --tone: #fb7185; }
 .tone-slate { --tone: #64748b; }
+/* Chart colours checked with the dataviz palette validator on this dark surface: roles (categorical, fixed order) and
+   status (good / warning / serious / neutral), always paired with a text label */
+.tone-role-1 { --tone: #3987e5; }
+.tone-role-2 { --tone: #d95926; }
+.tone-role-3 { --tone: #199e70; }
+.tone-role-4 { --tone: #c98500; }
+.tone-status-good { --tone: #0ca30c; }
+.tone-status-warning { --tone: #fab219; }
+.tone-status-serious { --tone: #ec835a; }
+.tone-status-neutral { --tone: #64748b; }
+
+/* Access review: accounts nobody is using */
+.dormant-hero { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 1.25rem 0 1rem; }
+.dormant-hero-icon { display: inline-flex; padding: 0.85rem; border-radius: 50%; }
+.dormant-hero.ok .dormant-hero-icon { color: var(--primary-emerald); background: rgba(16, 185, 129, 0.12); }
+.dormant-hero.warn .dormant-hero-icon { color: #ec835a; background: rgba(236, 131, 90, 0.12); }
+.dormant-hero-number { font-size: 3rem; font-weight: 800; line-height: 1; color: var(--text-main); font-variant-numeric: tabular-nums; }
+.dormant-hero-label { font-size: 0.85rem; color: var(--text-muted); }
+.unused-advice { margin-bottom: 0.85rem; font-size: 0.82rem; color: var(--text-muted); }
+.unused-list { list-style: none; display: grid; gap: 0.6rem; }
+.unused-list li { display: grid; grid-template-columns: auto 1fr; column-gap: 0.5rem; align-items: center; font-size: 0.85rem; }
+.unused-list li svg { color: #ec835a; }
+.unused-why { grid-column: 2; font-size: 0.78rem; color: var(--text-dim); }
 
 .chart-legend { list-style: none; display: grid; gap: 0.45rem; font-size: 0.82rem; color: var(--text-muted); }
 .chart-legend li { display: flex; align-items: center; gap: 0.5rem; }
@@ -1333,7 +1356,13 @@ a.nav-item {
 /* Audit Logs table */
 .audit-table { margin-top: 1rem; }
 .audit-sub { font-size: 0.75rem; color: var(--text-dim); }
-.audit-record { display: inline-block; margin-top: 0.3rem; }
+.audit-record { display: inline-block; margin-left: 0.4rem; font-weight: 400; }
+.audit-what { margin-bottom: 0.2rem; font-weight: 600; color: var(--text-main); }
+.audit-action { display: inline-block; padding: 0.15rem 0.55rem; border-radius: var(--radius-full); font-size: 0.74rem; font-weight: 600; white-space: nowrap; }
+.audit-action.created { background: rgba(16, 185, 129, 0.12); color: var(--primary-emerald); }
+.audit-action.edited { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.audit-action.deleted { background: rgba(244, 63, 94, 0.12); color: #fb7185; }
+.audit-action.other { background: rgba(148, 163, 184, 0.12); color: var(--text-muted); }
 .audit-table .data-table th, .audit-table .data-table td { vertical-align: top; }
 .audit-details { min-width: 220px; max-width: 380px; font-size: 0.84rem; line-height: 1.45; color: var(--text-muted); }
 .audit-module { display: inline-block; padding: 0.15rem 0.55rem; border-radius: var(--radius-full); font-size: 0.74rem; font-weight: 600; white-space: nowrap; background: rgba(6, 182, 212, 0.12); color: var(--primary-cyan); }

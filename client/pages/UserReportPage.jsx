@@ -1,34 +1,27 @@
-import { Users } from 'lucide-react'
-import { PageHeader } from '../components'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Notice, PageHeader } from '../components'
+import { selectAccounts } from '../features/accounts/store/accountsSlice'
+import { loadAccounts } from '../features/accounts/store/accountsThunks'
+import AccessReviewsPanel from '../features/accounts/components/AccessReviewsPanel'
+import './UserReportPage.css'
 
+// Reports → User Report (Owner): access reviews of every account for a period
 export default function UserReportPage() {
+  const dispatch = useDispatch()
+  const accounts = useSelector(selectAccounts)
+  const [notice, setNotice] = useState(null)
+
+  // Access reviews list every account, so the account list is loaded here too
+  useEffect(() => {
+    dispatch(loadAccounts()).catch((error) => setNotice({ type: 'error', text: error.message }))
+  }, [dispatch])
+
   return (
-    <div>
-      <PageHeader
-        title="User Report"
-        description="Comprehensive user activity, role access reviews, and branch staff performance reports."
-      />
-      <div className="content-section-card" style={{ textAlign: 'center', padding: '4.5rem 2rem' }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            padding: '1.25rem',
-            borderRadius: '50%',
-            background: 'rgba(6, 182, 212, 0.12)',
-            color: 'var(--primary-cyan)',
-            marginBottom: '1.25rem',
-            boxShadow: '0 0 25px rgba(6, 182, 212, 0.2)'
-          }}
-        >
-          <Users size={38} />
-        </div>
-        <h2 className="page-title" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-          Coming Soon
-        </h2>
-        <p className="page-desc" style={{ maxWidth: '440px', margin: '0 auto', fontSize: '1rem' }}>
-          Coming Soon text
-        </p>
-      </div>
+    <div className="content-section-card user-report-page">
+      <PageHeader centered title="User Report" description="Generate a User Report for any period to see every staff member's role, branch, account status and last sign-in, with dormant accounts highlighted." />
+      <Notice notice={notice} onDismiss={() => setNotice(null)} />
+      <AccessReviewsPanel accounts={accounts} />
     </div>
   )
 }

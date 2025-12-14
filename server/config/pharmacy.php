@@ -4,7 +4,8 @@ return [
     // The React app; links in emails (invitations, password resets) open pages there
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
 
-    'invitation_expire_hours' => (int) env('INVITATION_EXPIRE_HOURS', 72),
+    // How long an emailed invitation link works, in minutes (10 = ten minutes; 4320 = three days)
+    'invitation_expire_minutes' => (int) env('INVITATION_EXPIRE_MINUTES', 10),
 
     // The pharmacy's local time: "today", "this month" etc. in reports follow it (the database stays in UTC)
     'timezone' => env('PHARMACY_TIMEZONE', 'Africa/Addis_Ababa'),
@@ -21,8 +22,6 @@ return [
 
     // Access reviews: an active account with no sign-in for this many days is flagged as dormant
     'access_review_dormant_days' => (int) env('ACCESS_REVIEW_DORMANT_DAYS', 90),
-    // ...and an invitation not accepted after this many days as stale
-    'access_review_stale_invitation_days' => (int) env('ACCESS_REVIEW_STALE_INVITATION_DAYS', 30),
     // Off by default: the Owner generates reports. Set daily | weekly | monthly | quarterly | yearly to also make one
     // automatically after each finished period.
     'access_review_schedule' => env('ACCESS_REVIEW_SCHEDULE', ''),

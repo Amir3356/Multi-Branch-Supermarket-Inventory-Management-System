@@ -156,7 +156,7 @@ export default function BranchesTable({ data, selectedBranch, onEdit, onToggleSt
             {matchingCount === 0 && (
               <tr>
                 <td colSpan={columns.length + 1} style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
-                  {data.length ? 'No branches match your search or filters.' : 'No branches yet. Click Add Branch to create the first one.'}
+                  {data.length ? 'No branches match your search or filters.' : 'No branches yet. Click Create Branch to create the first one.'}
                 </td>
               </tr>
             )}

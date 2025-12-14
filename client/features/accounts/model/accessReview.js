@@ -47,15 +47,6 @@
  * @typedef {{ period: Exclude<PeriodType, 'custom'>, scope: 'current' | 'previous' } | { period: 'custom', from: string, to: string }} AccessReviewPayload
  */
 
-// The two choices offered for each period type in the Generate dialog
-export const SCOPE_LABELS = {
-  daily: { current: 'Today so far', previous: 'Yesterday' },
-  weekly: { current: 'This week so far', previous: 'Last week' },
-  monthly: { current: 'This month so far', previous: 'Last month' },
-  quarterly: { current: 'This quarter so far', previous: 'Last quarter' },
-  yearly: { current: 'This year so far', previous: 'Last year' }
-}
-
 // label: the report's type in titles, the list and the PDF; option: its name in the Report period picker
 export const PERIOD_TYPES = {
   daily: { label: 'Daily', option: 'Daily' },

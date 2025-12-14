@@ -238,7 +238,7 @@ export default function DashboardLayout() {
               <div className="nav-group-title" style={index ? { marginTop: '1.2rem' } : undefined}>{group.title}</div>
               {group.items.map((item) => {
                 const { path, label, icon: Icon, badge, children } = item
-                const hasChildren = Boolean(children && children.length > 1)
+                const hasChildren = Boolean(children && children.length > 0)
 
                 if (hasChildren) {
                   const isOpen = isSectionOpen(item)

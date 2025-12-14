@@ -18,6 +18,20 @@ class AuditLogRepository
      * Newest first, filtered: `from`/`to` are calendar days in the pharmacy's time zone, `search` matches the user,
      * action, record or details.
      */
+    /** The Audit Logs cards, across every branch and module: all actions ever recorded, and today's (pharmacy's local day) */
+    public function counts(): array
+    {
+        $todayStart = CarbonImmutable::now(config('pharmacy.timezone'))->startOfDay()->utc();
+        $today = AuditLog::where('occurred_at', '>=', $todayStart);
+
+        return [
+            'total' => AuditLog::count(),
+            'since' => AuditLog::min('occurred_at') ? CarbonImmutable::parse(AuditLog::min('occurred_at'))->toIso8601String() : null,
+            'today' => (clone $today)->count(),
+            'todayUsers' => (clone $today)->whereNotNull('user_id')->distinct()->count('user_id'),
+        ];
+    }
+
     public function search(array $filters, int $perPage): LengthAwarePaginator
     {
         $zone = config('pharmacy.timezone');

@@ -28,6 +28,6 @@ class AuditLogController
         ], ['to.after_or_equal' => 'The end date must be on or after the start date.']);
 
         return AuditLogResource::collection($this->logs->search($filters, self::PER_PAGE))
-            ->additional(['modules' => AuditLog::MODULES]);
+            ->additional(['modules' => AuditLog::MODULES, 'counts' => $this->logs->counts()]);
     }
 }

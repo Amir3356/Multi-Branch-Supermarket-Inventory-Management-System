@@ -88,20 +88,21 @@ export function HorizontalBarChart({ items, format = (v) => v.toLocaleString(), 
   )
 }
 
-// A round step for the value axis (1, 2, 2.5 or 5 × a power of ten) so about four gridlines cover `max`
-function niceTicks(max) {
-  const rough = max / 4
+// A round step for the value axis (1, 2, 2.5 or 5 × a power of ten) so about four gridlines cover `max`;
+// `minStep` keeps counts on whole numbers (no "1.5 people")
+function niceTicks(max, minStep = 0) {
+  const rough = Math.max(max / 4, minStep)
   const power = 10 ** Math.floor(Math.log10(rough))
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * power).find((v) => v >= rough)
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * power).find((v) => v >= rough && (!minStep || Number.isInteger(v)))
   return Array.from({ length: Math.ceil(max / step) + 1 }, (_, i) => i * step)
 }
 
 /** Bar chart: one group of side-by-side bars per column; `series` are { label, tone }, each column is { label, title, values[] }.
- * `wrapLabels` gives long labels (product names) two lines instead of one. */
-export function BarChart({ columns, series, format = (v) => v.toLocaleString(), emptyText, wrapLabels = false }) {
+ * `wrapLabels` gives long labels (product names) two lines instead of one; `wholeNumbers` keeps the axis on whole counts. */
+export function BarChart({ columns, series, format = (v) => v.toLocaleString(), emptyText, wrapLabels = false, wholeNumbers = false }) {
   const max = Math.max(...columns.flatMap((c) => c.values), 0)
   // With nothing to show the axes and columns stay, with the empty text over them
-  const ticks = max ? niceTicks(max) : [0, 0, 0, 0, 0]
+  const ticks = max ? niceTicks(max, wholeNumbers ? 1 : 0) : [0, 0, 0, 0, 0]
   const top = ticks[ticks.length - 1] || 1
   // Keep the axis readable when there are many columns
   const labelEvery = Math.ceil(columns.length / 10)

@@ -1,5 +1,5 @@
 import { EmptyRow } from '../../../components'
-import { auditDate, auditTime } from '../model/auditLog'
+import { actionTone, actionVerb, auditDate, auditTime } from '../model/auditLog'
 
 // The audit log as a table, newest first: one row per recorded action
 export default function AuditLogTable({ logs, isLoading }) {
@@ -12,8 +12,8 @@ export default function AuditLogTable({ logs, isLoading }) {
             <th>User &amp; Role</th>
             <th>Branch</th>
             <th>Module</th>
-            <th>Action &amp; Record</th>
-            <th>Details</th>
+            <th>Action</th>
+            <th>Description</th>
             <th>IP Address &amp; Device</th>
           </tr>
         </thead>
@@ -31,10 +31,17 @@ export default function AuditLogTable({ logs, isLoading }) {
               <td>{log.branchName || 'All branches'}</td>
               <td><span className="audit-module">{log.module}</span></td>
               <td>
-                <div className="nowrap">{log.action}</div>
-                {log.recordId && <span className="batch-badge audit-record">{log.recordId}</span>}
+                {/* One word: Created, Edited, Deleted, Received, Signed in… */}
+                <span className={`audit-action ${actionTone(actionVerb(log.action))}`}>{actionVerb(log.action)}</span>
               </td>
-              <td className="audit-details">{log.description}</td>
+              {/* What the user did: the full action and its record, then the details */}
+              <td className="audit-details">
+                <div className="audit-what">
+                  {log.action}
+                  {log.recordId && <span className="batch-badge audit-record">{log.recordId}</span>}
+                </div>
+                {log.description}
+              </td>
               <td className="nowrap">
                 <div>{log.ipAddress || '—'}</div>
                 {log.device && <div className="audit-sub">{log.device}</div>}

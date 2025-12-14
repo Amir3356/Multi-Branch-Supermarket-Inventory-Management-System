@@ -1,28 +1,5 @@
 import { PERIOD_TYPES } from '../model/accessReview'
-
-// The dates a report would cover if generated now (weeks start on Monday): the current period so far,
-// or the previous finished one. Matches the server's calculation.
-export const periodRange = (period, scope = 'current', now = new Date()) => {
-  const key = (d) => d.toLocaleDateString('en-CA')
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const start = new Date(today)
-  if (period === 'weekly') start.setDate(start.getDate() - ((start.getDay() + 6) % 7))
-  if (period === 'monthly') start.setDate(1)
-  if (period === 'quarterly') start.setMonth(Math.floor(start.getMonth() / 3) * 3, 1)
-  if (period === 'yearly') start.setMonth(0, 1)
-  if (scope === 'current') return { periodStart: key(start), periodEnd: key(today) }
-
-  // Previous: step back one period from the current period's start; it ends the day before that start
-  const end = new Date(start)
-  end.setDate(end.getDate() - 1)
-  const prevStart = new Date(start)
-  if (period === 'daily') prevStart.setDate(prevStart.getDate() - 1)
-  if (period === 'weekly') prevStart.setDate(prevStart.getDate() - 7)
-  if (period === 'monthly') prevStart.setMonth(prevStart.getMonth() - 1)
-  if (period === 'quarterly') prevStart.setMonth(prevStart.getMonth() - 3)
-  if (period === 'yearly') prevStart.setFullYear(prevStart.getFullYear() - 1)
-  return { periodStart: key(prevStart), periodEnd: key(end) }
-}
+import { drawAccessReviewCharts } from './accessReviewPdfCharts'
 
 // Last day the report's period runs to: daily → that day, weekly → Sunday, monthly/quarterly/yearly →
 // the last day of the month/quarter/year, custom → its end date
@@ -63,36 +40,45 @@ export const lastSignInText = (row, formatDate = localDate) =>
 
 const pdfDate = (iso) => new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
 
-// Printable, read-only copy of a report for management sign-off and auditors (landscape A4)
+// Printable, read-only copy of a report for management sign-off and auditors (landscape A4), downloaded as a file
 export async function exportAccessReviewPdf(review, pharmacyName = 'PharmaCare') {
   // Loaded only when someone exports, so pages stay light
   const [{ jsPDF }, { autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')])
+  buildAccessReviewPdf(review, pharmacyName, { jsPDF, autoTable })
+    .save(`user-report-${review.periodType}-${review.periodStart}-to-${review.periodEnd}.pdf`)
+}
+
+/** The report as a jsPDF document: the same figures, charts and table as the screen */
+export function buildAccessReviewPdf(review, pharmacyName, { jsPDF, autoTable }) {
   const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
   const s = review.summary
   const pageWidth = doc.internal.pageSize.getWidth()
   const typeLabel = PERIOD_TYPES[review.periodType]?.label || review.periodType
 
-  doc.setFont('helvetica', 'bold').setFontSize(16).text(`${pharmacyName} - Access Review`, 40, 44)
+  doc.setFont('helvetica', 'bold').setFontSize(16).text(`${pharmacyName} - ${PERIOD_TYPES[review.periodType]?.label || ''} User Report`, 40, 44)
   doc.setFont('helvetica', 'normal').setFontSize(10).setTextColor(90)
   const status = reportStatus(review) === 'Complete' ? 'Complete' : `Partial (covers up to ${pdfDate(review.generatedAt)})`
   doc.text(`Period: ${typeLabel} · ${formatPeriod(review)} · Status: ${status}`, 40, 64)
-  doc.text(`Generated ${pdfDate(review.generatedAt)} by ${review.scheduled ? 'the schedule' : review.generatedBy || 'the Owner'} · Dormant = no sign-in for ${s.dormantDays}+ days`, 40, 78)
+  doc.text(`Generated ${pdfDate(review.generatedAt)} by ${review.scheduled ? 'the schedule' : review.generatedBy || 'the Owner'}`, 40, 78)
   doc.setTextColor(0)
 
-  // Summary
+  // Summary: the same figures as the chips on screen
   autoTable(doc, {
     startY: 92,
-    head: [['Accounts', ...Object.keys(s.byRole), 'Dormant', 'Role changed', 'Invitation not accepted', 'Deactivated']],
+    head: [['Users', ...Object.keys(s.byRole), 'Dormant', 'Role changes', 'Invitation links expired', 'Deactivated on file']],
     body: [[s.totalUsers, ...Object.values(s.byRole), s.dormant, s.roleChanged, s.staleInvitations, s.deactivated]],
     theme: 'grid',
     styles: { fontSize: 9, halign: 'center' },
     headStyles: { fillColor: [8, 145, 178] }
   })
 
+  // The charts, as on screen
+  const chartsEnd = drawAccessReviewCharts(doc, review, doc.lastAutoTable.finalY + 14)
+
   // Every account
   autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 18,
-    head: [['Staff member', 'Email', 'Role', 'Branch', 'Status', 'Created', 'Last sign-in', 'Days', 'Role changes in period']],
+    startY: chartsEnd + 18,
+    head: [['Staff member', 'Email', 'Role', 'Branch', 'Status', 'Created', 'Last sign-in', 'Role changes in period']],
     body: review.rows.map((r) => [
       r.fullName,
       r.email,
@@ -100,8 +86,8 @@ export async function exportAccessReviewPdf(review, pharmacyName = 'PharmaCare')
       r.branchName || '-',
       r.status,
       r.createdAt,
-      lastSignInText(r),
-      r.daysSinceLogin ?? '-',
+      // Date and time, as on screen
+      lastSignInText(r, pdfDate),
       r.roleChanges.map((c) => `${c.from} -> ${c.to} (${localDate(c.at)})`).join('\n') || '-'
     ]),
     theme: 'striped',
@@ -117,5 +103,5 @@ export async function exportAccessReviewPdf(review, pharmacyName = 'PharmaCare')
     doc.text(`Page ${page} of ${pages}`, pageWidth - 40, doc.internal.pageSize.getHeight() - 20, { align: 'right' })
   }
 
-  doc.save(`access-review-${review.periodType}-${review.periodStart}-to-${review.periodEnd}.pdf`)
+  return doc
 }

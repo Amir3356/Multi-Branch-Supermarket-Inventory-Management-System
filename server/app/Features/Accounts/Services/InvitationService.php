@@ -24,13 +24,25 @@ class InvitationService
     public function send(User $user, ?User $invitedBy): void
     {
         $token = Str::random(64);
-        $hours = (int) config('pharmacy.invitation_expire_hours');
+        $minutes = max(1, (int) config('pharmacy.invitation_expire_minutes'));
 
-        $this->invitations->replaceFor($user, $invitedBy, hash('sha256', $token), now()->addHours($hours));
+        $this->invitations->replaceFor($user, $invitedBy, hash('sha256', $token), now()->addMinutes($minutes));
 
         $link = rtrim(config('pharmacy.frontend_url'), '/').'/accept-invitation?token='.urlencode($token);
 
-        Mail::to($user->email)->send(new AccountInvitationMail($user, $link, $hours));
+        Mail::to($user->email)->send(new AccountInvitationMail($user, $link, $this->duration($minutes)));
+    }
+
+    /** "10 minutes", "2 hours", "3 days": how long the link works, for the email */
+    private function duration(int $minutes): string
+    {
+        [$amount, $unit] = match (true) {
+            $minutes % 1440 === 0 => [$minutes / 1440, 'day'],
+            $minutes % 60 === 0 => [$minutes / 60, 'hour'],
+            default => [$minutes, 'minute'],
+        };
+
+        return $amount.' '.$unit.($amount === 1 ? '' : 's');
     }
 
     /** The pending invitation for a raw token from the link, or null if unknown or already used. */

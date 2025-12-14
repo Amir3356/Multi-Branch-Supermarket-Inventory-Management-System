@@ -59,10 +59,10 @@ class AccessReviewController
             return [$this->generator->generate($start, $end, $data['period'], $request->user()), $replaced];
         });
 
-        app(AuditLogger::class)->record('Access Reviews', $replaced->isEmpty() ? 'Access review generated' : 'Access review regenerated', (string) $review->id, ucfirst($data['period']).' report for '.$start->toDateString().' – '.$end->toDateString().'.');
+        app(AuditLogger::class)->record('User Report', $replaced->isEmpty() ? 'User report generated' : 'User report regenerated', (string) $review->id, ucfirst($data['period']).' report for '.$start->toDateString().' – '.$end->toDateString().'.');
 
         return response()->json([
-            'message' => $replaced->isEmpty() ? 'Access review generated.' : 'Access review updated with the latest data.',
+            'message' => $replaced->isEmpty() ? 'User report generated.' : 'User report updated with the latest data.',
             'review' => new AccessReviewResource($this->reviews->withPeople($review)),
             // Earlier reports for the same period that this one replaces
             'replacedIds' => $replaced->values(),
@@ -72,9 +72,9 @@ class AccessReviewController
     public function destroy(AccessReview $accessReview): JsonResponse
     {
         $this->reviews->delete($accessReview);
-        app(AuditLogger::class)->record('Access Reviews', 'Access review deleted', (string) $accessReview->id, ucfirst($accessReview->period_type).' report for '.$accessReview->period_start->toDateString().' – '.$accessReview->period_end->toDateString().' was deleted.');
+        app(AuditLogger::class)->record('User Report', 'User report deleted', (string) $accessReview->id, ucfirst($accessReview->period_type).' report for '.$accessReview->period_start->toDateString().' – '.$accessReview->period_end->toDateString().' was deleted.');
 
-        return response()->json(['message' => 'Access review deleted.']);
+        return response()->json(['message' => 'User report deleted.']);
     }
 
     public function show(AccessReview $accessReview): AccessReviewResource
