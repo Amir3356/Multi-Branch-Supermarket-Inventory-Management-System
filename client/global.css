@@ -1222,6 +1222,7 @@ a.nav-item {
 .tone-status-warning { --tone: #fab219; }
 .tone-status-serious { --tone: #ec835a; }
 .tone-status-neutral { --tone: #64748b; }
+.tone-status-critical { --tone: #d03b3b; }
 
 /* Access review: accounts nobody is using */
 .dormant-hero { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding: 1.25rem 0 1rem; }

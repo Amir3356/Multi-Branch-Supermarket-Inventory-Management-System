@@ -22,7 +22,8 @@ class AuditLogger
 
     public function __construct(private AuditLogRepository $logs) {}
 
-    public function record(string $module, string $action, ?string $recordId, string $description, ?string $branchId = null, ?User $actor = null, ?string $actorName = null): void
+    /** $branchName: only for a branch that no longer exists (just deleted), whose name can't be looked up */
+    public function record(string $module, string $action, ?string $recordId, string $description, ?string $branchId = null, ?User $actor = null, ?string $actorName = null, ?string $branchName = null): void
     {
         try {
             $request = request();
@@ -34,7 +35,7 @@ class AuditLogger
                 // Payments Chapa confirms on its own (callback, scheduled check) are the system's, not a person's
                 'user_role' => $actor?->role?->label() ?? ($actorName === 'Chapa' ? 'System' : null),
                 'branch_id' => $branchId,
-                'branch_name' => $branchId ? self::branchName($branchId) : null,
+                'branch_name' => $branchName ?? ($branchId ? self::branchName($branchId) : null),
                 'module' => $module,
                 'action' => $action,
                 'record_id' => $recordId,

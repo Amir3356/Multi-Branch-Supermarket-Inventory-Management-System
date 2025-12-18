@@ -62,7 +62,8 @@ class BranchController
         }
 
         $this->branches->delete($branch);
-        app(AuditLogger::class)->record('Branches', 'Branch deleted', $branch->id, "{$branch->name} ({$branch->location}) was deleted.");
+        // The branch is gone, so its name is passed rather than looked up
+        app(AuditLogger::class)->record('Branches', 'Branch deleted', $branch->id, "{$branch->name} ({$branch->location}) was deleted.", $branch->id, branchName: $branch->name);
         $this->live->changed('deleted');
 
         return response()->json(['message' => "{$branch->name} was deleted."]);

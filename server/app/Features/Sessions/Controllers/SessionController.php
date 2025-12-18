@@ -49,9 +49,10 @@ class SessionController
     {
         $this->ensureNotCurrent($request, $session);
         $email = $session->tokenable?->email;
+        $branchId = $session->tokenable?->branch_id;
         $wasOpen = $session->ended_at === null;
         $this->repository->delete($session);
-        app(AuditLogger::class)->record('Sessions', 'Session removed', (string) $session->id, "{$email}’s session on ".SessionService::describeDevice($session->name).' was removed from the list'.($wasOpen ? ' (it was still open, so it was signed out).' : '.'));
+        app(AuditLogger::class)->record('Sessions', 'Session removed', (string) $session->id, "{$email}’s session on ".SessionService::describeDevice($session->name).' was removed from the list'.($wasOpen ? ' (it was still open, so it was signed out).' : '.'), $branchId);
         if ($wasOpen) {
             $this->sessions->notifyEnded([$session->id], 'Ended by the Owner');
         }

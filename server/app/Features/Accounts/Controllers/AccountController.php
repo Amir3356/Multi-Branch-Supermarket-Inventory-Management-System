@@ -88,13 +88,16 @@ class AccountController
         } elseif (! $account->branch_id) {
             throw ValidationException::withMessages(['branchId' => 'Assign a branch for this role.']);
         }
-        // What changed, in words, for the audit log
+        // What changed, in words, for the audit log: each field before → after
+        $roleLabel = fn ($role) => $role instanceof Role ? $role->label() : Role::from($role)->label();
+        $statusLabel = fn ($status) => $status instanceof AccountStatus ? $status->label() : AccountStatus::from($status)->label();
+        $branchLabel = fn ($id) => $id ? AuditLogger::branchName($id) : 'all branches';
         $changed = collect($account->getDirty())->keys()->map(fn ($field) => match ($field) {
-            'full_name' => 'name → '.$account->full_name,
-            'email' => 'email → '.$account->email,
-            'role' => 'role '.Role::from($account->getOriginal('role') instanceof Role ? $account->getOriginal('role')->value : $account->getOriginal('role'))->label().' → '.$account->role->label(),
-            'branch_id' => 'branch → '.($account->branch_id ?? 'all branches'),
-            'status' => 'status → '.$account->status->value,
+            'full_name' => 'name '.$account->getOriginal('full_name').' → '.$account->full_name,
+            'email' => 'email '.$account->getOriginal('email').' → '.$account->email,
+            'role' => 'role '.$roleLabel($account->getOriginal('role')).' → '.$roleLabel($account->role),
+            'branch_id' => 'branch '.$branchLabel($account->getOriginal('branch_id')).' → '.$branchLabel($account->branch_id),
+            'status' => 'status '.$statusLabel($account->getOriginal('status')).' → '.$statusLabel($account->status),
             default => null,
         })->filter()->implode(', ');
         $emailChanged = $account->isDirty('email');

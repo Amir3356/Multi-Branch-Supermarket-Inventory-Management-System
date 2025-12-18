@@ -35,7 +35,7 @@ class OwnerDashboardRepository
         $damaged = fn () => DB::table('damaged_items')->whereBetween('damage_date', [$from, $to])->when($branchId, fn ($q) => $q->where('branch_id', $branchId));
 
         // Cost of what was sold: units × the product's purchase price (its latest, the one Add Medicine recorded)
-        $costOfSales = (float) $sales()->leftJoin('products', 'products.id', '=', 'sales.med_id')->sum(DB::raw('sales.qty * coalesce(products.purchase_price, 0)'));
+        $costOfSales = (float) self::withProduct($sales())->sum(DB::raw('sales.qty * coalesce(products.purchase_price, 0)'));
         $salesTotal = (float) $sales()->sum('total');
         $expensesTotal = (float) $expenses()->sum('amount');
         // What written-off stock cost to buy: it was paid for and can't be sold
@@ -63,6 +63,18 @@ class OwnerDashboardRepository
                 ->groupBy('product')->orderByDesc('total')->limit(20)->get()
                 ->map(fn ($r) => ['product' => $r->product, 'total' => (float) $r->total, 'qty' => (int) $r->qty])->all(),
         ];
+    }
+
+    /**
+     * Sales joined to their catalog product, for its purchase price: by the sale's product id when the catalog has it,
+     * otherwise by name and category (a sale without an id, or with one only a browser knew, still finds its cost).
+     */
+    public static function withProduct(Builder $sales): Builder
+    {
+        return $sales->leftJoin('products', fn ($j) => $j->on('products.id', '=', 'sales.med_id')->orWhere(fn ($w) => $w
+            ->whereRaw('lower(products.name) = lower(sales.product)')
+            ->whereColumn('products.category', 'sales.category')
+            ->whereRaw('not exists (select 1 from products known where known.id = sales.med_id)')));
     }
 
     private function inPeriod(Builder $query, string $column): Builder
@@ -97,7 +109,7 @@ class OwnerDashboardRepository
     /** Every branch's figures for the period, side by side (the branch filter doesn't apply here) */
     private function byBranch(string $from, string $to): array
     {
-        $sales = $this->inPeriod(DB::table('sales'), 'sales.created_at')->leftJoin('products', 'products.id', '=', 'sales.med_id')
+        $sales = self::withProduct($this->inPeriod(DB::table('sales'), 'sales.created_at'))
             ->selectRaw('sales.branch_id, sum(sales.total) as total, count(*) as count, sum(sales.qty * coalesce(products.purchase_price, 0)) as cost')
             ->groupBy('sales.branch_id')->get()->keyBy('branch_id');
         $purchases = $this->inPeriod(DB::table('procurements'), 'created_at')->where('status', 'paid')

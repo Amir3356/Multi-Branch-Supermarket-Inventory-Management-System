@@ -18,6 +18,10 @@ import StockTransfersPage from '../pages/StockTransfersPage'
 import DamagedPage from '../pages/DamagedPage'
 import ReportsPage from '../pages/ReportsPage'
 import UserReportPage from '../pages/UserReportPage'
+import SalesReportPage from '../pages/SalesReportPage'
+import InventoryReportPage from '../pages/InventoryReportPage'
+import FinancialReportPage from '../pages/FinancialReportPage'
+import ProcurementReportPage from '../pages/ProcurementReportPage'
 import AuditLogsPage from '../pages/AuditLogsPage'
 import BranchesPage from '../pages/BranchesPage'
 import PolicyPage from '../pages/PolicyPage'
@@ -38,6 +42,10 @@ const SECTION_PAGES = {
   damaged: DamagedPage,
   expenses: ExpensesPage,
   reports: ReportsPage,
+  salesReport: SalesReportPage,
+  inventoryReport: InventoryReportPage,
+  financialReport: FinancialReportPage,
+  procurementReport: ProcurementReportPage,
   userReports: UserReportPage,
   auditLogs: AuditLogsPage,
   branches: BranchesPage,

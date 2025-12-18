@@ -12,7 +12,11 @@ import {
   Building2,
   Settings,
   Sparkles,
-  Users
+  Users,
+  TrendingUp,
+  Boxes,
+  Landmark,
+  Truck
 } from 'lucide-react'
 import { PATHS } from './paths'
 
@@ -45,6 +49,10 @@ export const NAV_GROUPS = [
         label: 'Reports',
         icon: BarChart3,
         children: [
+          { section: 'salesReport', path: PATHS.salesReport, label: 'Sales Report', icon: TrendingUp },
+          { section: 'inventoryReport', path: PATHS.inventoryReport, label: 'Inventory Report', icon: Boxes },
+          { section: 'financialReport', path: PATHS.financialReport, label: 'Financial Report', icon: Landmark },
+          { section: 'procurementReport', path: PATHS.procurementReport, label: 'Procurement Report', icon: Truck },
           { section: 'userReports', path: PATHS.userReports, label: 'User Report', icon: Users }
         ]
       },
