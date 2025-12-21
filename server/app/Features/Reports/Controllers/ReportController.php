@@ -7,6 +7,7 @@ use App\Features\Reports\Repositories\InventoryReportRepository;
 use App\Features\Reports\Repositories\ProcurementReportRepository;
 use App\Features\Reports\Repositories\ReportPeriod;
 use App\Features\Reports\Repositories\SalesReportRepository;
+use App\Features\Reports\Repositories\UserReportRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,11 @@ class ReportController
     }
 
     public function procurement(Request $request, ProcurementReportRepository $report): JsonResponse
+    {
+        return $this->respond($request, fn (ReportPeriod $p) => $report->build($p));
+    }
+
+    public function users(Request $request, UserReportRepository $report): JsonResponse
     {
         return $this->respond($request, fn (ReportPeriod $p) => $report->build($p));
     }

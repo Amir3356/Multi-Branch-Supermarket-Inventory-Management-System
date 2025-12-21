@@ -84,7 +84,24 @@ class AccessReviewGenerator
         }];
     }
 
+    /** Works out a report and saves it (the schedule's reports, and the API's generate) */
     public function generate(CarbonImmutable $start, CarbonImmutable $end, string $type, ?User $by = null, bool $scheduled = false): AccessReview
+    {
+        ['summary' => $summary, 'rows' => $rows] = $this->compute($start, $end);
+
+        return $this->reviews->create([
+            'period_start' => $start->toDateString(),
+            'period_end' => $end->toDateString(),
+            'period_type' => $type,
+            'scheduled' => $scheduled,
+            'generated_by' => $by?->id,
+            'summary' => $summary,
+            'rows' => $rows,
+        ]);
+    }
+
+    /** Works out a report without saving it: { summary, rows } (the live User Report under Reports) */
+    public function compute(CarbonImmutable $start, CarbonImmutable $end): array
     {
         $asOf = $end->min(self::localNow());
         // Periods are in the pharmacy's local time; stored timestamps are in the app timezone (UTC)
@@ -173,14 +190,6 @@ class AccessReviewGenerator
             'asOf' => $asOf->toIso8601String(),
         ];
 
-        return $this->reviews->create([
-            'period_start' => $start->toDateString(),
-            'period_end' => $end->toDateString(),
-            'period_type' => $type,
-            'scheduled' => $scheduled,
-            'generated_by' => $by?->id,
-            'summary' => $summary,
-            'rows' => $rows->values()->all(),
-        ]);
+        return ['summary' => $summary, 'rows' => $rows->values()->all()];
     }
 }

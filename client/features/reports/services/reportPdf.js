@@ -145,13 +145,35 @@ function empty(doc, chart, x, y, w, h) {
   doc.setFontSize(8).setTextColor(...MUTED).text(chart.empty || 'Nothing to show.', x + w / 2, y + h / 2 + 10, { align: 'center' })
 }
 
+// A headline figure: a badge (green tick when none, orange cross when some), the big count, then who it is about
+function drawHeadline(doc, chart, x, y, w, h) {
+  const cx = x + w / 2
+  const warn = chart.count > 0
+  fill(doc, warn ? 'status-serious' : 'status-good')
+  doc.circle(cx, y + 54, 13, 'F')
+  doc.setDrawColor(255).setLineWidth(2.2)
+  if (warn) doc.line(cx - 5, y + 49, cx + 5, y + 59).line(cx + 5, y + 49, cx - 5, y + 59)
+  else doc.line(cx - 6, y + 54, cx - 2, y + 58).line(cx - 2, y + 58, cx + 6, y + 49)
+  doc.setFont('helvetica', 'bold').setFontSize(24).setTextColor(...INK).text(String(chart.count), cx, y + 96, { align: 'center' })
+  doc.setFont('helvetica', 'normal').setFontSize(8).setTextColor(...MUTED).text(chart.label, cx, y + 107, { align: 'center' })
+  if (!warn) return
+  const fits = Math.floor((h - 122) / 19)
+  chart.list.slice(0, fits).forEach((item, i) => {
+    const ly = y + 124 + i * 19
+    doc.setFont('helvetica', 'bold').setFontSize(7.5).setTextColor(...INK).text(item.name, x + 14, ly, { maxWidth: w - 28 })
+    doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(...MUTED).text(item.why, x + 14, ly + 8.5, { maxWidth: w - 28 })
+  })
+  if (chart.list.length > fits) doc.setFontSize(7).text(`+ ${chart.list.length - fits} more (see the table)`, x + 14, y + h - 8)
+}
+
 function chartPanel(doc, chart, x, y, w, h, money) {
   doc.setDrawColor(...GRID).setLineWidth(0.8).roundedRect(x, y, w, h, 6, 6, 'S')
   doc.setFont('helvetica', 'bold').setFontSize(10).setTextColor(...INK).text(chart.title, x + 12, y + 18)
   if (chart.subtitle) doc.setFont('helvetica', 'normal').setFontSize(7).setTextColor(...MUTED).text(chart.subtitle, x + 12, y + 29, { maxWidth: w - 24 })
   doc.setFont('helvetica', 'normal')
   const format = chart.money ? money : plain
-  if (chart.kind === 'pie') drawPieChart(doc, chart, x, y, w, h, format, false)
+  if (chart.kind === 'headline') drawHeadline(doc, chart, x, y, w, h)
+  else if (chart.kind === 'pie') drawPieChart(doc, chart, x, y, w, h, format, false)
   else if (chart.kind === 'donut') drawPieChart(doc, chart, x, y, w, h, format, true)
   else if (chart.kind === 'hbar') drawHBars(doc, chart, x, y, w, h, format)
   else drawBars(doc, chart, x, y, w, h, format, chart.money)

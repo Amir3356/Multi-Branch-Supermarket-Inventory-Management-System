@@ -5,7 +5,8 @@ export const REPORT_ENDPOINTS = {
   sales: '/reports/sales',
   inventory: '/reports/inventory',
   financial: '/reports/financial',
-  procurement: '/reports/procurement'
+  procurement: '/reports/procurement',
+  users: '/reports/users'
 }
 
 /** One report's figures; `branchId` 'all' (or empty) means every branch. Throws ApiError. */

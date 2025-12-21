@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { AlertTriangle, ArrowDownUp, Banknote, Boxes, CalendarClock, CircleDollarSign, Clock, FileText, Hourglass, Package, PackageCheck, ShoppingCart, TrendingUp, Truck, Wallet } from 'lucide-react'
+import { AlertTriangle, ArrowDownUp, Banknote, Boxes, CalendarClock, CheckCircle2, CircleDollarSign, Clock, FileText, Hourglass, MailWarning, Package, PackageCheck, ShoppingCart, TrendingUp, Truck, UserCog, Users, UserX, Wallet } from 'lucide-react'
 import { PageHeader, StatCard } from '../../../components'
 import { useBranchScope, useFormatMoney } from '../../../hooks'
 import { selectSettings } from '../../policy/store/settingsSlice'
@@ -10,10 +10,39 @@ import { useReport } from '../hooks/useReport'
 import { exportReportPdf } from '../services/reportPdf'
 import './ReportPage.css'
 
-const CARD_ICONS = { revenue: CircleDollarSign, units: Boxes, cost: Wallet, profit: TrendingUp, net: Banknote, value: Package, low: AlertTriangle, expiry: CalendarClock, orders: ShoppingCart, pending: Hourglass, delivery: Truck, received: PackageCheck, movement: ArrowDownUp, time: Clock }
+const CARD_ICONS = { revenue: CircleDollarSign, units: Boxes, cost: Wallet, profit: TrendingUp, net: Banknote, value: Package, low: AlertTriangle, expiry: CalendarClock, orders: ShoppingCart, pending: Hourglass, delivery: Truck, received: PackageCheck, movement: ArrowDownUp, time: Clock, users: Users, dormant: UserX, roles: UserCog, invites: MailWarning }
+
+// A single headline figure instead of a chart: a big count (green tick when none), then who it is about
+function Headline({ chart }) {
+  const warn = chart.count > 0
+  return (
+    <>
+      <div className={`dormant-hero ${warn ? 'warn' : 'ok'}`} role="status">
+        <span className="dormant-hero-icon">{warn ? <UserX size={34} /> : <CheckCircle2 size={34} />}</span>
+        <span className="dormant-hero-number">{chart.count}</span>
+        <span className="dormant-hero-label">{chart.label}</span>
+      </div>
+      {warn && (
+        <>
+          <p className="unused-advice">{chart.advice}</p>
+          <ul className="unused-list">
+            {chart.list.map((item) => (
+              <li key={item.name}>
+                <UserX size={16} />
+                <span className="fw-600">{item.name}</span>
+                <span className="unused-why">{item.why}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  )
+}
 
 // One chart from a spec, drawn with the dashboard's charts
 function SpecChart({ chart, money }) {
+  if (chart.kind === 'headline') return <Headline chart={chart} />
   const format = chart.money ? money : (v) => Number(v).toLocaleString('en-US')
   if (chart.kind === 'pie') return <PieChart items={chart.items} format={format} emptyText={chart.empty} />
   if (chart.kind === 'donut') return <DonutChart items={chart.items} unit={chart.unit} emptyText={chart.empty} />
