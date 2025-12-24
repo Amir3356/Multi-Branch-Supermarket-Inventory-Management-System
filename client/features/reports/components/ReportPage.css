@@ -14,6 +14,7 @@
 /* Charts two to a row (one on narrow screens), so pie legends have room for their labels */
 .report-page .charts-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); }
 .report-scope { margin-top: 0.6rem; }
+.report-header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.6rem; }
 .report-loading { margin-top: 2rem; text-align: center; }
 .report-body { transition: opacity var(--transition-fast); }
 .report-body.is-loading { opacity: 0.55; }

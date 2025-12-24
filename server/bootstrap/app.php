@@ -1,5 +1,6 @@
 <?php
 
+use App\Shared\Http\Middleware\EnsureActiveBranch;
 use App\Shared\Http\Middleware\EnsureRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands(glob(__DIR__.'/../app/Features/*/Console', GLOB_ONLYDIR))
     ->withMiddleware(function (Middleware $middleware): void {
         // RBAC: ->middleware('role:owner') or 'role:pharmacist,cashier'
-        $middleware->alias(['role' => EnsureRole::class]);
+        $middleware->alias(['role' => EnsureRole::class, 'branch.active' => EnsureActiveBranch::class]);
         // Check the role before looking up {record} in the URL, so a role without access gets 403 for every
         // id, and can't learn which ids exist from 404s
         $middleware->prependToPriorityList(before: SubstituteBindings::class, prepend: EnsureRole::class);

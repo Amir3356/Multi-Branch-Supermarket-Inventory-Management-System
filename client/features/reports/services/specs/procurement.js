@@ -9,7 +9,6 @@ export function procurementSpec(d, money) {
     cards: [
       { title: 'Spent', icon: 'cost', tone: 'cyan', value: money(t.spent), chip: `${count(t.paidOrders)} paid ${t.paidOrders === 1 ? 'order' : 'orders'}` },
       { title: 'Orders Placed', icon: 'orders', tone: 'teal', value: count(t.orders), chip: `${count(t.suppliers)} ${t.suppliers === 1 ? 'supplier' : 'suppliers'} · ${count(t.unitsBought)} units` },
-      { title: 'Awaiting Payment', icon: 'pending', tone: 'warning', value: count(t.awaitingPayment), chip: money(t.awaitingPaymentAmount), chipTone: t.awaitingPayment ? 'negative' : 'positive' },
       { title: 'Awaiting Delivery', icon: 'delivery', tone: 'danger', value: count(t.awaitingDelivery), chip: t.failed ? `${count(t.failed)} payment${t.failed === 1 ? '' : 's'} failed` : 'Paid, not yet in stock', chipTone: t.failed ? 'negative' : 'neutral' }
     ],
     charts: [

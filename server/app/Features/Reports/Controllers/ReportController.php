@@ -8,15 +8,26 @@ use App\Features\Reports\Repositories\ProcurementReportRepository;
 use App\Features\Reports\Repositories\ReportPeriod;
 use App\Features\Reports\Repositories\SalesReportRepository;
 use App\Features\Reports\Repositories\UserReportRepository;
+use App\Shared\Enums\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-// The Owner's reports under Reports: each for a period (the pharmacy's calendar days) and every branch or one. Read only.
+// The reports under Reports (the Owner's; the Cashier's Sales Report, the Pharmacist's Inventory Report and the Procurement Officer's Procurement Report): each for a period (the pharmacy's calendar days) and every branch or one. Read only.
 class ReportController
 {
     public function sales(Request $request, SalesReportRepository $report): JsonResponse
     {
-        return $this->respond($request, fn (ReportPeriod $p) => $report->build($p));
+        // Cost and profit come from purchase prices, which only the Owner sees here
+        $hideCost = $request->user()->role !== Role::Owner;
+
+        return $this->respond($request, function (ReportPeriod $p) use ($report, $hideCost) {
+            $data = $report->build($p);
+            if ($hideCost) {
+                unset($data['totals']['costOfSales'], $data['totals']['grossProfit']);
+            }
+
+            return $data;
+        });
     }
 
     public function inventory(Request $request, InventoryReportRepository $report): JsonResponse
@@ -46,7 +57,10 @@ class ReportController
             'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from'],
             'branchId' => ['nullable', 'string', 'exists:branches,id'],
         ], ['to.after_or_equal' => 'The end date must be on or after the start date.']);
-        $period = new ReportPeriod($data['from'], $data['to'], $data['branchId'] ?? null);
+        // Staff who work at one branch only ever see theirs, whatever was asked for
+        $user = $request->user();
+        $branchId = $user->coversAllBranches() ? ($data['branchId'] ?? null) : $user->branch_id;
+        $period = new ReportPeriod($data['from'], $data['to'], $branchId);
 
         return response()->json(['data' => ['from' => $period->from, 'to' => $period->to, 'branchId' => $period->branchId] + $build($period)]);
     }

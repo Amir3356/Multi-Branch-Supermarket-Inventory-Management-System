@@ -7,12 +7,14 @@ export function financialSpec(d, money) {
   const vs = (now, before) => change(now, before)
   const revenueChange = vs(t.revenue, p.revenue)
   const netChange = vs(t.netProfit, p.netProfit)
+  const expenseEntries = d.expensesByCategory.reduce((n, e) => n + e.entries, 0)
+  const damagedUnits = d.damageByReason.reduce((n, r) => n + r.units, 0)
   return {
     note: `Compared with the previous period: ${date(p.from)} – ${date(p.to)}`,
     cards: [
       { title: 'Revenue', icon: 'revenue', tone: 'cyan', value: money(t.revenue), chip: revenueChange?.text || 'Sales in the period', chipTone: revenueChange?.tone || 'neutral' },
-      { title: 'Gross Profit', icon: 'profit', tone: 'teal', value: money(t.grossProfit), chip: `Gross margin ${percent(t.grossMargin)}` },
-      { title: 'Expenses & Losses', icon: 'cost', tone: 'warning', value: money(t.expenses + t.damageLoss), chip: `${money(t.expenses)} expenses · ${money(t.damageLoss)} damage` },
+      { title: 'Expenses', icon: 'cost', tone: 'warning', value: money(t.expenses), chip: `${count(expenseEntries)} ${expenseEntries === 1 ? 'entry' : 'entries'}` },
+      { title: 'Damage Losses', icon: 'low', tone: 'danger', value: money(t.damageLoss), chip: `${count(damagedUnits)} ${damagedUnits === 1 ? 'unit' : 'units'} written off`, chipTone: t.damageLoss ? 'negative' : 'positive' },
       { title: 'Net Profit', icon: 'net', tone: t.netProfit >= 0 ? 'teal' : 'danger', value: money(t.netProfit), chip: netChange?.text || `Net margin ${percent(t.netMargin)}`, chipTone: netChange?.tone || (t.netProfit >= 0 ? 'positive' : 'negative') }
     ],
     charts: [

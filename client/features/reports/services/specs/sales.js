@@ -7,8 +7,11 @@ export function salesSpec(d, money) {
     cards: [
       { title: 'Revenue', icon: 'revenue', tone: 'cyan', value: money(t.revenue), chip: `${count(t.transactions)} ${t.transactions === 1 ? 'sale' : 'sales'}` },
       { title: 'Units Sold', icon: 'units', tone: 'teal', value: count(t.units), chip: `Average sale ${money(t.averageSale)}` },
-      { title: 'Cost of Goods Sold', icon: 'cost', tone: 'warning', value: money(t.costOfSales), chip: 'At purchase price' },
-      { title: 'Gross Profit', icon: 'profit', tone: 'teal', value: money(t.grossProfit), chip: 'Revenue − cost of goods', chipTone: t.grossProfit >= 0 ? 'positive' : 'negative' }
+      // Cost and profit only come for the Owner (they use purchase prices)
+      ...(t.costOfSales === undefined ? [] : [
+        { title: 'Cost of Goods Sold', icon: 'cost', tone: 'warning', value: money(t.costOfSales), chip: 'At purchase price' },
+        { title: 'Gross Profit', icon: 'profit', tone: 'teal', value: money(t.grossProfit), chip: 'Revenue − cost of goods', chipTone: t.grossProfit >= 0 ? 'positive' : 'negative' }
+      ])
     ],
     charts: [
       { kind: 'bars', title: 'Revenue per day', subtitle: 'Each day of the period with sales', money: true, columns: dailyColumns(d.daily, 'revenue'), series: [{ label: 'Revenue', tone: 'role-1' }], empty: 'No sales in this period.' },

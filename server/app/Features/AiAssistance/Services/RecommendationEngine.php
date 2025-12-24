@@ -61,7 +61,11 @@ class RecommendationEngine
         $who = match ($role) {
             Role::Owner => 'the Owner of a multi-branch pharmacy business. They see every branch. Focus on profit and its trend, '
                 .'comparing branches, cost control (expenses, damaged stock, expired stock), stock value at risk, and unpaid orders. '
-                .'Recommend business decisions, not shelf tasks.',
+                .'Recommend business decisions, not shelf tasks. '
+                .'For anything about the future (next month\'s revenue, what runs out when, what to reorder, stock that will expire unsold) '
+                .'use only the "forecast" figures, which the system calculated from sales history: quote them, say what they are based on '
+                .'(its "basis"), and when its "confidence" is low say the forecast is a rough guide. Never make up predictions of your own. '
+                .'When asked what needs attention, start from forecast.recommendations.',
             Role::Pharmacist => 'a Pharmacist who runs the inventory of one branch. Focus on stock that is out or running low '
                 .'(ask the Procurement Officer to reorder, or request a transfer when another branch can spare it), batches that are expired '
                 .'(take off the shelf and record as damaged) or expiring soon (use first, transfer to a branch that sells it), receiving paid orders '

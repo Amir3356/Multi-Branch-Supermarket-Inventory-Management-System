@@ -34,6 +34,13 @@ export default function BranchesPage() {
     setEditingBranch(null)
   }
 
+  // Deactivating closes the branch at once, so it asks first; activating again needs no warning
+  const handleToggleStatus = (branch) => {
+    const deactivating = branch.status === 'Active'
+    if (deactivating && !window.confirm(`Deactivate ${branch.name}?\n\nIt will be closed: no new sales, transfers, purchase orders, expenses, damaged items or stock corrections can be recorded there until you activate it again. Its records are kept.`)) return
+    run(toggleBranchStatus(branch))
+  }
+
   const handleDelete = (branch) => {
     if (!window.confirm(`Delete ${branch.name}? This cannot be undone.`)) return
     run(deleteBranch(branch))
@@ -49,7 +56,7 @@ export default function BranchesPage() {
 
       <Notice notice={notice} onDismiss={() => setNotice(null)} />
 
-      <BranchesTable data={branches} selectedBranch={selectedBranch} onEdit={setEditingBranch} onToggleStatus={(b) => run(toggleBranchStatus(b))} onDelete={handleDelete} />
+      <BranchesTable data={branches} selectedBranch={selectedBranch} onEdit={setEditingBranch} onToggleStatus={handleToggleStatus} onDelete={handleDelete} />
 
       {editingBranch && <BranchModal branch={editingBranch} branches={branches} onClose={() => setEditingBranch(null)} onSave={handleEdit} />}
       {showAddBranch && <BranchModal branches={branches} onClose={() => setShowAddBranch(false)} onSave={handleAdd} />}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { AlertTriangle, ArrowDownUp, Banknote, Boxes, CalendarClock, CheckCircle2, CircleDollarSign, Clock, FileText, Hourglass, MailWarning, Package, PackageCheck, ShoppingCart, TrendingUp, Truck, UserCog, Users, UserX, Wallet } from 'lucide-react'
+import { AlertTriangle, ArrowDownUp, Banknote, Boxes, CalendarClock, CheckCircle2, CircleDollarSign, Clock, FileText, Radio, Hourglass, MailWarning, Package, PackageCheck, ShoppingCart, TrendingUp, Truck, UserCog, Users, UserX, Wallet } from 'lucide-react'
 import { PageHeader, StatCard } from '../../../components'
 import { useBranchScope, useFormatMoney } from '../../../hooks'
 import { selectSettings } from '../../policy/store/settingsSlice'
@@ -84,7 +84,7 @@ function SpecTable({ table }) {
  * the server report; `buildSpec(data, money)` turns its figures into what's shown (the PDF draws the same spec).
  */
 export default function ReportPage({ kind, title, description, buildSpec }) {
-  const { period, branchId, setBranchId, data, error, loading } = useReport(kind)
+  const { period, branchId, setBranchId, canPickBranch, data, error, loading, isLive, updatedAt } = useReport(kind)
   const { branches, branchById } = useBranchScope()
   const money = useFormatMoney()
   const { pharmacyName } = useSelector(selectSettings)
@@ -108,25 +108,32 @@ export default function ReportPage({ kind, title, description, buildSpec }) {
   return (
     <div className="content-section-card report-page">
       <PageHeader title={title} description={description}>
-        <button type="button" className="secondary-action-btn" onClick={exportPdf} disabled={!spec || exporting || loading}>
-          <FileText size={16} /> {exporting ? 'Preparing PDF…' : 'Export PDF'}
-        </button>
+        <div className="report-header-actions">
+          <span className={`stat-chip ${isLive ? 'positive' : 'neutral'}`} title={isLive ? 'The figures update the moment anything is recorded' : 'Live connection unavailable; the figures update every minute'}>
+            <Radio size={13} /> {isLive ? 'Live' : 'Updates every minute'}
+          </span>
+          <button type="button" className="secondary-action-btn" onClick={exportPdf} disabled={!spec || exporting || loading}>
+            <FileText size={16} /> {exporting ? 'Preparing PDF…' : 'Export PDF'}
+          </button>
+        </div>
       </PageHeader>
 
       <div className="report-filters">
         <PeriodPicker state={period} errorId={`${kind}-range-error`} />
-        {/* Styled like the period picker beside it */}
-        <div className="dashboard-period">
-          <div className="form-group">
-            <label htmlFor={`${kind}-branch`}>Branch</label>
-            <select id={`${kind}-branch`} className="input-field" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
-              <option value="all">All Branches</option>
-              {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
+        {/* Styled like the period picker beside it; staff who work at one branch only see theirs, so there's nothing to pick */}
+        {canPickBranch && (
+          <div className="dashboard-period">
+            <div className="form-group">
+              <label htmlFor={`${kind}-branch`}>Branch</label>
+              <select id={`${kind}-branch`} className="input-field" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+                <option value="all">All Branches</option>
+                {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
           </div>
-        </div>
+        )}
       </div>
-      {!period.invalid && <p className="page-desc report-scope">{period.text} · {scope}{spec?.note ? ` · ${spec.note}` : ''}</p>}
+      {!period.invalid && <p className="page-desc report-scope">{period.text} · {scope}{spec?.note ? ` · ${spec.note}` : ''}{updatedAt ? ` · Updated ${updatedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' })}` : ''}</p>}
 
       {period.invalid && <PeriodError id={`${kind}-range-error`} />}
       {exportError && <p className="error-msg">{exportError}</p>}

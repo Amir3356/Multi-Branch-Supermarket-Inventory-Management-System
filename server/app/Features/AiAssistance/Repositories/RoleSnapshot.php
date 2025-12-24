@@ -3,6 +3,7 @@
 namespace App\Features\AiAssistance\Repositories;
 
 use App\Features\Accounts\Models\User;
+use App\Features\AiAssistance\Services\Forecaster;
 use App\Features\Dashboard\Repositories\OwnerDashboardRepository;
 use App\Features\Policies\Repositories\PolicyRepository;
 use App\Features\Stock\Models\StockBatch;
@@ -39,6 +40,7 @@ class RoleSnapshot
     public function __construct(
         private PolicyRepository $policies,
         private OwnerDashboardRepository $ownerDashboard,
+        private Forecaster $forecaster,
     ) {}
 
     public function for(User $user): array
@@ -91,6 +93,8 @@ class RoleSnapshot
             'staffAndPayments' => $now['now'],
             'expensesByCategory' => $this->expensesByCategory(null),
             'damageByReason' => $this->damageByReason(null),
+            // Calculated forecasts and recommendations (the AI explains them rather than predicting itself)
+            'forecast' => $this->forecaster->build($this->minStock),
         ];
     }
 
