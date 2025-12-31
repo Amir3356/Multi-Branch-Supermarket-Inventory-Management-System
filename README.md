@@ -12,7 +12,107 @@ PharmaCare is a web system for running a pharmacy with several branches. It cove
 
 ---
 
-## 1. Users and roles
+## 1. System architecture
+
+### 1.1 Architecture style: monolithic
+
+PharmaCare uses a **monolithic system architecture**. The whole backend is one Laravel application with one codebase and one PostgreSQL database, built and deployed as a single unit.
+
+- **One application.** Every feature runs in the same Laravel process and calls the others directly in code, not over the network. This includes accounts, branches, procurement, inventory, sales, transfers, damaged items, expenses, reports, audit logs and AI Assistance.
+- **One database.** All features share one PostgreSQL database. A single action that touches several features commits or rolls back together in one database transaction. For example, a sale writes the sale record, the stock change and the audit log entry together.
+- **One deployment.** The API, the WebSocket server (Reverb, started from the same codebase with `php artisan reverb:start`) and the scheduled jobs (`php artisan schedule:work`) all run from the same application.
+- **A separate browser client.** The React app in `client/` is a single-page application. It talks to the monolith only through its REST API (`/api/...`) and its live channels (WebSockets).
+
+```
+ ┌───────────────────────────┐        REST API (/api)         ┌──────────────────────────────────────┐
+ │  React single-page app    │ ─────────────────────────────▶ │  Laravel monolith (server/)          │
+ │  (client/)                │                                 │  ├─ Features: Accounts, Branches,    │
+ │  Redux store, pages,      │ ◀───────────────────────────── │  │  Procurements, Stock, Sales, ...  │
+ │  live listeners (Echo)    │   WebSockets (Reverb), live     │  ├─ Shared: roles, middleware        │
+ └───────────────────────────┘   updates                       │  ├─ Reverb (WebSockets)              │
+                                                               │  └─ Scheduler (background jobs)      │
+                                                               └───────────────┬──────────────────────┘
+                                                                               │
+                                                     ┌─────────────────────────┼──────────────────────┐
+                                                     ▼                         ▼                      ▼
+                                              PostgreSQL              Chapa (payments)       OpenRouter (AI)
+                                              (one database)          external service       external service
+```
+
+**Why a monolith:** one team builds and runs the system. Stock, sales, procurement and the audit log must change together in one transaction. A single deployable keeps development, testing and hosting simple. It is a *modular* monolith: every feature stays in its own folder (see 1.2), so a feature could later be moved into its own service if needed.
+
+### 1.2 Code organisation: feature-based
+
+The project is organised **by feature**, not by technical layer. Everything that belongs to one business feature lives together in one folder, in both the backend and the frontend. To change "Sales", you work inside the Sales folder.
+
+**Backend (`server/app/`)**
+
+```
+server/app/
+├── Features/                 one folder per business feature
+│   ├── AccessReviews/
+│   ├── Accounts/
+│   ├── AiAssistance/
+│   ├── AuditLogs/
+│   ├── Auth/
+│   ├── Branches/
+│   ├── DamagedItems/
+│   ├── Dashboard/
+│   ├── Expenses/
+│   ├── Policies/
+│   ├── Procurements/
+│   ├── Products/
+│   ├── Reports/
+│   ├── Sales/
+│   ├── Sessions/
+│   ├── Stock/
+│   └── Transfers/
+├── Shared/                   code used by every feature
+│   ├── Enums/                (Role: the RBAC sections for each role)
+│   ├── Http/Middleware/      (EnsureRole, EnsureActiveBranch)
+│   └── Services/             (ID sequences, batch numbers)
+└── Providers/
+```
+
+Each feature contains only the layers it needs. Here is `Sales` as an example:
+
+```
+Features/Sales/
+├── Controllers/     handle the HTTP request and return the response
+├── Requests/        validation and authorisation of input
+├── Models/          Eloquent models (the feature's tables)
+├── Repositories/    every database read and write for the feature
+├── Services/        business logic (for example, broadcasting a sale live)
+├── Events/          live events pushed over WebSockets
+├── Resources/       the JSON shape returned by the API
+└── Routes/          api.php (endpoints) and channels.php (live channels)
+```
+
+Each feature also registers its own parts:
+- `routes/api.php` loads every `Features/*/Routes/api.php`, so a feature declares its own endpoints and role checks.
+- Live channels, scheduled jobs (`Routes/console.php`), console commands (`Console/`) and email views (`views/`) are also discovered per feature.
+
+**Frontend (`client/`)**
+
+```
+client/
+├── features/                 one folder per business feature
+│   ├── accounts/   aiAssistance/   auditLogs/   auth/
+│   ├── branches/   damaged/        dashboard/   expenses/
+│   ├── inventory/  notifications/  policy/      purchases/
+│   └── reports/    sales/          transfers/
+├── pages/                    one thin page per route; composes feature components
+├── routes/                   paths, sidebar navigation, role-based route guards
+├── layouts/                  the signed-in layout (sidebar, header, live listeners)
+├── components/  hooks/  utils/  api/   shared building blocks
+└── redux/                    the store, combining each feature's slice
+```
+
+A frontend feature folder holds that feature's `api/` (server calls), `store/` (Redux slice and thunks), `model/` and `services/` (rules and calculations), `hooks/` and `components/`.
+
+---
+
+## 2. Users and roles
 
 The system has four roles. The server decides what each role may open, and the sidebar and page guards in the browser follow the same list.
 
@@ -42,7 +142,7 @@ The system has four roles. The server decides what each role may open, and the s
 
 ---
 
-## 2. Functional requirements
+## 3. Functional requirements
 
 ### FR-1 Authentication and sessions
 - **FR-1.1** Users sign in with email and password. After 5 failed attempts, sign-in from that source is blocked for a minute.
@@ -137,7 +237,7 @@ The system has four roles. The server decides what each role may open, and the s
 
 ---
 
-## 3. Non-functional requirements
+## 4. Non-functional requirements
 
 ### NFR-1 Security
 - **NFR-1.1 Role-based access control:** every API route checks the user's role on the server (`role:` middleware). Branch staff are limited to their own branch in the query itself, not only in the browser.
@@ -188,6 +288,7 @@ The system has four roles. The server decides what each role may open, and the s
 - **NFR-6.2** Money is shown in ETB and rounded to cents. The Owner's dashboard and the Financial Report use the same calculation, so they always agree.
 
 ### NFR-7 Maintainability
+- **NFR-7.0** The system is a modular monolith with feature-based code organisation (see section 1).
 - **NFR-7.1** The backend is organised by feature (`app/Features/<Feature>/` with Controllers, Requests, Repositories, Services, Events and Routes). All database access goes through repositories.
 - **NFR-7.2** The frontend is organised by feature (`client/features/<feature>/` with api, store, hooks, services and components).
 - **NFR-7.3** Settings that change between installations (time zone, invitation expiry, session timeouts, dormant days, Chapa mode, AI model) come from environment variables, not code.
@@ -198,7 +299,7 @@ The system has four roles. The server decides what each role may open, and the s
 
 ---
 
-## 4. Running the system
+## 5. Running the system
 
 **Requirements:** PHP 8.3+, Composer, Node.js, and PostgreSQL.
 
