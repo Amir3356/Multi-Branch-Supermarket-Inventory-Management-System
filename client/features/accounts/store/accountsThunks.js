@@ -1,4 +1,4 @@
-import { createAccount, destroyAccount, fetchAccounts, resendAccountInvitation, updateAccount } from '../api/accountsApi'
+import { createAccount, destroyAccount, fetchAccounts, resendAccountInvitation, updateAccount } from '../../../api/accountsApi'
 import { accountRemoved, accountSaved, accountsLoaded } from './accountsSlice'
 import { toAccountChanges } from '../model/account'
 import { loadSessions } from './sessionsThunks'

@@ -1,4 +1,4 @@
-import { fetchPolicy, updatePolicy } from '../api/policyApi'
+import { fetchPolicy, updatePolicy } from '../../../api/policyApi'
 import { toPolicyPayload } from '../model/policy'
 import { policyLoaded } from './settingsSlice'
 

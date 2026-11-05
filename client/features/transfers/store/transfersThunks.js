@@ -2,7 +2,7 @@ import { findCatalogProduct } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { productUpdated } from '../../inventory/store/productsSlice'
 import { refreshStock } from '../../inventory/store/stockThunks'
-import { createTransfer, fetchTransfers, receiveTransfer } from '../api/transfersApi'
+import { createTransfer, fetchTransfers, receiveTransfer } from '../../../api/transfersApi'
 import { transferSaved, transfersLoaded } from './transfersSlice'
 
 // Transfer thunks call the API and return the confirmation message; failures throw ApiError

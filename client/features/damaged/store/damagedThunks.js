@@ -1,6 +1,6 @@
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { refreshStock } from '../../inventory/store/stockThunks'
-import { createDamagedItem, fetchDamagedItems } from '../api/damagedApi'
+import { createDamagedItem, fetchDamagedItems } from '../../../api/damagedApi'
 import { toDamagePayload } from '../model/damageRecord'
 import { damageSaved, damagedLoaded } from './damagedSlice'
 

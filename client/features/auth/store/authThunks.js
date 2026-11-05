@@ -1,4 +1,4 @@
-import { acceptInvitationRequest, fetchCurrentUser, fetchInvitationByToken, forgotPassword, login, logout, resetPasswordRequest } from '../api/authApi'
+import { acceptInvitationRequest, fetchCurrentUser, fetchInvitationByToken, forgotPassword, login, logout, resetPasswordRequest } from '../../../api/authApi'
 import { loggedIn, loggedOut, sessionEnded, userRefreshed } from './authSlice'
 
 // Each thunk returns the signed-in user, or throws ApiError for the page to show

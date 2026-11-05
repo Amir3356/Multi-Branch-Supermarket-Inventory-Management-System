@@ -1,4 +1,4 @@
-import { destroySession, endSessionRequest, fetchSessions } from '../api/sessionsApi'
+import { destroySession, endSessionRequest, fetchSessions } from '../../../api/sessionsApi'
 import { sessionFromApi } from '../model/session'
 import { sessionRemoved, sessionSaved, sessionsLoaded } from './sessionsSlice'
 

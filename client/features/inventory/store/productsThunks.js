@@ -1,4 +1,4 @@
-import { fetchProducts } from '../api/productsApi'
+import { fetchProducts } from '../../../api/productsApi'
 import { productsLoaded } from './productsSlice'
 
 // The product catalog from the server: loaded first, since procurements, transfers and sales refer to its products

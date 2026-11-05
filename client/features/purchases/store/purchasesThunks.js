@@ -1,4 +1,4 @@
-import { createProcurement, fetchProcurements, receiveProcurement, verifyProcurementPayment } from '../api/procurementsApi'
+import { createProcurement, fetchProcurements, receiveProcurement, verifyProcurementPayment } from '../../../api/procurementsApi'
 import { findCatalogProduct, nextId } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { categoryAdded, productAdded, productUpdated } from '../../inventory/store/productsSlice'

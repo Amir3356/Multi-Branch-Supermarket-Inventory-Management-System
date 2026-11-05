@@ -1,5 +1,5 @@
 import { thunkContext } from '../../../redux/thunkHelpers'
-import { createExpense, destroyExpense, fetchExpenses } from '../api/expensesApi'
+import { createExpense, destroyExpense, fetchExpenses } from '../../../api/expensesApi'
 import { toExpensePayload } from '../model/expense'
 import { expensesLoaded } from './expensesSlice'
 

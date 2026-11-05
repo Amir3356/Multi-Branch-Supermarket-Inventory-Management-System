@@ -3,7 +3,7 @@ import { Activity, CalendarClock, ChevronLeft, ChevronRight, Filter, Radio, Sear
 import { PageHeader, StatCard } from '../components'
 import { useBranchScope } from '../hooks'
 import { realtime, watchConnection } from '../api/realtime'
-import { fetchAuditLogs } from '../features/auditLogs/api/auditLogsApi'
+import { fetchAuditLogs } from '../api/auditLogsApi'
 import AuditLogTable from '../features/auditLogs/components/AuditLogTable'
 import { usePeriod } from '../features/dashboard/hooks/usePeriod'
 import { PeriodError, PeriodPicker } from '../features/dashboard/components/DashboardParts'

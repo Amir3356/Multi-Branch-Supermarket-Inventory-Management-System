@@ -1,0 +1,21 @@
+{
+  "name": "api-gateway",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The one public entry point: authenticates requests and routes /api/* and /socket.io to the services",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "dotenv": "16.4.5",
+    "express": "5.1.0",
+    "http-proxy-middleware": "3.0.10"
+  }
+}

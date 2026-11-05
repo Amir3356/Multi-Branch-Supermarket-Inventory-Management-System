@@ -1,6 +1,6 @@
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { refreshStock } from '../../inventory/store/stockThunks'
-import { createSale, fetchSales } from '../api/salesApi'
+import { createSale, fetchSales } from '../../../api/salesApi'
 import { toSalePayload } from '../model/sale'
 import { saleSaved, salesLoaded } from './salesSlice'
 

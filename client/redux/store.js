@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { onUnauthorized, setAuthToken } from '../api/http'
+import { onUnauthorized, setAuthToken } from '../utils/http'
 import { STORAGE_KEYS, writeJson } from '../utils'
 import authReducer, { sessionEnded } from '../features/auth/store/authSlice'
 import settingsReducer from '../features/policy/store/settingsSlice'

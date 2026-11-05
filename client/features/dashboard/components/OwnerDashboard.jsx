@@ -3,7 +3,7 @@ import { Building2, CreditCard, DollarSign, PackageCheck, PackageX, ShoppingCart
 import { BranchTag, EmptyRow } from '../../../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../../../hooks'
 import { realtime } from '../../../api/realtime'
-import { fetchOwnerDashboard } from '../api/ownerDashboardApi'
+import { fetchOwnerDashboard } from '../../../api/ownerDashboardApi'
 import { dashboardCards } from '../services/dashboardCards'
 import { moneyOverTime, topSlices } from '../services/dashboardCharts'
 import { usePeriod } from '../hooks/usePeriod'

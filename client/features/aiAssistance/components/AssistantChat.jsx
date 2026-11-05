@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, RotateCcw, Send, Sparkles } from 'lucide-react'
-import { askAssistant } from '../api/aiApi'
+import { askAssistant } from '../../../api/aiApi'
 
 // The conversation sent with each question: the latest turns only, so requests stay small
 const HISTORY_SENT = 12

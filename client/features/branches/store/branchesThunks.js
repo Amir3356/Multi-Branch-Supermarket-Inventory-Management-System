@@ -1,4 +1,4 @@
-import { createBranch, destroyBranch, fetchBranches, patchBranch } from '../api/branchesApi'
+import { createBranch, destroyBranch, fetchBranches, patchBranch } from '../../../api/branchesApi'
 import { branchRemoved, branchSaved, branchesLoaded } from './branchesSlice'
 
 // Branch thunks call the API and return the confirmation message; failures throw ApiError

@@ -1,5 +1,5 @@
 import { findCatalogProduct, nextId } from '../../../utils'
-import { fetchStock } from '../api/stockApi'
+import { fetchStock } from '../../../api/stockApi'
 import { categoryAdded, productAdded } from './productsSlice'
 import { stockBatchesChanged, stockLoaded } from './stockSlice'
 

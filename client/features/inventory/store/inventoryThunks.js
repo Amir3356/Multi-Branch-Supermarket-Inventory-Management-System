@@ -1,5 +1,5 @@
-import { updateSellingPrice } from '../api/productsApi'
-import { correctStockBatch } from '../api/stockApi'
+import { updateSellingPrice } from '../../../api/productsApi'
+import { correctStockBatch } from '../../../api/stockApi'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { productUpdated } from './productsSlice'
 import { stockPushed } from './stockThunks'

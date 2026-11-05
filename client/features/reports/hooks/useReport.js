@@ -4,7 +4,7 @@ import { realtime, watchConnection } from '../../../api/realtime'
 import { useBranchScope } from '../../../hooks'
 import { selectCurrentUser } from '../../auth/store/authSlice'
 import { usePeriod } from '../../dashboard/hooks/usePeriod'
-import { fetchReport } from '../api/reportsApi'
+import { fetchReport } from '../../../api/reportsApi'
 
 // Without a live connection the report reloads this often
 const FALLBACK_REFRESH_MS = 60000
