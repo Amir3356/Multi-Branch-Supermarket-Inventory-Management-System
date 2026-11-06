@@ -27,8 +27,12 @@ export function broadcast(channel, event, data = {}) {
  * actor:      { id, fullName, role } when it isn't the signed-in user (e.g. a sign-in before there is a session)
  * actorName:  a name with no account behind it (the email typed at a failed sign-in, or 'Chapa' for the system)
  * branchName: only for a branch that no longer exists (just deleted), whose name can't be looked up
+ * type:       create | update | delete | approve | reject | view | login | logout | other; left out, reporting-service
+ *             works it out from the action ("Branch added" → create)
+ * before:     the record as it was (updates, deletes); after: as it is now (creates, updates). Plain objects or rows;
+ *             reporting-service strips secrets (passwords, tokens) before storing them.
  */
-export function audit(req, { module, action, recordId = null, description, branchId = null, actor = null, actorName = null, branchName = null }) {
+export function audit(req, { module, action, recordId = null, description, branchId = null, actor = null, actorName = null, branchName = null, type = null, before = null, after = null }) {
   const who = actor ?? req?.user ?? null
   serviceClient('reporting')
     .post(
@@ -42,12 +46,25 @@ export function audit(req, { module, action, recordId = null, description, branc
         branchName,
         actor: who ? { id: who.id, fullName: who.fullName, role: who.role } : null,
         actorName,
+        type,
+        before: snapshot(before),
+        after: snapshot(after),
         ip: req?.clientIp ?? null,
         userAgent: req?.userAgent ?? null,
       },
       { timeoutMs: 5_000 },
     )
     .catch((error) => logger.error('Audit log not written', { module, action, recordId, error: error.message }))
+}
+
+/** A JSON-safe copy of a record (dates as ISO strings, numeric strings kept), or null */
+function snapshot(value) {
+  if (value === null || value === undefined) return null
+  try {
+    return JSON.parse(JSON.stringify(value))
+  } catch {
+    return null
+  }
 }
 
 /**

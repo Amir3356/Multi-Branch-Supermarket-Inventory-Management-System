@@ -19,7 +19,7 @@ router.post('/procurements', requireRole('purchase_officer'), validateStoreProcu
 router.post('/procurements/:procurement/verify', requireRole('purchase_officer'), bindProcurement, controller.verify)
 router.post(
   '/procurements/:procurement/receive',
-  requireRole('pharmacist'),
+  requireRole('inventory_officer'),
   bindProcurement,
   requireReceivingBranch,
   validateReceiveProcurement,

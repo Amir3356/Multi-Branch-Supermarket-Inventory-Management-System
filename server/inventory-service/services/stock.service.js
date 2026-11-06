@@ -1,4 +1,4 @@
-import { HttpError, audit, broadcast, formatDate, logger, pharmacyToday, plural, productKey, transaction } from '../utils/index.js'
+import { HttpError, audit, broadcast, formatDate, logger, storeToday, plural, productKey, transaction } from '../utils/index.js'
 import { toResources } from '../models/stock.model.js'
 import {
   catalog,
@@ -102,7 +102,7 @@ export async function add(client, live, attributes) {
  */
 export async function take(client, live, branchId, product, batch, units, expiredAction = null) {
   requireTransaction(client)
-  const today = pharmacyToday()
+  const today = storeToday()
   const key = productKey(product)
 
   const taken = await takeUnits(client, branchId, key, batch, units, expiredAction, today)
@@ -199,6 +199,8 @@ export async function correct(req, batch, data) {
       recordId: batch.batch,
       description: `${batch.product} batch ${batch.batch}: ${changes.join(', ')}.`,
       branchId: batch.branch_id,
+      before: { product: batch.product, batch: batch.batch, units: before.units, expiry: before.expiry },
+      after: { product: batch.product, batch: batch.batch, units: after.units, expiry: after.expiry },
     })
   }
 

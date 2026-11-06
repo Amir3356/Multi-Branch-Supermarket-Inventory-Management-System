@@ -9,7 +9,7 @@ export const PERIODS = Object.freeze(['daily', 'weekly', 'monthly', 'quarterly',
 /** The Luxon unit of each period */
 export const UNIT = { daily: 'day', weekly: 'week', monthly: 'month', quarterly: 'quarter', yearly: 'year' }
 
-// ACCESS_REVIEW_SCHEDULE: a report for each finished period, just after it ends (pharmacy time); empty = off
+// ACCESS_REVIEW_SCHEDULE: a report for each finished period, just after it ends (store time); empty = off
 export const CRON = {
   daily: '0 1 * * *',
   weekly: '0 1 * * 1', // Mondays

@@ -92,7 +92,7 @@ export default function OwnerDashboard() {
           {!summary && !error && <p className="chart-empty">Loading the figures…</p>}
           {summary && (
             <>
-              <DashboardSection id="owner-money-title" title="Money In & Out" description={`${period.name} · ${scope}`}>
+              <DashboardSection centered id="owner-money-title" title="Money In & Out" description={`${period.name} · ${scope}`}>
                 <CardGrid className="dashboard-money-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'period')} />
                 <div className="charts-grid">
                   <ChartCard title="Revenue, Purchases and Expenses" subtitle={period.name}>
@@ -117,7 +117,7 @@ export default function OwnerDashboard() {
                 </div>
               </DashboardSection>
 
-              <DashboardSection id="owner-branches-title" title="Branch Performance" description={`Every branch side by side · ${period.name}. Net profit (an estimate) is sales minus what the sold items cost to buy, the branch's expenses and its damage loss.`}>
+              <DashboardSection centered id="owner-branches-title" title="Branch Performance" description={`Every branch side by side · ${period.name}. Net profit (an estimate) is sales minus what the sold items cost to buy, the branch's expenses and its damage loss.`}>
                 <div className="table-responsive">
                   <table className="data-table">
                     <thead>
@@ -149,8 +149,8 @@ export default function OwnerDashboard() {
                 </div>
               </DashboardSection>
 
-              <DashboardSection id="owner-now-title" title="Right Now" description="The current state; the period doesn’t change these.">
-                <CardGrid className="dashboard-three-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'now')} />
+              <DashboardSection centered id="owner-now-title" title="Right Now" description="The current state; the period doesn’t change these.">
+                <CardGrid className="dashboard-two-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'now')} />
               </DashboardSection>
             </>
           )}

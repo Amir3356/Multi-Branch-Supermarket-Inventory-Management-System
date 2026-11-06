@@ -5,7 +5,6 @@ import { BranchTag, EmptyRow, Notice, PageHeader } from '../components'
 import { useBranchScope, useFormatMoney, useMoneyColumns } from '../hooks'
 import { selectDamaged } from '../features/damaged/store/damagedSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
-import { selectCategories } from '../features/inventory/store/productsSlice'
 import { recordDamage } from '../features/damaged/store/damagedThunks'
 import RecordDamageModal from '../features/damaged/components/RecordDamageModal'
 import './DamagedPage.css'
@@ -17,7 +16,6 @@ export default function DamagedPage() {
   const { branchById, isAllBranches, scopeLabel, inScope } = useBranchScope()
   const damaged = useSelector(selectDamaged).filter((d) => inScope(d.branchId))
   const inventory = useSelector(selectInventory)
-  const categories = useSelector(selectCategories)
   const [showRecordDamage, setShowRecordDamage] = useState(false)
   const [notice, setNotice] = useState(null)
 
@@ -29,7 +27,7 @@ export default function DamagedPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Damaged Items · ${scopeLabel}`} description="Products that were physically damaged and can no longer be sold or used.">
+      <PageHeader centered title={`Damaged Items · ${scopeLabel}`} description="Products that were physically damaged and can no longer be sold or used.">
         <button className="primary-action-btn" onClick={() => setShowRecordDamage(true)}>
           <Plus size={16} /> Record Damaged Item
         </button>
@@ -72,7 +70,7 @@ export default function DamagedPage() {
       </div>
 
       {showRecordDamage && (
-        <RecordDamageModal inventory={inventory.filter((i) => inScope(i.branchId))} categories={categories} formatMoney={formatMoney} onClose={() => setShowRecordDamage(false)} onSave={handleRecordDamage} />
+        <RecordDamageModal inventory={inventory.filter((i) => inScope(i.branchId))} formatMoney={formatMoney} onClose={() => setShowRecordDamage(false)} onSave={handleRecordDamage} />
       )}
     </div>
   )

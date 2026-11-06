@@ -4,7 +4,7 @@ import { selectBranches } from '../features/branches/store/branchesSlice'
 import { selectBranchInView } from '../features/auth/store/authSlice'
 
 // Which branch the list pages show ("all" or one branch), with helpers for filtering and labels. Staff tied to a
-// branch only see their own; the Owner and the Procurement Officer see every branch.
+// branch only see their own; the Owner and the Purchase Officer see every branch.
 export function useBranchScope() {
   const branches = useSelector(selectBranches)
   const selectedBranch = useSelector(selectBranchInView)

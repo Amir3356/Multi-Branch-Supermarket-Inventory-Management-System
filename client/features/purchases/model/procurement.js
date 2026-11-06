@@ -1,17 +1,7 @@
 // A procurement (purchase order paid through Chapa), as the API sends it (server: Procurements/Resources/ProcurementResource.php)
 
 /**
- * @typedef {object} Payment
- * @property {string} id                 Chapa's reference
- * @property {string} purchaseId
- * @property {string} branchId
- * @property {string} supplier
- * @property {string} method             e.g. "Chapa · Telebirr"
- * @property {number} amount
- * @property {string} date               YYYY-MM-DD
- * @property {'Cleared'} status
- *
- * @typedef {object} ApiProcurement
+ * @typedef {object} Procurement
  * @property {string} id                 e.g. "PO-00001"
  * @property {string} branchId
  * @property {string} supplier
@@ -23,16 +13,12 @@
  * @property {number} total
  * @property {'ETB' | 'USD'} currency
  * @property {string} date               YYYY-MM-DD
+ * @property {string | null} createdAt  when it was placed (ISO 8601); its time shows under Purchased On
  * @property {'Pending' | 'Paid' | 'Failed'} status
- * @property {string | null} checkoutUrl Chapa's page, while the payment can still be finished
- * @property {string | null} receivedAt  when the branch's Inventory Officer added the stock (Add Medicine); until then
+ * @property {string | null} receivedAt  when the branch's Inventory Officer added the stock (Receive Stock); until then
  *                                       a paid order is not in stock and its delivery is Pending
  * @property {string | null} batch       the batch number generated when it was added to stock (BT-00001, …)
  * @property {string | null} expiryDate  its expiration date (YYYY-MM-DD), entered with the batch
- * @property {Payment | null} payment    once Paid
- *
- * The procurement as kept in the store (its payment is stored separately)
- * @typedef {Omit<ApiProcurement, 'payment'>} Procurement
  *
  * Sent to POST /procurements
  * @typedef {object} ProcurementPayload
@@ -65,8 +51,5 @@ export const toProcurementPayload = (form, product, qty, totalCost) => ({
 /** The batch number a procurement's stock arrived under: the generated one, else (older orders) its ID */
 export const procurementBatch = (procurement) => procurement.batch || procurement.id
 
-/** @returns {{ procurement: Procurement, payment: Payment | null }} */
-/** Delivery for the Procurement Officer: Pending until the receiving branch adds the stock, then Arrived */
+/** Delivery for the Purchase Officer: Pending until the receiving branch adds the stock, then Arrived */
 export const deliveryStatus = (procurement) => (procurement.status !== 'Paid' ? null : procurement.receivedAt ? 'Arrived' : 'Pending')
-
-export const procurementFromApi = ({ payment, ...procurement }) => ({ procurement, payment })

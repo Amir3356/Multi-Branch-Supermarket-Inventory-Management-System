@@ -1,8 +1,9 @@
-import { pharmacyToday } from '../../utils/index.js'
+import { storeToday } from '../../utils/index.js'
 import { normalizeInput, phpString } from '../../utils/php.js'
 import { validateRules } from '../../utils/validation.js'
 import { CURRENCIES } from '../../models/procurement.model.js'
 import { activeBranchExists } from '../../repositories/procurement.repository.js'
+import { findByName as findCategoryByName } from '../../repositories/category.repository.js'
 
 /**
  * StoreProcurementRequest. The total is worked out from the Total Cost, never taken as a unit price from the browser.
@@ -19,7 +20,16 @@ export async function validateStoreProcurement(req, res, next) {
     name: 'exists',
     test: async (value) => (typeof value === 'string' || typeof value === 'number') && (await activeBranchExists(String(value))),
   }
-  // A Procurement Officer receives stock only into the branch the Owner assigned them in Account Provision
+  // The category must be one the Purchase Officer added; it is saved as that list spells it
+  const knownCategory = {
+    name: 'exists',
+    test: async (value) => {
+      const category = typeof value === 'string' && value ? await findCategoryByName(value) : null
+      if (category) data.category = category.name
+      return Boolean(category)
+    },
+  }
+  // A Purchase Officer receives stock only into the branch the Owner assigned them in Account Provision
   const assignedBranchOnly = (value, fail) => {
     const user = req.user
     if (!user.coversAllBranches && user.branchId !== value) {
@@ -32,7 +42,7 @@ export async function validateStoreProcurement(req, res, next) {
     {
       branchId: ['required', 'string', activeBranch, assignedBranchOnly],
       supplier: ['required', 'string', 'max:255'],
-      category: ['required', 'string', 'max:120'],
+      category: ['required', 'string', 'max:120', knownCategory],
       product: ['required', 'string', 'max:255'],
       medId: ['nullable', 'string', 'max:20'],
       qty: ['required', 'integer', 'min:1', 'max:1000000'],
@@ -43,16 +53,17 @@ export async function validateStoreProcurement(req, res, next) {
     },
     {
       'branchId.exists': 'Choose an active branch.',
+      'category.exists': 'Choose a category from the list. Add new ones on the Category & Product page.',
       'currency.in': 'Chapa only accepts payments in ETB or USD. Change the currency in Policy settings.',
     },
   )
   next()
 }
 
-/** Adding a paid order's stock (Add Medicine). Leaves the validated input on req.validated. */
+/** Adding a paid order's stock (Receive Stock). Leaves the validated input on req.validated. */
 export async function validateReceiveProcurement(req, res, next) {
-  // "Today" in the pharmacy's local time: stock that has already expired can't be added
-  const today = pharmacyToday()
+  // "Today" in the store's local time: stock that has already expired can't be added
+  const today = storeToday()
   req.validated = await validateRules(
     normalizeInput(req.body ?? {}),
     {

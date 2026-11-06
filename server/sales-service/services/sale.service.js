@@ -50,6 +50,7 @@ export async function recordSale(req, data) {
       recordId: sale.id,
       description: `${sale.qty} × ${sale.product} sold to ${sale.customer} for ${money(sale.total)}${from ? ` (batches ${from})` : ''}.`,
       branchId: sale.branch_id,
+      after: sale,
     })
   }
 

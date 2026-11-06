@@ -47,7 +47,7 @@ export async function snapshotFor(user) {
     recentPeriod: `last ${DAYS} days`,
   }
 
-  const roles = { owner, pharmacist, cashier, purchase_officer: procurementOfficer }
+  const roles = { owner, inventory_officer: inventoryOfficer, cashier, purchase_officer: procurementOfficer }
   // Branch staff always have a branch; PHP failed (500) for one without, and so does this
   if (user.role !== 'owner' && user.role !== 'purchase_officer' && !branchId) throw new Error(`The ${user.role} has no branch for the AI snapshot.`)
   return { ...context, ...(await roles[user.role](s, branchId)) }
@@ -77,7 +77,7 @@ async function owner(s) {
   }
 }
 
-async function pharmacist(s, branchId) {
+async function inventoryOfficer(s, branchId) {
   const stock = s.stock.filter((p) => p.branchId === branchId)
   const velocityHere = await velocity(s, branchId)
   const awaiting = await roleSnapshotRepository.paidAwaitingReceiving(branchId)

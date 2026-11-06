@@ -13,4 +13,4 @@ export const stockRouter = Router()
 
 stockRouter.get('/stock', requireAuth, stockController.index)
 // Route-model binding runs after the role check and before branch.active, as in Laravel's middleware order
-stockRouter.patch('/stock/:stockBatch', requireRole('pharmacist'), bindStockBatch, requireActiveBranch('correct stock'), validateUpdate, stockController.update)
+stockRouter.patch('/stock/:stockBatch', requireRole('inventory_officer'), bindStockBatch, requireActiveBranch('correct stock'), validateUpdate, stockController.update)

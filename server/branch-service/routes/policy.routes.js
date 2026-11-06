@@ -4,14 +4,14 @@ import { validateUpdatePolicy } from '../middleware/validators/policy.validator.
 import * as policyController from '../controllers/policy.controller.js'
 
 /**
- * The pharmacy's policy (Laravel's PolicyController): everyone reads it (Low Stock and Expiring Soon depend on it);
- * the Inventory Officer (Pharmacist, Policy page) changes it.
+ * The store's policy (Laravel's PolicyController): everyone reads it (Low Stock and Expiring Soon depend on it);
+ * the Inventory Officer (Policy page) changes it.
  *   GET /policy   signed in
- *   PUT /policy   Pharmacist
+ *   PUT /policy   Inventory Officer
  */
 const router = Router()
 
 router.get('/policy', requireAuth, policyController.show)
-router.put('/policy', requireRole(ROLES.PHARMACIST), validateUpdatePolicy, policyController.update)
+router.put('/policy', requireRole(ROLES.INVENTORY_OFFICER), validateUpdatePolicy, policyController.update)
 
 export default router

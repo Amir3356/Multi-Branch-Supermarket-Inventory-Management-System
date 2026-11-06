@@ -6,12 +6,12 @@ import { chapaClient } from './chapa.service.js'
 import { fakeChapaClient } from './fakeChapa.service.js'
 import { procurementChanged } from './procurementEvents.service.js'
 
-// CHAPA_MODE=fake: a pretend checkout on this service, for local development without working Chapa keys
+// CHAPA_MODE=fake: payments succeed straight away (no checkout page), for local development without Chapa keys
 export const chapa = config.chapa.mode === 'fake' ? fakeChapaClient : chapaClient
 
 /**
  * Asks Chapa for a checkout page for this procurement and keeps its URL so the payment can be resumed.
- * `payer` is the signed-in user (req.user).
+ * `payer` is the signed-in user (req.user). Returns null in CHAPA_MODE=fake, where the payment is already made.
  */
 export async function startCheckout(procurement, payer) {
   const [firstName, lastName = ''] = splitOnce(payer.fullName.trim(), ' ')
@@ -34,7 +34,7 @@ export async function startCheckout(procurement, payer) {
     },
   })
 
-  await procurements.update(procurement.id, { checkout_url: checkoutUrl })
+  if (checkoutUrl) await procurements.update(procurement.id, { checkout_url: checkoutUrl })
   return checkoutUrl
 }
 
@@ -77,7 +77,7 @@ export async function sync(procurement, req = null) {
     return locked
   })
 
-  // Recorded once, by whichever check saw the change: the Procurement Officer's screen, Chapa's callback or the
+  // Recorded once, by whichever check saw the change: the Purchase Officer's screen, Chapa's callback or the
   // scheduled check. Without a signed-in person it's the system's (Chapa's) doing.
   if (changed && !isPending(synced)) {
     const paid = synced.status === 'paid'
@@ -88,6 +88,9 @@ export async function sync(procurement, req = null) {
       description: `${paid ? 'Chapa confirmed payment of ' : 'Chapa payment failed for '}${money(synced.total, synced.currency)} (${synced.qty} × ${synced.product}).`,
       branchId: synced.branch_id,
       actorName: req?.user ? null : 'Chapa',
+      type: paid ? 'approve' : 'reject',
+      before: procurement,
+      after: synced,
     })
   }
 

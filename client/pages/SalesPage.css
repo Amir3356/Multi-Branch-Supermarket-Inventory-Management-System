@@ -5,7 +5,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   padding: 0.85rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgb(var(--overlay-rgb) / 0.03);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
 }
@@ -31,14 +31,14 @@
 
 .sale-summary .sale-total {
   font-size: 1.05rem;
-  color: #34d399;
+  color: var(--primary-emerald);
 }
 
 .negative-text {
-  color: #fb7185;
+  color: var(--danger-text);
 }
 
 .data-table td.negative-text,
 .sale-summary strong.negative-text {
-  color: #fb7185;
+  color: var(--danger-text);
 }

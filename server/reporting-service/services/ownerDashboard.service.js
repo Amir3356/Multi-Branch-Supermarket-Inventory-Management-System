@@ -3,13 +3,13 @@ import { dbTime, toFloat, toInt, truthy } from '../utils/php.js'
 import * as ownerDashboardRepository from '../repositories/ownerDashboard.repository.js'
 
 /**
- * The Owner's dashboard figures, worked out in the database for a period (calendar days in the pharmacy's time zone)
+ * The Owner's dashboard figures, worked out in the database for a period (calendar days in the store's time zone)
  * and optionally one branch. Sales count by when they were made, purchases by order date (paid orders only, as on the
- * Procurement Officer's dashboard), expenses by their expense date, damaged stock by the day it was written off.
+ * Purchase Officer's dashboard), expenses by their expense date, damaged stock by the day it was written off.
  * Reads sales, procurements, expenses, damaged_items, products, branches and users (owned by other services).
  */
 export async function summary(from, to, branchId) {
-  // Timestamps are stored in UTC; the period's days are the pharmacy's
+  // Timestamps are stored in UTC; the period's days are the store's
   const zone = config.timezone
   const start = dbTime(DateTime.fromISO(from, { zone }).startOf('day').toUTC())
   const end = dbTime(DateTime.fromISO(to, { zone }).endOf('day').toUTC())
@@ -17,7 +17,7 @@ export async function summary(from, to, branchId) {
 
   const { sales, purchases, expenses, damaged } = ownerDashboardRepository.periodConditions(start, end, from, to, branchId, byBranch)
 
-  // Cost of what was sold: units × the product's purchase price (its latest, the one Add Medicine recorded)
+  // Cost of what was sold: units × the product's purchase price (its latest, the one Receive Stock recorded)
   const [cost, salesRow, purchasesRow, expensesRow, damagedRow] = await Promise.all([
     ownerDashboardRepository.costOfSales(sales),
     ownerDashboardRepository.salesTotals(sales),

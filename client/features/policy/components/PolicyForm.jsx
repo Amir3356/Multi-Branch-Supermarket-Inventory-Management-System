@@ -1,9 +1,6 @@
 import { useState } from 'react'
-import {
-  CheckCircle2,
-  X,
-  Save
-} from 'lucide-react'
+import { Save } from 'lucide-react'
+import { Notice } from '../../../components'
 import { isWholeNumber } from '../../../utils'
 import { MAX_WARNING_DAYS } from '../model/policy'
 
@@ -47,15 +44,7 @@ export default function PolicyForm({ settings, onSave }) {
 
   return (
     <>
-      {notice && (
-        <div className="success-notice">
-          <CheckCircle2 size={16} />
-          <span>{notice}</span>
-          <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss">
-            <X size={14} />
-          </button>
-        </div>
-      )}
+      <Notice notice={notice} onDismiss={() => setNotice(null)} />
 
       <form className="settings-box policy-box" onSubmit={handleSave} noValidate>
         {errors.form && <span className="error-msg">{errors.form}</span>}

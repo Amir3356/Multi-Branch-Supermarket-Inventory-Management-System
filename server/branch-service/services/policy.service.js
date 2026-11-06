@@ -3,7 +3,7 @@ import * as policies from '../repositories/policy.repository.js'
 import { presentPolicy } from '../models/policy.model.js'
 
 /**
- * The pharmacy's policy (Laravel's PolicyController logic and PolicyBroadcaster). The live payload is what the old
+ * The store's policy (Laravel's PolicyController logic and PolicyBroadcaster). The live payload is what the old
  * event's broadcastWith() sent (PolicyChanged: the policy resource).
  */
 
@@ -31,6 +31,8 @@ export async function update(req, { defaultMinStock, expiryWarningDays }) {
     recordId: null,
     description: `${summary.charAt(0).toUpperCase()}${summary.slice(1)} (every product at all branches).`,
     branchId: req.user.branchId,
+    before,
+    after: policy,
   })
   return policy
 }

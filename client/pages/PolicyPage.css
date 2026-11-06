@@ -7,14 +7,14 @@
 }
 
 .settings-box {
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(255, 255, 255, 0.5);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 1.25rem;
 }
 
 .settings-box h4 {
-  color: #ffffff;
+  color: var(--text-main);
   margin-bottom: 1rem;
   font-size: 0.98rem;
 }
@@ -52,7 +52,7 @@
 }
 
 .settings-panel select.input-field option {
-  background: #0f172a;
+  background: var(--bg-card);
 }
 
 .settings-panel .input-field:disabled {

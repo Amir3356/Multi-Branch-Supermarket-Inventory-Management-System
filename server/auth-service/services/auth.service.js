@@ -33,7 +33,7 @@ export async function login(req, { email, password }) {
       actor: actorOf(user),
       actorName: email,
     })
-    throw validationError({ email: 'These credentials do not match our records.' })
+    throw validationError({ email: 'Invalid email or password.' })
   }
 
   if (user.status === ACCOUNT_STATUSES.INACTIVE) {

@@ -8,7 +8,7 @@ import { DAMAGE_REASONS } from '../model/damageRecord'
 const EMPTY_DAMAGE_FORM = { category: '', productName: '', batchKey: '', qty: '', reason: '' }
 
 // Records stock that was physically damaged and takes it out of the branch's sellable stock
-export default function RecordDamageModal({ inventory, categories, formatMoney, onClose, onSave }) {
+export default function RecordDamageModal({ inventory, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState(EMPTY_DAMAGE_FORM)
   const [errors, setErrors] = useState({})
   const [isSaving, setIsSaving] = useState(false)
@@ -17,6 +17,8 @@ export default function RecordDamageModal({ inventory, categories, formatMoney, 
 
   // Filter inventory with stock > 0
   const availableStock = inventory.filter((i) => i.stock > 0)
+  // Categories and products as the Inventory page lists them (its Category and Product Name columns): only what's in stock
+  const categories = [...new Set(availableStock.map((i) => i.category))].sort((a, b) => a.localeCompare(b))
   const categoryCount = (cat) => availableStock.filter((i) => i.category === cat).length
 
   // Products under chosen category
@@ -98,8 +100,8 @@ export default function RecordDamageModal({ inventory, categories, formatMoney, 
               {categories.map((c) => {
                 const count = categoryCount(c)
                 return (
-                  <option key={c} value={c} disabled={!count}>
-                    {c} {count ? `(${count} in stock)` : '(none in stock)'}
+                  <option key={c} value={c}>
+                    {c} ({count} in stock)
                   </option>
                 )
               })}

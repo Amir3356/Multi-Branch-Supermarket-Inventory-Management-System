@@ -1,3 +1,4 @@
+import { HEADERS, encodeContext } from '../utils/index.js'
 import { introspect as introspectToken } from '../services/introspection.service.js'
 import * as sessions from '../services/session.service.js'
 import * as tokens from '../services/token.service.js'
@@ -21,6 +22,20 @@ export async function introspect(req, res) {
     touch: body.touch === true,
   })
   res.json(result ?? { user: null })
+}
+
+/**
+ * GET /internal/auth/gateway-check: the nginx gateway's auth_request. nginx sends the browser's Authorization header
+ * and IP; the answer is always 204 (guests pass too: each service decides whether a route needs sign-in), with
+ * x-auth-context set to the signed-in user when the bearer token is valid. nginx forwards that header to the service.
+ */
+export async function gatewayCheck(req, res) {
+  const match = /^Bearer\s+(.+)$/i.exec(req.get('authorization') ?? '')
+  if (match) {
+    const result = await introspectToken({ token: match[1].trim(), ip: req.clientIp, touch: true })
+    if (result?.user) res.set(HEADERS.CONTEXT, encodeContext({ user: result.user, tokenId: result.tokenId }))
+  }
+  res.status(204).end()
 }
 
 /** Signs a user in right after another service proved who they are (an accepted invitation) */

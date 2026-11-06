@@ -6,8 +6,8 @@ import { buildSalesReport } from './salesReport.service.js'
 import { buildUserReport } from './userReport.service.js'
 
 /**
- * The reports under Reports (the Owner's; the Cashier's Sales Report, the Pharmacist's Inventory Report and the
- * Procurement Officer's Procurement Report): each for a period (the pharmacy's calendar days) and every branch or one.
+ * The reports under Reports (the Owner's; the Cashier's Sales Report, the Inventory Officer's Inventory Report and the
+ * Purchase Officer's Procurement Report): each for a period (the store's calendar days) and every branch or one.
  * Read only. `data` is the validated { from, to, branchId? }.
  */
 async function respond(data, user, build) {
@@ -21,10 +21,10 @@ async function respond(data, user, build) {
 export const financialReport = (data, user) => respond(data, user, buildFinancialReport)
 export const userReport = (data, user) => respond(data, user, buildUserReport)
 
-// The Procurement Report is the Procurement Officer's too: they buy for every branch
+// The Procurement Report is the Purchase Officer's too: they buy for every branch
 export const procurementReport = (data, user) => respond(data, user, buildProcurementReport)
 
-// The Pharmacist sees the Inventory Report for their own branch (respond keeps them to it)
+// The Inventory Officer sees the Inventory Report for their own branch (respond keeps them to it)
 export const inventoryReport = (data, user) => respond(data, user, buildInventoryReport)
 
 // The Cashier sees the Sales Report for their own branch, without purchase-price figures

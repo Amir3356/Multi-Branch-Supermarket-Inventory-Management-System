@@ -3,13 +3,13 @@ import { findCatalogProduct, nextId } from '../../../utils'
 import { thunkContext } from '../../../redux/thunkHelpers'
 import { categoryAdded, productAdded, productUpdated } from '../../inventory/store/productsSlice'
 import { refreshStock } from '../../inventory/store/stockThunks'
-import { procurementBatch, procurementFromApi } from '../model/procurement'
-import { paymentSaved, purchaseSaved } from './purchasesSlice'
+import { procurementBatch } from '../model/procurement'
+import { purchaseSaved } from './purchasesSlice'
 
 // Procurements live on the server and are paid through Chapa. Paying puts the product in the catalog; its stock enters
-// the receiving branch's Inventory (on the server) only when that branch's Inventory Officer adds it (Add Medicine).
+// the receiving branch's Inventory (on the server) only when that branch's Inventory Officer adds it (Receive Stock).
 
-// The catalog product a paid order bought; a product new to the catalog is added (selling price set with Add Medicine)
+// The catalog product a paid order bought; a product new to the catalog is added (selling price set with Receive Stock)
 const productFor = (procurement) => (dispatch, getState) => {
   const { state } = thunkContext(getState)
   const { category, product, purchasePrice } = procurement
@@ -22,23 +22,21 @@ const productFor = (procurement) => (dispatch, getState) => {
   return medId
 }
 
-// Paid: the product is ready for Add Medicine at the receiving branch, but nothing is in stock yet
+// Paid: the product is ready for Receive Stock at the receiving branch, but nothing is in stock yet
 const procurementPaid = (procurement) => (dispatch) => {
   dispatch(productFor(procurement))
 }
 
 // Keeps the browser's copy in step with the API's
-const procurementSynced = (apiProcurement) => (dispatch, getState) => {
-  const { procurement, payment } = procurementFromApi(apiProcurement)
+const procurementSynced = (procurement) => (dispatch, getState) => {
   const known = getState().purchases.items.find((p) => p.id === procurement.id)
   dispatch(purchaseSaved(procurement))
-  if (payment) dispatch(paymentSaved(payment))
   if (procurement.status === 'Paid' && known?.status !== 'Paid') dispatch(procurementPaid(procurement))
-  // Added with Add Medicine: the product is in the catalog (its units are in the server's stock)
+  // Added with Receive Stock: the product is in the catalog (its units are in the server's stock)
   if (procurement.receivedAt && !known?.receivedAt) dispatch(productFor(procurement))
 }
 
-// Inventory Officer (Add Medicine): add a paid order's stock to their branch with the expiry on the package (the server
+// Inventory Officer (Receive Stock): add a paid order's stock to their branch with the expiry on the package (the server
 // generates its batch number), and set its selling price; returns the confirmation, or throws ApiError (e.g. already added on another screen)
 export const addProcurementToStock = (procurement, sellingPrice, { expiryDate }) => async (dispatch, getState) => {
   // The server saves the product's shared prices too (this order's unit cost, and the selling price)
@@ -65,9 +63,10 @@ export const loadProcurements = () => async (dispatch) => {
 // Saves the order as Pending and returns its id and Chapa's checkout page to pay on; failures throw ApiError
 export const startProcurement = (data) => async (dispatch, getState) => {
   const { currency } = getState().settings
-  const { procurement, checkoutUrl } = await createProcurement({ ...data, currency })
+  const { procurement, checkoutUrl, message } = await createProcurement({ ...data, currency })
   dispatch(procurementSynced(procurement))
-  return { id: procurement.id, checkoutUrl }
+  // checkoutUrl is null when there is no checkout page (CHAPA_MODE=fake): the order is already paid
+  return { id: procurement.id, checkoutUrl, status: procurement.status, message }
 }
 
 // Confirms the payment with the API and returns a notice for the page, with the procurement's status

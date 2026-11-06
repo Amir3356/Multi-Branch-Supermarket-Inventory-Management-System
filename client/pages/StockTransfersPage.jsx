@@ -5,7 +5,7 @@ import { Notice, PageHeader, StatCard } from '../components'
 import { useBranchScope } from '../hooks'
 import { selectTransfers } from '../features/transfers/store/transfersSlice'
 import { selectInventory } from '../features/inventory/store/selectors'
-import { selectCategories, selectProducts } from '../features/inventory/store/productsSlice'
+import { selectProducts } from '../features/inventory/store/productsSlice'
 import { selectSettings } from '../features/policy/store/settingsSlice'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { sendTransfer } from '../features/transfers/store/transfersThunks'
@@ -20,7 +20,6 @@ export default function StockTransfersPage() {
   const transfers = allTransfers.filter((t) => inScope(t.from) || inScope(t.to))
   const inventory = useSelector(selectInventory)
   const products = useSelector(selectProducts)
-  const categories = useSelector(selectCategories)
   const { maxTransferQty } = useSelector(selectSettings)
   const user = useSelector(selectCurrentUser)
   // Staff send from their own branch; the Owner (branch "all") picks any
@@ -54,7 +53,7 @@ export default function StockTransfersPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Stock Transfers · ${scopeLabel}`} description="Move stock between branches. It leaves the sending branch at once and reaches the receiving branch's Inventory when their Inventory Officer adds it (Add Medicine).">
+      <PageHeader centered title={`Stock Transfers · ${scopeLabel}`} description="Move stock between branches. It leaves the sending branch at once and reaches the receiving branch's Inventory when their Inventory Officer adds it (Receive Stock).">
         <button className="primary-action-btn" onClick={() => setShowNewTransfer(true)}>
           <Plus size={16} /> New Transfer
         </button>
@@ -69,21 +68,7 @@ export default function StockTransfersPage() {
             <StatCard title="Received" icon={ArrowDownLeft} tone="teal" value={sum(incoming).toLocaleString()} chipTone="positive" chip={`${incoming.length} ${incoming.length === 1 ? 'transfer' : 'transfers'} from other branches`} />
           </div>
 
-          <div className="section-header">
-            <div>
-              <h3>Outgoing · Sent from {scopeLabel}</h3>
-              <p className="page-desc">Stock this branch moved to other branches.</p>
-            </div>
-          </div>
           <TransfersTable transfers={outgoing} products={products} branchById={branchById} show="to" emptyText="Nothing sent to other branches yet." />
-
-          <div className="section-header" style={{ marginTop: '2.5rem' }}>
-            <div>
-              <h3>Incoming · Received at {scopeLabel}</h3>
-              <p className="page-desc">Stock other branches moved here.</p>
-            </div>
-          </div>
-          <TransfersTable transfers={incoming} products={products} branchById={branchById} show="from" emptyText="Nothing received from other branches yet." />
         </>
       ) : (
         <>
@@ -96,7 +81,7 @@ export default function StockTransfersPage() {
       )}
 
       {showNewTransfer && (
-        <NewTransferModal branches={branches} assignedBranchId={assignedBranchId} inventory={inventory} categories={categories} maxQty={maxTransferQty} onClose={() => setShowNewTransfer(false)} onSave={handleTransfer} />
+        <NewTransferModal branches={branches} assignedBranchId={assignedBranchId} inventory={inventory} maxQty={maxTransferQty} onClose={() => setShowNewTransfer(false)} onSave={handleTransfer} />
       )}
     </div>
   )

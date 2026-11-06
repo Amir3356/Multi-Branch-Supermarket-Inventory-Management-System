@@ -1,14 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { STORAGE_KEYS, readJson } from '../../../utils'
 
-const MEDICINES = []
-const GOVERNMENT_TAXES = []
-const EXPENSE_CATEGORIES = []
-
 const USD_TO_ETB = 161
 
 export const DEFAULT_SETTINGS = {
-  pharmacyName: 'PharmaCare',
+  storeName: 'SuperMart IMS',
   currency: 'ETB',
   defaultBranch: 'all',
   expiryWarningDays: 60,
@@ -16,9 +12,9 @@ export const DEFAULT_SETTINGS = {
   // One minimum stock level for every product at all branches (set on the Policy page)
   defaultMinStock: 20,
   expiryAlerts: true,
-  reorderLevels: Object.fromEntries(MEDICINES.map((m) => [m.id, m.reorderLevel])),
-  tax: { version: 3, rates: GOVERNMENT_TAXES },
-  expenseCategories: EXPENSE_CATEGORIES,
+  reorderLevels: {},
+  tax: { version: 3, rates: [] },
+  expenseCategories: [],
   maxTransferQty: 500
 }
 

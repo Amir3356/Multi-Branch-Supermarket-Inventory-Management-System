@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { AlertTriangle, ArrowDownUp, Banknote, Boxes, CalendarClock, CheckCircle2, CircleDollarSign, Clock, FileText, Radio, Hourglass, MailWarning, Package, PackageCheck, ShoppingCart, TrendingUp, Truck, UserCog, Users, UserX, Wallet } from 'lucide-react'
 import { PageHeader, StatCard } from '../../../components'
 import { useBranchScope, useFormatMoney } from '../../../hooks'
-import { selectSettings } from '../../policy/store/settingsSlice'
 import { BarChart, ChartCard, DonutChart, HorizontalBarChart, PieChart } from '../../dashboard/components/Charts'
 import { PeriodError, PeriodPicker } from '../../dashboard/components/DashboardParts'
 import { useReport } from '../hooks/useReport'
@@ -50,12 +48,19 @@ function SpecChart({ chart, money }) {
   return <BarChart columns={chart.columns} series={chart.series} format={format} wholeNumbers={chart.wholeNumbers} wrapLabels={chart.columns.length < 8} emptyText={chart.empty} />
 }
 
-function SpecTable({ table }) {
+function SpecTable({ table, centered }) {
+  const isCentered = centered || table.title === 'Top products'
   return (
     <section className="report-table-section">
-      <div className="report-table-heading">
-        <h3>{table.title}</h3>
-        {table.note && <span className="page-desc">{table.note}</span>}
+      <div className="report-table-heading" style={isCentered ? { justifyContent: 'center', textAlign: 'center' } : undefined}>
+        <div style={isCentered ? { textAlign: 'center', width: '100%' } : undefined}>
+          <h3 style={isCentered ? { textAlign: 'center' } : undefined}>{table.title}</h3>
+          {table.note && (
+            <span className="page-desc" style={isCentered ? { textAlign: 'center', display: 'block', marginTop: '0.25rem' } : undefined}>
+              {table.note}
+            </span>
+          )}
+        </div>
       </div>
       <div className="table-responsive">
         <table className="data-table">
@@ -74,7 +79,11 @@ function SpecTable({ table }) {
           </tbody>
         </table>
       </div>
-      {table.footnote && <p className="page-desc report-footnote">{table.footnote}</p>}
+      {table.footnote && (
+        <p className="page-desc report-footnote" style={centered ? { textAlign: 'center' } : undefined}>
+          {table.footnote}
+        </p>
+      )}
     </section>
   )
 }
@@ -83,11 +92,10 @@ function SpecTable({ table }) {
  * A report page: period and branch filters, then the report's cards, charts and tables, with Export PDF. `kind` picks
  * the server report; `buildSpec(data, money)` turns its figures into what's shown (the PDF draws the same spec).
  */
-export default function ReportPage({ kind, title, description, buildSpec }) {
+export default function ReportPage({ kind, title, description, buildSpec, centered = true }) {
   const { period, branchId, setBranchId, canPickBranch, data, error, loading, isLive, updatedAt } = useReport(kind)
   const { branches, branchById } = useBranchScope()
   const money = useFormatMoney()
-  const { pharmacyName } = useSelector(selectSettings)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState(null)
   const spec = data ? buildSpec(data, money) : null
@@ -97,7 +105,7 @@ export default function ReportPage({ kind, title, description, buildSpec }) {
     setExporting(true)
     setExportError(null)
     try {
-      await exportReportPdf({ title, spec, pharmacyName, periodText: period.text, scope, kind, from: data.from, to: data.to })
+      await exportReportPdf({ title, description, spec, periodText: period.text, scope, kind, from: data.from, to: data.to })
     } catch (e) {
       setExportError(`The PDF couldn't be created: ${e.message}`)
     } finally {
@@ -106,8 +114,8 @@ export default function ReportPage({ kind, title, description, buildSpec }) {
   }
 
   return (
-    <div className="content-section-card report-page">
-      <PageHeader title={title} description={description}>
+    <div className={`content-section-card report-page ${centered ? 'centered' : ''}`}>
+      <PageHeader centered={centered} title={title} description={description}>
         <div className="report-header-actions">
           <span className={`stat-chip ${isLive ? 'positive' : 'neutral'}`} title={isLive ? 'The figures update the moment anything is recorded' : 'Live connection unavailable; the figures update every minute'}>
             <Radio size={13} /> {isLive ? 'Live' : 'Updates every minute'}
@@ -150,13 +158,13 @@ export default function ReportPage({ kind, title, description, buildSpec }) {
 
           <div className="charts-grid">
             {spec.charts.map((chart) => (
-              <ChartCard key={chart.title} title={chart.title} subtitle={chart.subtitle}>
+              <ChartCard key={chart.title} title={chart.title} subtitle={chart.subtitle} centered={centered}>
                 <SpecChart chart={chart} money={money} />
               </ChartCard>
             ))}
           </div>
 
-          {spec.tables.map((table) => <SpecTable key={table.title} table={table} />)}
+          {spec.tables.map((table) => <SpecTable key={table.title} table={table} centered={centered} />)}
         </div>
       )}
     </div>

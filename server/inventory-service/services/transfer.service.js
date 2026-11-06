@@ -69,12 +69,13 @@ export async function send(req, data) {
     recordId: transfer.id,
     description: `${transfer.qty} × ${transfer.product} (batch ${transfer.batch}) sent from ${await branchName(transfer.from_branch_id)} to ${await branchName(transfer.to_branch_id)}.`,
     branchId: transfer.from_branch_id,
+    after: transfer,
   })
 
   return transfer
 }
 
-/** Receiving branch's Inventory Officer (Add Medicine): the units enter their stock, once. Returns the transfer row. */
+/** Receiving branch's Inventory Officer (Receive Stock): the units enter their stock, once. Returns the transfer row. */
 export async function receive(req, found, sellingPrice) {
   const received = await transaction(async (client) => {
     const locked = await lockForUpdate(found.id, client)
@@ -94,6 +95,9 @@ export async function receive(req, found, sellingPrice) {
     recordId: received.id,
     description: `${received.qty} × ${received.product} from ${await branchName(received.from_branch_id)} added as batch ${received.received_batch}, selling at ${money(sellingPrice)}.`,
     branchId: received.to_branch_id,
+    type: 'approve',
+    before: found,
+    after: received,
   })
 
   return received

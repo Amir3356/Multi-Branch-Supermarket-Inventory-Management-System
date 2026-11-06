@@ -70,7 +70,7 @@ export function expensesByCategory(expenses, range) {
   return [...totals].map(([label, value]) => ({ label, value })).sort((a, b) => b.value - a.value)
 }
 
-// The Procurement Officer's chart
+// The Purchase Officer's chart
 
 /** Paid order totals (money) per column of the period, by order date */
 export const purchasesOverTime = (purchases, range) =>

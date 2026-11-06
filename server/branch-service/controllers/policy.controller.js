@@ -1,7 +1,7 @@
 import * as policyService from '../services/policy.service.js'
 import { presentPolicy } from '../models/policy.model.js'
 
-/** The pharmacy's policy (Laravel's PolicyController): HTTP in, JSON out */
+/** The store's policy (Laravel's PolicyController): HTTP in, JSON out */
 
 export async function show(req, res) {
   res.json({ data: presentPolicy(await policyService.current()) })

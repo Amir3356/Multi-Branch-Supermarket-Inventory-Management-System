@@ -1,16 +1,21 @@
-import { AlertTriangle, CheckCircle2, X } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
-// Dismissible confirmation / error banner. notice: { type: 'success' | 'error' | 'info', text } or a plain string.
+// Shows a notice as a Sonner toast (the <Toaster> in App removes it after 3 seconds). It renders nothing itself.
+// notice: { type: 'success' | 'error' | 'info', text } or a plain string. Once shown, onDismiss() clears the page's
+// notice state, so setting the same message again shows a new toast.
 export default function Notice({ notice, onDismiss }) {
-  if (!notice) return null
-  const { type = 'success', text } = typeof notice === 'string' ? { text: notice } : notice
-  return (
-    <div className={`success-notice ${type === 'success' ? '' : type}`}>
-      {type === 'error' ? <AlertTriangle size={16} /> : <CheckCircle2 size={16} />}
-      <span>{text}</span>
-      <button type="button" onClick={onDismiss} aria-label="Dismiss">
-        <X size={14} />
-      </button>
-    </div>
-  )
+  const shown = useRef(null)
+
+  useEffect(() => {
+    // StrictMode runs effects twice in development: the ref stops the same notice being toasted twice
+    if (!notice || shown.current === notice) return
+    shown.current = notice
+    const { type = 'success', text } = typeof notice === 'string' ? { text: notice } : notice
+    const show = { success: toast.success, error: toast.error, info: toast.info }[type] ?? toast
+    show(text)
+    onDismiss?.()
+  }, [notice, onDismiss])
+
+  return null
 }

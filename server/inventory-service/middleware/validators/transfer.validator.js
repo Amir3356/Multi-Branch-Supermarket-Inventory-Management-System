@@ -13,7 +13,7 @@ const storeRules = (user) => ({
     // Staff send only from their own branch; those who cover every branch from any
     rule((value) => user.coversAllBranches || user.branchId === value, 'You can only send stock from your assigned branch.'),
   ],
-  to: [required(), string(), different('from', 'Choose a different branch from the sending branch.'), rule(activeBranch, 'Choose an active receiving branch.')],
+  to: [required(), string(), different('from', 'Choose a different branch from the sending branch.'), rule(activeBranch, 'This branch was deactivated by the Owner, so it can’t receive stock. Choose an active branch, or ask the Owner to activate it.')],
   category: [required(), string(), max(120)],
   product: [required(), string(), max(255)],
   medId: [string(), max(20)],

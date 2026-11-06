@@ -4,7 +4,7 @@ import { HttpError } from '../utils/errors.js'
 /**
  * Lets a change through only while the signed-in staff member's branch is active: a deactivated branch is closed, so
  * nothing new is recorded there. Those who cover every branch have none, and pass.
- *   router.post('/expenses', requireRole('pharmacist'), requireActiveBranch('record expenses'), controller.store)
+ *   router.post('/expenses', requireRole('inventory_officer'), requireActiveBranch('record expenses'), controller.store)
  */
 export function requireActiveBranch(action = 'make changes') {
   return async (req, res, next) => {

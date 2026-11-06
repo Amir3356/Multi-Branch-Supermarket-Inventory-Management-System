@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   const user = useSelector(selectCurrentUser)
   return (
     <div className="content-section-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-      <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: 'rgba(6, 182, 212, 0.12)', color: 'var(--primary-cyan)', marginBottom: '1rem' }}>
+      <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: 'rgba(31, 122, 77, 0.12)', color: 'var(--primary-cyan)', marginBottom: '1rem' }}>
         <SearchX size={36} />
       </div>
       <h2 className="page-title" style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>Page not found</h2>

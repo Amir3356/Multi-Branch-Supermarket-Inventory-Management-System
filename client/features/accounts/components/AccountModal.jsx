@@ -95,7 +95,7 @@ export default function AccountModal({ account, branches, onClose, onSave }) {
             <div className="form-group">
               <label htmlFor="account-branch">Assigned Branch {coversAllBranches(form.role) ? '' : '*'}</label>
               {coversAllBranches(form.role) ? (
-                // The Procurement Officer buys for every branch, so there is no branch to assign
+                // The Purchase Officer buys for every branch, so there is no branch to assign
                 <input id="account-branch" className="input-field" value="All Branches" readOnly disabled />
               ) : (
                 <select id="account-branch" className={`input-field ${errors.branchId ? 'error' : ''}`} value={form.branchId} onChange={update('branchId')}>

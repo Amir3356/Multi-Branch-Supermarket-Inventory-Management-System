@@ -17,14 +17,14 @@ export function presentAccount(user, { invitationExpired } = {}) {
     email: user.email,
     role: user.role,
     roleLabel: roleLabel(user.role),
-    // Those who cover every branch (Owner, Procurement Officer)
+    // Those who cover every branch (Owner, Purchase Officer)
     branchId: allBranches ? 'all' : user.branch_id,
     branchName: allBranches ? 'All Branches' : (user.branch_name ?? null),
     status: statusLabel(user.status),
   }
   if (user.status === 'invited' && invitationExpired !== undefined) account.invitationExpired = invitationExpired
   account.lastLoginAt = iso8601(user.last_login_at)
-  account.createdAt = user.created_at ? iso8601(user.created_at).slice(0, 10) : null
+  account.createdAt = iso8601(user.created_at)
   return account
 }
 

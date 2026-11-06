@@ -3,11 +3,11 @@ import { config } from './config.js'
 
 export { DateTime }
 
-/** Now in the pharmacy's time zone (PHARMACY_TIMEZONE): report periods like "today" follow it */
-export const pharmacyNow = () => DateTime.now().setZone(config.timezone)
+/** Now in the store's time zone (STORE_TIMEZONE): report periods like "today" follow it */
+export const storeNow = () => DateTime.now().setZone(config.timezone)
 
-/** Today's date in the pharmacy's time zone, 'YYYY-MM-DD' */
-export const pharmacyToday = () => pharmacyNow().toISODate()
+/** Today's date in the store's time zone, 'YYYY-MM-DD' */
+export const storeToday = () => storeNow().toISODate()
 
 const toDateTime = (value) => {
   if (value === null || value === undefined) return null

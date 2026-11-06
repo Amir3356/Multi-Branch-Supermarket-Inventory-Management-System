@@ -3,8 +3,8 @@ import { Params, sqlString } from '../utils/php.js'
 
 /**
  * A copy of reporting-service's ownerDashboard queries: the Owner's AI snapshot uses the same figures as the dashboard.
- * The Owner's dashboard queries for a period (calendar days in the pharmacy's time zone) and optionally one branch.
- * Sales count by when they were made, purchases by order date (paid orders only, as on the Procurement Officer's
+ * The Owner's dashboard queries for a period (calendar days in the store's time zone) and optionally one branch.
+ * Sales count by when they were made, purchases by order date (paid orders only, as on the Purchase Officer's
  * dashboard), expenses by their expense date, damaged stock by the day it was written off.
  * Reads sales, procurements, expenses, damaged_items, products, branches and users (owned by other services).
  */
@@ -33,7 +33,7 @@ export function periodConditions(start, end, from, to, branchId, byBranch) {
   return { sales, purchases, expenses, damaged }
 }
 
-// Cost of what was sold: units × the product's purchase price (its latest, the one Add Medicine recorded)
+// Cost of what was sold: units × the product's purchase price (its latest, the one Receive Stock recorded)
 export const costOfSales = (sales) =>
   one(`select sum(sales.qty * coalesce(products.purchase_price, 0)) as cost from sales ${WITH_PRODUCT} where ${sales.sql}`, sales.values)
 

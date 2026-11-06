@@ -2,9 +2,11 @@ import { createSlice } from '@reduxjs/toolkit'
 import { minutesBetween } from '../../../utils'
 
 /** Active while used in the last `idleAfterMinutes`, then Idle; ended sessions stay Ended */
-export const sessionState = (session, now, idleAfterMinutes) => {
-  if (session.status === 'Ended') return 'Ended'
-  return minutesBetween(now, session.lastActiveAt) > idleAfterMinutes ? 'Idle' : 'Active'
+export const sessionState = (session, now, idleAfterMinutes = 15) => {
+  if (!session || session.status === 'Ended' || session.endedAt) return 'Ended'
+  const lastActive = session.lastActiveAt || session.signedInAt
+  if (!lastActive) return 'Active'
+  return minutesBetween(now, lastActive) > (idleAfterMinutes || 15) ? 'Idle' : 'Active'
 }
 
 // Signed-in sessions across all staff, from the API (Owner only). Times are timestamps (ms).

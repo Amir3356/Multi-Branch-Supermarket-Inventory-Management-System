@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut, Pill, User } from 'lucide-react'
+import { ChevronDown, LogOut, Store, User } from 'lucide-react'
 import { useBranchScope } from '../hooks'
 import { NAV_GROUPS } from '../routes/navigation'
 import { PATHS, canOpen } from '../routes/paths'
@@ -26,7 +26,7 @@ export default function DashboardLayout() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useSelector(selectCurrentUser)
-  const { pharmacyName } = useSelector(selectSettings)
+  const { storeName } = useSelector(selectSettings)
   const inventory = useSelector(selectInventory)
   const { branches, inScope } = useBranchScope()
 
@@ -101,7 +101,7 @@ export default function DashboardLayout() {
   }, [sessionChecked, dispatch])
 
   // Live updates per branch: stock (whatever moved it) and the procurement, transfer, sale and damage lists. Staff listen to their own branch; those who cover every branch (Owner,
-  // Procurement Officer) to all of them. After a dropped connection, catch up once.
+  // Purchase Officer) to all of them. After a dropped connection, catch up once.
   const liveBranchIds = (user?.branchId === 'all' ? branches.map((b) => b.id) : [user?.branchId]).filter(Boolean).join(' ')
   useEffect(() => {
     const echo = realtime()
@@ -224,10 +224,10 @@ export default function DashboardLayout() {
       <aside className="dashboard-sidebar">
         <div className="sidebar-brand">
           <div className="logo-icon-wrapper">
-            <Pill size={22} />
+            <Store size={22} />
           </div>
           <div className="brand-title-wrap">
-            <span className="logo-text">{pharmacyName}</span>
+            <span className="logo-text">{storeName}</span>
             <span className="brand-subtitle">Multi-Branch Inventory</span>
           </div>
         </div>

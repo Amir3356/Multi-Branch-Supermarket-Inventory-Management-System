@@ -20,7 +20,7 @@ export const transferPushed = (transfer) => (dispatch) => {
 }
 
 // Inventory Officer: send stock to another branch. It leaves this branch now and is Pending until the receiving
-// branch adds it with Add Medicine.
+// branch adds it with Receive Stock.
 export const sendTransfer = ({ medId, expiry, ...data }) => async (dispatch) => {
   const { transfer, message } = await createTransfer({ ...data, medId, expiry })
   dispatch(transferSaved(transfer))
@@ -28,7 +28,7 @@ export const sendTransfer = ({ medId, expiry, ...data }) => async (dispatch) => 
   return message
 }
 
-// Receiving branch's Inventory Officer (Add Medicine): the units enter this branch's stock, and the product's selling
+// Receiving branch's Inventory Officer (Receive Stock): the units enter this branch's stock, and the product's selling
 // price is set
 export const receiveTransferToStock = (transfer, sellingPrice) => async (dispatch, getState) => {
   // The server saves the product's selling price too, for every branch

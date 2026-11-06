@@ -66,7 +66,7 @@ export function releaseStock({ reference }) {
 }
 
 /**
- * Units arriving from a paid procurement: the next batch number, the units added, and the product's shared prices set
+ * Units arriving from a paid procurement: under a newly generated Batch ID (BT-00001, …), the units added, and the product's shared prices set
  * when it is in the catalog and prices are given. → { batch, product } (ProductResource, or null).
  */
 export async function receiveStock(input, user) {
@@ -84,6 +84,7 @@ export async function receiveStock(input, user) {
         : await findProduct(medId, client)
       : null
 
+    // Each receipt gets its own Batch ID, generated here when the Inventory Officer adds the stock
     const batch = await nextId(client, 'batches', 'BT')
     await add(client, stockBroadcaster(client), {
       branchId,

@@ -46,7 +46,7 @@ export function phpRound(value, precision = 2) {
 
 export const ucfirst = (value) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : value)
 
-/** A timestamp shown as its date in the pharmacy's time zone (Carbon ->setTimezone(...)->toDateString()) */
+/** A timestamp shown as its date in the store's time zone (Carbon ->setTimezone(...)->toDateString()) */
 export function localDate(value) {
   if (!value) return null
   return DateTime.fromJSDate(value instanceof Date ? value : new Date(value), { zone: 'utc' }).setZone(config.timezone).toISODate()

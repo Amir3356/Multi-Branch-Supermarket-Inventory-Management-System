@@ -9,7 +9,7 @@ import ProcurementOfficerDashboard from '../features/dashboard/components/Procur
 
 const ROLE_INTRO = {
   owner: 'Sales, purchases, expenses and profit across every branch.',
-  pharmacist: 'Your branch’s stock at a glance.',
+  inventory_officer: 'Your branch’s stock at a glance.',
   cashier: 'Your branch’s sales.',
   purchase_officer: 'Purchases for every branch.'
 }
@@ -23,8 +23,8 @@ export default function DashboardPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Dashboard · ${staffBranchId ? branchById(staffBranchId)?.name || '' : scopeLabel}`} description={ROLE_INTRO[role]} />
-      {role === 'pharmacist' && <InventoryOfficerDashboard branchId={staffBranchId} />}
+      <PageHeader centered title={`Dashboard · ${staffBranchId ? branchById(staffBranchId)?.name || '' : scopeLabel}`} description={ROLE_INTRO[role]} />
+      {role === 'inventory_officer' && <InventoryOfficerDashboard branchId={staffBranchId} />}
       {role === 'owner' && <OwnerDashboard />}
       {role === 'cashier' && <CashierDashboard branchId={staffBranchId} />}
       {role === 'purchase_officer' && <ProcurementOfficerDashboard />}

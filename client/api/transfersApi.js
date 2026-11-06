@@ -1,6 +1,6 @@
 import { api } from '../utils/http'
 
-// Stock transfer endpoints: one branch sends, the other adds the stock (Add Medicine)
+// Stock transfer endpoints: one branch sends, the other adds the stock (Receive Stock)
 export const TRANSFERS_ENDPOINTS = {
   list: '/transfers',
   receive: (id) => `/transfers/${encodeURIComponent(id)}/receive`

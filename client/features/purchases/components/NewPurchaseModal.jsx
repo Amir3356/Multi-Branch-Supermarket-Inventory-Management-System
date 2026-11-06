@@ -9,8 +9,7 @@ import { useEscapeKey } from '../../../hooks'
 import { EMPTY_PURCHASE_FORM, toProcurementPayload, unitPriceFrom } from '../model/procurement'
 import { validatePurchase } from '../services/purchaseRules'
 
-// Category and Product Name are picked from the product catalog. An officer's Receiving Branch is the branch the Owner
-// assigned them in Account Provision, and can't be changed here.
+// Category and Product Name come from what the Purchase Officer adds on the Category & Product page (sidebar). An officer's Receiving Branch is the branch the Owner assigned them in Account Provision, and can't be changed.
 export default function NewPurchaseModal({ branches, assignedBranchId, products, categories, suppliers, formatMoney, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_PURCHASE_FORM, branchId: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
@@ -78,7 +77,6 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
             </div>
             <div>
               <h2 id="new-purchase-title">Create Procurement</h2>
-              <p className="page-desc">Buy stock from a supplier and pay through Chapa. Stock is received into the branch once the payment is confirmed.</p>
             </div>
           </div>
           <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Close">
@@ -117,7 +115,9 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
-            {errors.category && <span className="error-msg">{errors.category}</span>}
+            {errors.category
+              ? <span className="error-msg">{errors.category}</span>
+              : !categories.length && <span className="field-hint">No categories yet. Add them on the Category & Product page in the sidebar.</span>}
           </div>
 
           <div className="form-group">
@@ -128,7 +128,9 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
-            {errors.medId && <span className="error-msg">{errors.medId}</span>}
+            {errors.medId
+              ? <span className="error-msg">{errors.medId}</span>
+              : form.category && !categoryProducts.length && <span className="field-hint">Add products to {form.category} on the Category & Product page in the sidebar.</span>}
           </div>
 
           <div className="modal-grid">
@@ -149,7 +151,7 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
               Cancel
             </button>
             <button type="submit" className="primary-action-btn" disabled={submitting}>
-              <CreditCard size={16} /> {submitting ? 'Opening Chapa…' : 'Create & Pay with Chapa'}
+              <CreditCard size={16} /> {submitting ? 'Paying…' : 'Pay'}
             </button>
           </div>
         </form>

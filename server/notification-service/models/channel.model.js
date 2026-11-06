@@ -17,7 +17,7 @@ const RULES = [
   [/^products$/, everyone],
   // "Your session was ended": only the browser holding that very session
   [/^session\.(\d+)$/, ({ tokenId }, [, sessionId]) => String(tokenId) === sessionId],
-  // Live branch data: its own staff, and those who cover every branch (Owner, Procurement Officer)
+  // Live branch data: its own staff, and those who cover every branch (Owner, Purchase Officer)
   [
     /^branch\.([^.]+)\.([a-z]+)$/,
     ({ user }, [, branchId, topic]) => BRANCH_TOPICS.includes(topic) && (user.coversAllBranches || user.branchId === branchId),

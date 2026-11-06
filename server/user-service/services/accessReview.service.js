@@ -16,7 +16,7 @@ import { UNIT } from '../models/accessReview.model.js'
  *  - deactivated        blocked but still on file
  *
  * Each account is shown as it was at the end of the period (or now, for the current period), from the sign-in and
- * change logs. Periods are in the pharmacy's local time (PHARMACY_TIMEZONE); stored timestamps are UTC.
+ * change logs. Periods are in the store's local time (STORE_TIMEZONE); stored timestamps are UTC.
  */
 
 /** Carbon's toIso8601String() in the value's own zone: '2026-11-05T13:15:00+03:00' */
@@ -184,6 +184,9 @@ export async function generateManual(req, input) {
     action: replaced.length ? 'User report regenerated' : 'User report generated',
     recordId: review.id,
     description: `${ucfirst(period)} report for ${start.toISODate()} – ${end.toISODate()}.`,
+    type: 'create',
+    before: replaced.length ? { replacedReports: replaced } : null,
+    after: { id: review.id, period, from: start.toISODate(), to: end.toISODate() },
   })
 
   return { review: await reviews.findWithPeople(review.id), replaced }
@@ -196,5 +199,6 @@ export async function remove(req, review) {
     action: 'User report deleted',
     recordId: review.id,
     description: `${ucfirst(review.period_type)} report for ${review.period_start} – ${review.period_end} was deleted.`,
+    before: { id: review.id, period: review.period_type, from: review.period_start, to: review.period_end },
   })
 }

@@ -30,7 +30,7 @@ export function validationMessage(errors) {
   return more > 0 ? `${messages[0]} (and ${more} more error${more === 1 ? '' : 's'})` : messages[0]
 }
 
-/** A 422 with per-field messages: validationError({ email: 'These credentials do not match our records.' }) */
+/** A 422 with per-field messages: validationError({ email: 'Invalid email or password.' }) */
 export function validationError(errors) {
   const normalized = Object.fromEntries(Object.entries(errors).map(([field, value]) => [field, Array.isArray(value) ? value : [value]]))
   return new HttpError(422, validationMessage(normalized), normalized)

@@ -9,7 +9,7 @@
   margin-left: 0.3rem;
   padding: 0 0.4rem;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(var(--overlay-rgb) / 0.08);
   font-size: 0.72rem;
 }
 
@@ -26,15 +26,15 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem 1.1rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgb(var(--overlay-rgb) / 0.03);
   border: 1px solid var(--bg-card-border);
   border-radius: var(--radius-md);
   transition: var(--transition-fast);
 }
 
 .notification-item.unread {
-  background: rgba(6, 182, 212, 0.05);
-  border-color: rgba(6, 182, 212, 0.22);
+  background: rgba(31, 122, 77, 0.05);
+  border-color: rgba(31, 122, 77, 0.22);
 }
 
 .notification-item.read .notification-title {

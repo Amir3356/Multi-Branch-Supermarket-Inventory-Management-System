@@ -11,4 +11,4 @@ import * as damagedItemController from '../controllers/damagedItem.controller.js
 export const damagedItemRouter = Router()
 
 damagedItemRouter.get('/damaged-items', requireAuth, damagedItemController.index)
-damagedItemRouter.post('/damaged-items', requireRole('pharmacist'), requireActiveBranch('record damaged items'), validateStore, damagedItemController.store)
+damagedItemRouter.post('/damaged-items', requireRole('inventory_officer'), requireActiveBranch('record damaged items'), validateStore, damagedItemController.store)

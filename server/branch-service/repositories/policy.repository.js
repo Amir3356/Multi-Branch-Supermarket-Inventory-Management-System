@@ -1,6 +1,6 @@
 import { one } from '../utils/index.js'
 
-// Every database read and write for the pharmacy's single policy row (Laravel's PolicyRepository)
+// Every database read and write for the store's single policy row (Laravel's PolicyRepository)
 
 const WITH_EDITOR = `select p.id, p.default_min_stock, p.expiry_warning_days, p.updated_by, p.updated_at, u.full_name as editor_name
   from policy_settings p left join users u on u.id = p.updated_by`

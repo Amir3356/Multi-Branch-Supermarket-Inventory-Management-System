@@ -3,7 +3,7 @@
 .view-toggle {
   display: inline-flex;
   padding: 3px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(var(--overlay-rgb) / 0.05);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
 }
@@ -22,7 +22,7 @@
 }
 
 .view-toggle button.active {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(31, 122, 77, 0.15);
   color: var(--primary-cyan);
 }
 
@@ -56,7 +56,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  color: #fb7185;
+  color: var(--danger-text);
   font-weight: 600;
 }
 

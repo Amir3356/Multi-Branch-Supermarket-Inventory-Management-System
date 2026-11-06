@@ -1,6 +1,6 @@
 import { config } from '../utils/index.js'
 import { paginate } from '../utils/paginator.js'
-import { MODULES, PER_PAGE, toCountsResource, toResource } from '../models/auditLog.model.js'
+import { ACTION_TYPES, MODULES, PER_PAGE, toCountsResource, toResource } from '../models/auditLog.model.js'
 import * as auditLogService from '../services/auditLog.service.js'
 
 // The URL the browser called (through the gateway), which Laravel's paginator puts in its links
@@ -17,8 +17,14 @@ export async function index(req, res) {
   res.json({
     ...paginate({ items: rows.map(toResource), total, page, perPage: PER_PAGE, path: publicPath(req) }),
     modules: MODULES,
+    actionTypes: ACTION_TYPES,
     counts: toCountsResource(totals),
   })
+}
+
+/** POST /audit-logs/views { section }: the signed-in user opened that page → { recorded } */
+export async function view(req, res) {
+  res.status(201).json({ recorded: await auditLogService.recordPageView(req, req.body.section) })
 }
 
 /**

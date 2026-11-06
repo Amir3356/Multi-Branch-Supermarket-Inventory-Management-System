@@ -1,13 +1,13 @@
 // Browser storage for per-viewer preferences. Every read and write tolerates storage being unavailable.
 
 export const STORAGE_KEYS = {
-  settings: 'pharmacare-settings',
-  notifications: 'pharmacare-notifications',
-  auth: 'pharmacare-auth',
+  settings: 'supermart-settings',
+  notifications: 'supermart-notifications',
+  auth: 'supermart-auth',
   // When this browser was last used (any tab), for the inactivity sign-out
-  lastActivity: 'pharmacare-last-activity',
+  lastActivity: 'supermart-last-activity',
   // The session whose device location was already asked for, so the prompt shows once per sign-in
-  locationAsked: 'pharmacare-location-asked'
+  locationAsked: 'supermart-location-asked'
 }
 
 export const readJson = (key) => {

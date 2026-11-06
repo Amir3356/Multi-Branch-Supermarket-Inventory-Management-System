@@ -1,4 +1,4 @@
-// The pharmacy's policy, as the API sends it (server: Policies/Resources/PolicyResource.php)
+// The store's policy, as the API sends it (server: Policies/Resources/PolicyResource.php)
 
 /**
  * @typedef {object} Policy

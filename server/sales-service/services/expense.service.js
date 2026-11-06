@@ -6,7 +6,7 @@ import { ID_PREFIX, MODEL_CLASS, TABLE } from '../models/expense.model.js'
 // Pushed to a branch when an expense is recorded or deleted, so its open screens reload the list
 const announce = (branchId) => broadcast(`branch.${branchId}.expenses`, 'expenses.changed', { branchId })
 
-/** A branch's expenses, recorded by its Inventory Officer; the Owner and Procurement Officer can read all */
+/** A branch's expenses, recorded by its Inventory Officer; the Owner and Purchase Officer can read all */
 export function visibleTo(user) {
   return expenses.visibleTo(user)
 }
@@ -34,6 +34,7 @@ export async function record(req, data) {
     recordId: expense.id,
     description: `${expense.category}${expense.description ? ` (${expense.description})` : ''}: ${money(expense.amount)} on ${data.date}.`,
     branchId: expense.branch_id,
+    after: saved,
   })
 
   return expense
@@ -52,6 +53,7 @@ export async function remove(req, id) {
     recordId: expense.id,
     description: `${expense.category} expense of ${money(expense.amount)} was deleted.`,
     branchId: expense.branch_id,
+    before: expense,
   })
   announce(expense.branch_id)
 

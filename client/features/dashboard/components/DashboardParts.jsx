@@ -5,13 +5,16 @@ import { PERIODS } from '../services/periods'
 // Pieces every role's dashboard is built from: a titled section, the period picker, and a row of summary cards.
 
 /** A dashboard section with its heading, a line under it, and optional controls on the right */
-export function DashboardSection({ id, title, description, actions, children }) {
+export function DashboardSection({ id, title, description, actions, centered, children }) {
   return (
     <section className="dashboard-section" aria-labelledby={id}>
-      <div className="section-header dashboard-section-header">
-        <div>
-          <h3 id={id}>{title}</h3>
-          {description && <p className="page-desc">{description}</p>}
+      <div
+        className="section-header dashboard-section-header"
+        style={centered ? { justifyContent: 'center', textAlign: 'center' } : undefined}
+      >
+        <div style={centered ? { textAlign: 'center', width: '100%' } : undefined}>
+          <h3 id={id} style={centered ? { textAlign: 'center' } : undefined}>{title}</h3>
+          {description && <p className="page-desc" style={centered ? { textAlign: 'center' } : undefined}>{description}</p>}
         </div>
         {actions}
       </div>

@@ -44,6 +44,7 @@ export async function create(req, data) {
     recordId: branch.id,
     description: `${branch.name} added at ${branch.location} (${branch.status}).`,
     branchId: branch.id,
+    after: branch,
   })
   branchesChanged('added')
   return branch
@@ -64,6 +65,8 @@ export async function update(req, branch, data) {
     recordId: branch.id,
     description: `${after.name}: ${changes || 'no changes'}.`,
     branchId: branch.id,
+    before: branch,
+    after,
   })
   branchesChanged('updated')
   return after
@@ -88,6 +91,7 @@ export async function remove(req, branch) {
     description: `${branch.name} (${str(branch.location)}) was deleted.`,
     branchId: branch.id,
     branchName: branch.name,
+    before: branch,
   })
   branchesChanged('deleted')
 }

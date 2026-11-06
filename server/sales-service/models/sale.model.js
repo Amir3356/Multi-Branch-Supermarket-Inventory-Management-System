@@ -9,6 +9,9 @@ export const IDEMPOTENCY_CONSTRAINT = 'sales_sold_by_idempotency_key_unique'
 
 /** SaleResource. `sale.seller_name` is the seller's full name (null once the account is deleted). */
 export function toResource(sale) {
+  const createdAtIso = sale.created_at
+    ? (sale.created_at instanceof Date ? sale.created_at.toISOString() : new Date(sale.created_at).toISOString())
+    : null
   return {
     id: sale.id,
     branchId: sale.branch_id,
@@ -23,6 +26,8 @@ export function toResource(sale) {
     total: Number(sale.total),
     status: ucfirst(sale.status),
     date: localDate(sale.created_at),
+    createdAt: createdAtIso,
+    time: createdAtIso ? new Date(createdAtIso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : null,
     soldBy: sale.seller_name ?? null,
   }
 }

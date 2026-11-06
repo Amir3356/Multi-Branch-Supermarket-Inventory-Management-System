@@ -1,4 +1,4 @@
-// Date helpers shared across the app. Dates in the mock data are local calendar days (YYYY-MM-DD).
+// Date helpers shared across the app. Dates are local calendar days (YYYY-MM-DD).
 
 /** Local calendar date as YYYY-MM-DD */
 export const toDateKey = (date) =>
@@ -16,17 +16,31 @@ export const daysUntil = (date) => Math.round((date - startOfToday()) / (1000 * 
 
 export const formatDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
-/** A date the given number of years from today, as YYYY-MM-DD */
-export const yearsFromToday = (years) => {
-  const d = new Date()
-  d.setFullYear(d.getFullYear() + years)
-  return toDateKey(d)
+/** Formats a calendar date (YYYY-MM-DD string or Date) as DD/MM/YYYY (date/month/year) */
+export const formatDMY = (date) => {
+  if (!date) return '—'
+  if (typeof date === 'string') {
+    const parts = date.split('-')
+    if (parts.length === 3 && parts[0].length === 4) {
+      const [year, month, day] = parts
+      return `${day}/${month}/${year}`
+    }
+  }
+  const d = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(d.getTime())) return String(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}/${month}/${year}`
 }
 
-/** Current time as HH:MM (24-hour) */
-export const timeKey = (date = new Date()) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-
-export const minutesBetween = (later, earlier) => Math.max(0, Math.round((later - earlier) / 60000))
+export const minutesBetween = (later, earlier) => {
+  if (!later || !earlier) return 0
+  const l = later instanceof Date ? later.getTime() : typeof later === 'string' ? new Date(later).getTime() : Number(later)
+  const e = earlier instanceof Date ? earlier.getTime() : typeof earlier === 'string' ? new Date(earlier).getTime() : Number(earlier)
+  if (Number.isNaN(l) || Number.isNaN(e)) return 0
+  return Math.max(0, Math.round((l - e) / 60000))
+}
 
 export const timeAgo = (date, now) => {
   const minutes = minutesBetween(now, date)
@@ -40,6 +54,9 @@ export const timeAgo = (date, now) => {
 
 /** "Today 09:38" or "Oct 4 09:38" */
 export const formatSessionTime = (date, now) => {
-  const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const time = formatTime(date)
   return toDateKey(date) === toDateKey(now) ? `Today ${time}` : `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} ${time}`
 }
+
+/** "14:05": the time of day, 24-hour */
+export const formatTime = (date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })

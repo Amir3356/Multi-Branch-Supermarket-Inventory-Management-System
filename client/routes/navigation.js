@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Boxes,
   Landmark,
-  Truck
+  Truck,
+  Tags
 } from 'lucide-react'
 import { PATHS } from './paths'
 
@@ -34,7 +35,8 @@ export const NAV_GROUPS = [
   {
     title: 'OPERATIONS',
     items: [
-      { section: 'purchases', path: PATHS.purchases, label: 'Procurement', icon: PackageCheck },
+      { section: 'purchases', path: PATHS.purchases, label: 'Purchase', icon: PackageCheck },
+      { section: 'catalog', path: PATHS.catalog, label: 'Category & Product', icon: Tags },
       { section: 'transfers', path: PATHS.transfers, label: 'Stock Transfers', icon: ArrowLeftRight },
       { section: 'damaged', path: PATHS.damaged, label: 'Damaged', icon: PackageX },
       { section: 'expenses', path: PATHS.expenses, label: 'Expenses', icon: Wallet }

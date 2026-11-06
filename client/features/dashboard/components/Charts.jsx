@@ -1,12 +1,23 @@
 // Small dependency-free charts for the dashboard. Colours come from CSS classes so they follow the theme.
 
 /** A titled card that holds one chart */
-export function ChartCard({ title, subtitle, children }) {
+export function ChartCard({ title, subtitle, centered, children }) {
+  const isCentered = centered || title === 'Top products'
   return (
     <div className="chart-card">
-      <div className="chart-card-header">
-        <h4>{title}</h4>
-        {subtitle && <span className="chart-subtitle">{subtitle}</span>}
+      <div
+        className="chart-card-header"
+        style={isCentered ? { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' } : undefined}
+      >
+        <h4 style={isCentered ? { textAlign: 'center', width: '100%' } : undefined}>{title}</h4>
+        {subtitle && (
+          <span
+            className="chart-subtitle"
+            style={isCentered ? { textAlign: 'center', width: '100%', marginTop: '0.25rem' } : undefined}
+          >
+            {subtitle}
+          </span>
+        )}
       </div>
       {children}
     </div>

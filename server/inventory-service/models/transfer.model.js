@@ -18,9 +18,9 @@ export const toResource = (t) => ({
   receivedBatch: t.received_batch,
   expiry: t.expiry_date ?? null,
   qty: t.qty,
-  // Pending until the receiving branch adds it to stock (Add Medicine), then Received
+  // Pending until the receiving branch adds it to stock (Receive Stock), then Received
   status: t.status === 'in_transit' ? 'Pending' : 'Received',
-  // The day it was sent, in the pharmacy's time zone
+  // The day it was sent, in the store's time zone
   date: t.created_at ? DateTime.fromJSDate(t.created_at, { zone: 'utc' }).setZone(config.timezone).toISODate() : null,
   sentBy: t.sender_name ?? null,
   receivedBy: t.receiver_name ?? null,

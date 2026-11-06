@@ -71,6 +71,7 @@ export async function create(req, input) {
     recordId: user.id,
     description: `${roleLabel(user.role)} account created for ${user.full_name} (${user.email}); invitation emailed.`,
     branchId: user.branch_id,
+    after: user,
   })
   return user
 }
@@ -142,6 +143,8 @@ export async function update(req, account, input) {
     recordId: account.id,
     description: `${next.full_name} (${next.email}): ${changed || 'no changes'}.`,
     branchId: next.branch_id,
+    before: account,
+    after: next,
   })
 
   let message = `${next.full_name}'s account was updated.`
@@ -164,6 +167,8 @@ export async function remove(req, account) {
     recordId: account.id,
     description: `${account.full_name} (${account.email}, ${roleLabel(account.role)}) was deleted.`,
     branchId: account.branch_id,
+    type: 'delete',
+    before: account,
   })
 }
 

@@ -8,7 +8,7 @@ import {
   Pencil
 } from 'lucide-react'
 import { useMoneyColumns } from '../../../hooks'
-import { listTableFeatures, INVENTORY_STATUSES } from '../../../utils'
+import { listTableFeatures, INVENTORY_STATUSES, formatDMY } from '../../../utils'
 import { StatusTag, BranchTag, SortableHeader } from '../../../components'
 
 
@@ -24,7 +24,7 @@ const INVENTORY_SORTS = {
 
 const INVENTORY_DEFAULT_SORTING = INVENTORY_SORTS['name-asc'].sorting
 
-// Search matches the medicine name, SKU code, or batch number
+// Search matches the product name, SKU code, or batch number
 const inventorySearchFn = (row, _columnId, value) => {
   const query = String(value).trim().toLowerCase()
   const { name, id, batch } = row.original
@@ -40,9 +40,8 @@ export default function InventoryTable({ data, branches, categories, showBranch,
   const columns = useMemo(() => {
     const branchName = (id) => branches.find((b) => b.id === id)?.name || ''
     return [
-      // First column: the batch the row's stock arrived under (replaces the old row number)
-      { accessorKey: 'batch', header: 'Batch Number', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
-      { accessorKey: 'name', header: 'Product Name', sortFn: 'text', cell: (info) => <span className="fw-600">{info.getValue()}</span> },
+      // First column: the Batch ID the system generated when this stock was received (Receive Stock)
+      { accessorKey: 'batch', header: 'Batch ID', sortFn: 'text', cell: (info) => <span className="batch-badge">{info.getValue()}</span> },
       ...(showBranch
         ? [{
             accessorKey: 'branchId',
@@ -53,8 +52,11 @@ export default function InventoryTable({ data, branches, categories, showBranch,
           }]
         : []),
       { accessorKey: 'category', header: 'Category', filterFn: 'equalsString', sortFn: 'text' },
+      { accessorKey: 'name', header: 'Product', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <span className="fw-600">{info.getValue()}</span> },
       { accessorKey: 'stock', header: 'Current Stock', sortFn: 'basic', cell: (info) => `${info.getValue()} units` },
       { accessorKey: 'purchasePrice', header: moneyHeader('Unit Purchase Price'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
+      // What the whole procurement this batch arrived from cost, as on the Procurement page ("—" for transferred stock)
+      { accessorKey: 'procurementTotal', header: moneyHeader('Total Cost'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? '—' : formatAmount(info.getValue())) },
       // The whole quantity's purchase cost: Current Stock × unit purchase price
       { id: 'totalCost', accessorFn: (row) => row.stock * (row.purchasePrice || 0), header: moneyHeader('Stock Value'), sortFn: 'basic', cell: (info) => formatAmount(info.getValue()) },
       { accessorKey: 'sellingPrice', header: moneyHeader('Unit Selling Price'), sortFn: 'basic', sortUndefined: 'last', cell: (info) => (info.getValue() == null ? <span className="not-set">Not set</span> : formatAmount(info.getValue())) },
@@ -64,14 +66,17 @@ export default function InventoryTable({ data, branches, categories, showBranch,
         accessorKey: 'expiry',
         header: 'Expiration Date',
         sortFn: 'text',
-        cell: (info) =>
-          info.row.original.expiringSoon ? (
+        sortUndefined: 'last',
+        cell: (info) => {
+          const val = formatDMY(info.getValue())
+          return info.row.original.expiringSoon ? (
             <span className="expiry-warning" title="Expiring soon">
-              <Clock size={13} /> {info.getValue()}
+              <Clock size={13} /> {val}
             </span>
           ) : (
-            info.getValue()
+            val
           )
+        }
       },
       { id: 'status', accessorKey: 'inventoryStatus', header: 'Status', filterFn: 'equalsString', sortFn: 'text', cell: (info) => <StatusTag status={info.getValue()} /> },
       {
@@ -124,6 +129,20 @@ export default function InventoryTable({ data, branches, categories, showBranch,
   const matchingCount = table.getFilteredRowModel().rows.length
   const visibleColumnCount = columns.length
 
+  const categoryHeader = table.getColumn('category')?.columnDef.header || 'Category'
+  const categoryOptions = useMemo(() => {
+    const fromData = [...new Set(data.map((item) => item.category).filter(Boolean))].sort()
+    return fromData.length ? fromData : categories
+  }, [data, categories])
+
+  const selectedCategory = filterValue('category')
+  const productOptions = useMemo(() => {
+    const sourceData = selectedCategory && selectedCategory !== 'all'
+      ? data.filter((item) => item.category === selectedCategory)
+      : data
+    return [...new Set(sourceData.map((item) => item.name).filter(Boolean))].sort((a, b) => a.localeCompare(b))
+  }, [data, selectedCategory])
+
   return (
     <>
       {/* Search & Filters */}
@@ -142,10 +161,36 @@ export default function InventoryTable({ data, branches, categories, showBranch,
           />
         </div>
 
-        <select className="input-field filter-select" aria-label="Filter by category" value={filterValue('category')} onChange={(e) => setFilter('category', e.target.value)}>
-          <option value="all">All Categories</option>
-          {categories.map((c) => (
+        <select
+          className="input-field filter-select"
+          aria-label="Filter by category"
+          value={filterValue('category')}
+          onChange={(e) => {
+            const cat = e.target.value
+            setFilter('category', cat)
+            if (filterValue('name') !== 'all') {
+              const stillValid = data.some((item) => (cat === 'all' || item.category === cat) && item.name === filterValue('name'))
+              if (!stillValid) {
+                setFilter('name', 'all')
+              }
+            }
+          }}
+        >
+          <option value="all">{categoryHeader}</option>
+          {categoryOptions.map((c) => (
             <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        <select
+          className="input-field filter-select"
+          aria-label="Filter by product"
+          value={filterValue('name')}
+          onChange={(e) => setFilter('name', e.target.value)}
+        >
+          <option value="all">Product</option>
+          {productOptions.map((p) => (
+            <option key={p} value={p}>{p}</option>
           ))}
         </select>
 
@@ -202,7 +247,7 @@ export default function InventoryTable({ data, branches, categories, showBranch,
             {matchingCount === 0 && (
               <tr>
                 <td colSpan={visibleColumnCount} style={{ color: 'var(--text-dim)', textAlign: 'center', padding: '2rem' }}>
-                  No medicines match your search or filters.
+                  No products match your search or filters.
                 </td>
               </tr>
             )}

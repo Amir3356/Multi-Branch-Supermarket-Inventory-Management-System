@@ -99,6 +99,9 @@ export async function acceptAndSignIn(req, token, password) {
     branchId: user.branch_id,
     // Not signed in yet: the person who accepted is the actor
     actor: { id: user.id, fullName: user.full_name, role: user.role },
+    type: 'approve',
+    before: { status: ACCOUNT_STATUSES.INVITED },
+    after: { status: user.status },
   })
 
   return auth.post('/internal/auth/issue-token', { userId: user.id }, { req })

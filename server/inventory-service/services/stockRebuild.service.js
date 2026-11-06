@@ -1,4 +1,4 @@
-import { pharmacyToday, productKey, transaction } from '../utils/index.js'
+import { storeToday, productKey, transaction } from '../utils/index.js'
 import {
   adjustments as readAdjustments,
   damagedItems,
@@ -44,7 +44,7 @@ const dateOnly = (value) => (value ? String(value).slice(0, 10) : null)
 
 async function replay(client) {
   const rows = new Map()
-  const today = pharmacyToday()
+  const today = storeToday()
   const keyOf = (branch, product, batch) => `${branch}|${productKey(product)}|${batch}`
 
   const arrivals = stableSortBy(

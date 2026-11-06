@@ -21,8 +21,8 @@ const LIVE_CHANNELS = {
  * A report's period, branch and figures. Loads again whenever the period or branch changes, and updates by itself:
  * every action recorded anywhere (each is audit-logged, pushed live to the Owner) reloads the figures in place, and
  * without the live connection they reload every minute. Other staff can't hear the audit log, so their report reloads on
- * its branches' own events instead (procurements for the Procurement Officer; stock, transfers, damage and sales for the
- * Pharmacist's Inventory Report; sales for the Cashier's Sales Report). Staff who work at one branch (Pharmacist, Cashier) only see theirs.
+ * its branches' own events instead (procurements for the Purchase Officer; stock, transfers, damage and sales for the
+ * Inventory Officer's Inventory Report; sales for the Cashier's Sales Report). Staff who work at one branch (Inventory Officer, Cashier) only see theirs.
  */
 export function useReport(kind) {
   const period = usePeriod()

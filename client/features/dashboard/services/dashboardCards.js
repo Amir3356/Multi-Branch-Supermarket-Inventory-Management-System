@@ -1,7 +1,7 @@
 import { todayKey } from '../../../utils'
 import { inPeriod } from './periods'
 
-// Each role's dashboard: summary cards worked out from the app's own data (no mock data), for the branch in scope.
+// Each role's dashboard: summary cards worked out from the app's own data, for the branch in scope.
 // Cards are { title, icon, tone, value, chip, chipTone }; `icon` is a key the page maps to an icon.
 
 const sum = (list, fn) => list.reduce((total, item) => total + fn(item), 0)
@@ -23,7 +23,7 @@ function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], d
   const inStock = inventory.filter((i) => i.stock > 0)
   // Inventory has a row per batch: count each product once
   const productsWith = (rows) => new Set(rows.map((i) => i.medId)).size
-  // Paid for this branch, or sent here by another branch, but not added with Add Medicine yet, so not in stock
+  // Paid for this branch, or sent here by another branch, but not added with Receive Stock yet, so not in stock
   const waiting = [...purchases.filter((p) => p.status === 'Paid' && !p.receivedAt), ...incomingTransfers.filter((t) => t.status === 'Pending')]
   const damagedInPeriod = damaged.filter((d) => inPeriod(d.date, period.range))
   const expensesInPeriod = expenses.filter((e) => inPeriod(e.date, period.range))
@@ -31,7 +31,7 @@ function inventoryOfficerCards({ inventory, purchases, incomingTransfers = [], d
   return [
     { group: 'stock', title: 'Products in Stock', icon: 'stock', tone: 'teal', value: productsWith(inStock), chip: plural(sum(inStock, (i) => i.stock), 'unit on hand', 'units on hand') },
     { group: 'stock', wide: true, title: 'Stock Value', icon: 'money', tone: 'cyan', value: money(sum(inventory, (i) => i.stock * (i.purchasePrice || 0))), chip: `Selling value ${money(sum(inventory, (i) => i.stock * (i.sellingPrice || 0)))}`, chipTone: 'positive' },
-    { group: 'stock', title: 'Waiting to Add', icon: 'procurement', tone: 'warning', value: waiting.length, chip: waiting.length ? `${plural(sum(waiting, (p) => p.qty), 'unit', 'units')} · use Add Medicine` : 'Nothing waiting', chipTone: waiting.length ? 'negative' : 'neutral' },
+    { group: 'stock', title: 'Waiting to Add', icon: 'procurement', tone: 'warning', value: waiting.length, chip: waiting.length ? `${plural(sum(waiting, (p) => p.qty), 'unit', 'units')} · use Receive Stock` : 'Nothing waiting', chipTone: waiting.length ? 'negative' : 'neutral' },
     { group: 'stock', title: 'Low Stock', icon: 'low', tone: 'warning', value: productsWith(inStock.filter((i) => i.status === 'Low Stock')), chip: `Below ${settings.defaultMinStock} units`, chipTone: 'negative' },
     { group: 'stock', title: 'Expiring Soon', icon: 'clock', tone: 'warning', value: inventory.filter((i) => i.inventoryStatus === 'Expiring Soon').length, chip: `Within ${settings.expiryWarningDays} days`, chipTone: 'negative' },
     { group: 'stock', title: 'Expired', icon: 'expired', tone: 'danger', value: inStock.filter((i) => i.expired).length, chip: 'Must not be sold', chipTone: 'negative' },
@@ -62,14 +62,13 @@ function ownerCards({ totals, now }, { money, period }) {
     // A loss shows as Net Loss with the amount lost, rather than a negative profit
     { group: 'period', title: profitable ? 'Net Profit (est.)' : 'Net Loss (est.)', icon: 'money', tone: profitable ? 'teal' : 'danger', value: money(Math.abs(totals.netProfit)), hint: 'Revenue − what the sold items cost to buy − Total Expenses − Damage Loss. Estimated: each item is costed at its latest purchase price.', chip: `Cost of items sold ${money(totals.costOfSales)}`, chipTone: profitable ? 'positive' : 'negative' },
     { group: 'now', title: 'Active Branches', icon: 'branch', tone: 'cyan', value: now.activeBranches, chip: `${now.totalBranches} in total` },
-    { group: 'now', title: 'Active Staff', icon: 'staff', tone: 'teal', value: now.activeStaff, chip: now.invitedStaff ? `${plural(now.invitedStaff, 'invitation', 'invitations')} not accepted yet` : 'Every invitation accepted', chipTone: now.invitedStaff ? 'negative' : 'positive' },
-    { group: 'now', title: 'Awaiting Payment', icon: 'card', tone: 'warning', value: now.awaitingPayment, chip: now.awaitingPayment ? `${money(now.awaitingPaymentAmount)} to pay on Chapa` : 'Nothing to pay', chipTone: now.awaitingPayment ? 'negative' : 'neutral' }
+    { group: 'now', title: 'Active Staff', icon: 'staff', tone: 'teal', value: now.activeStaff, chip: now.invitedStaff ? `${plural(now.invitedStaff, 'invitation', 'invitations')} not accepted yet` : 'Every invitation accepted', chipTone: now.invitedStaff ? 'negative' : 'positive' }
   ]
 }
 
 const CARDS_BY_ROLE = {
   owner: ownerCards,
-  pharmacist: inventoryOfficerCards,
+  inventory_officer: inventoryOfficerCards,
   cashier: cashierCards,
   purchase_officer: procurementOfficerCards
 }
@@ -84,9 +83,9 @@ export function dashboardCards(role, data, { money, settings, period }) {
 const ATTENTION_ORDER = { Expired: 0, 'Out of Stock': 1, 'Expiring Soon': 2, 'Low Stock': 3 }
 const ATTENTION_ACTION = {
   Expired: 'Take it off the shelf and record it as damaged',
-  'Out of Stock': 'Ask the Procurement Officer for a restock',
+  'Out of Stock': 'Ask the Purchase Officer for a restock',
   'Expiring Soon': 'Sell it first or move it to another branch',
-  'Low Stock': 'Ask the Procurement Officer for a restock'
+  'Low Stock': 'Ask the Purchase Officer for a restock'
 }
 
 export const needsAttention = (inventory) =>

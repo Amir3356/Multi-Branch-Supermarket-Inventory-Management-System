@@ -7,7 +7,7 @@ export function validateAccount(form, email) {
   if (!form.fullName.trim()) errors.fullName = 'Full name is required'
   if (!email) errors.email = 'Email is required'
   else if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = 'Enter a valid email address'
-  // The Procurement Officer covers every branch; Pharmacists and Cashiers work at one
+  // The Purchase Officer covers every branch; Inventory Officers and Cashiers work at one
   if (!form.branchId && !coversAllBranches(form.role)) errors.branchId = 'Assign a branch'
   return errors
 }

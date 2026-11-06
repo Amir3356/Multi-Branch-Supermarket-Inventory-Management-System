@@ -3,7 +3,7 @@ import { NULLABLE, afterOrEqual, dateFormat, exists, required, string, validateI
 
 export const END_DATE_MESSAGE = 'The end date must be on or after the start date.'
 
-/** The period every report and the Owner's dashboard take: from, to (pharmacy calendar days) and an optional branch */
+/** The period every report and the Owner's dashboard take: from, to (store calendar days) and an optional branch */
 export const PERIOD_RULES = {
   from: [required('from'), dateFormat('from')],
   to: [required('to'), dateFormat('to'), afterOrEqual('from', END_DATE_MESSAGE)],

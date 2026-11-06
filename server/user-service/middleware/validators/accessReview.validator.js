@@ -5,7 +5,7 @@ import { PERIODS } from '../../models/accessReview.model.js'
 
 /** POST /access-reviews (GenerateAccessReviewRequest): req.body becomes the normalized, validated input */
 export function validateGenerateAccessReview(req, res, next) {
-  // "Today" in the pharmacy's local time, not the server's UTC date
+  // "Today" in the store's local time, not the server's UTC date
   const today = localNow().toISODate()
   // before_or_equal / after_or_equal compared timestamps in the app's time zone (UTC)
   const utc = (value) => parseDate(value, 'utc')

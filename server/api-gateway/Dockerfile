@@ -1,9 +1,7 @@
-# Nginx API Gateway Dockerfile
+# api-gateway: nginx, the one public entry point (see nginx.conf)
 FROM nginx:alpine
 
-# Copy custom Nginx gateway configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# A template: on start the image fills in ${INTERNAL_SERVICE_SECRET} from the environment
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 EXPOSE 8000
-
-CMD ["nginx", "-g", "daemon off;"]

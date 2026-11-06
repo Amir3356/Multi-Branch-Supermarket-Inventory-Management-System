@@ -6,12 +6,12 @@ import {
   X
 } from 'lucide-react'
 import { useEscapeKey, useMoneyColumns } from '../../../hooks'
-import { allocateFifo, newIdempotencyKey, productsInStock } from '../../../utils'
+import { fefoBatches, newIdempotencyKey, productsInStock } from '../../../utils'
 import { validateSale } from '../services/saleRules'
 
-const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', qty: '1' }
+const EMPTY_SALE_FORM = { branchId: '', customer: '', category: '', key: '', batch: '', qty: '1' }
 // Fields with their own place for an error message
-const FORM_FIELDS = ['branchId', 'customer', 'category', 'key', 'qty']
+const FORM_FIELDS = ['branchId', 'customer', 'category', 'key', 'batch', 'qty']
 
 export default function NewSaleModal({ branches, inventory, categories, onClose, onSave }) {
   // A cashier's own branch is the only choice, so it starts selected
@@ -48,35 +48,57 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
   // batches it came in
   const branchStock = productsInStock(inventory.filter((i) => i.branchId === form.branchId && i.sellingPrice != null))
   const categoryCount = (category) => branchStock.filter((i) => i.category === category).length
+  // Only categories with in-stock products at this branch
+  const inStockCategories = new Set(branchStock.map((i) => i.category))
+  const availableCategories = [
+    ...(categories || []).filter((c) => inStockCategories.has(c)),
+    ...[...inStockCategories].filter((c) => !(categories || []).includes(c))
+  ].sort((a, b) => a.localeCompare(b))
   const branchProducts = branchStock
     .filter((i) => i.category === form.category)
     .sort((a, b) => a.name.localeCompare(b.name))
   const product = branchProducts.find((i) => i.key === form.key)
+  // FEFO (First Expired, First Out): the sale comes from the batch that expires soonest; the cashier doesn't choose it.
+  // Once that batch is sold out, the next sale takes the next one to expire.
+  const batchRow = product ? fefoBatches(product.batches)[0] || null : null
   const qty = Number(form.qty)
   const total = product && Number.isInteger(qty) && qty > 0 ? product.sellingPrice * qty : 0
-  // First in, first out: the units come from the batch that arrived earliest, then the next
-  const fromBatches = product && Number.isInteger(qty) && qty > 0 ? allocateFifo(product.batches, qty) : null
-  const expiryOf = (batch) => product?.batches.find((b) => b.batch === batch)?.expiry
+  const fromBatches = batchRow && Number.isInteger(qty) && qty > 0 ? [{ batch: batchRow.batch, qty }] : null
 
   const update = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-      // Changing branch clears category and product (stock differs per branch); changing category clears product
-      ...(field === 'branchId' ? { category: '', key: '', qty: '1' } : {}),
-      ...(field === 'category' ? { key: '', qty: '1' } : {})
-    }))
+    setForm((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === 'branchId') {
+        next.category = ''
+        next.key = ''
+        next.batch = ''
+        next.qty = '1'
+      }
+      if (field === 'category') {
+        next.key = ''
+        next.batch = ''
+        next.qty = '1'
+      }
+      if (field === 'key') {
+        const prod = branchProducts.find((i) => i.key === value)
+        // FEFO: the batch that expires first
+        next.batch = (prod ? fefoBatches(prod.batches)[0]?.batch : '') || ''
+        next.qty = '1'
+      }
+      return next
+    })
     setErrors((prev) => ({
       ...prev,
       [field]: undefined,
-      ...(field === 'branchId' ? { category: undefined, key: undefined, qty: undefined } : {}),
-      ...(field === 'category' ? { key: undefined, qty: undefined } : {})
+      ...(field === 'branchId' ? { category: undefined, key: undefined, batch: undefined, qty: undefined } : {}),
+      ...(field === 'category' ? { key: undefined, batch: undefined, qty: undefined } : {}),
+      ...(field === 'key' ? { batch: undefined, qty: undefined } : {})
     }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newErrors = validateSale(form, product, qty)
+    const newErrors = validateSale(form, product, qty, batchRow)
     setErrors(newErrors)
     if (Object.keys(newErrors).length || submitting.current) return
 
@@ -90,6 +112,7 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
         category: product.category,
         product: product.name,
         medId: product.medId,
+        batch: batchRow?.batch || form.batch,
         qty,
         unitPrice: product.sellingPrice,
         batches: fromBatches
@@ -148,12 +171,18 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
           <div className="form-group">
             <label htmlFor="sale-category">Category *</label>
             <select id="sale-category" className={`input-field ${errors.category ? 'error' : ''}`} value={form.category} onChange={(e) => update('category', e.target.value)} disabled={!form.branchId}>
-              <option value="">{form.branchId ? 'Select category…' : 'Select a branch first'}</option>
-              {categories.map((c) => {
+              <option value="">
+                {!form.branchId
+                  ? 'Select a branch first'
+                  : availableCategories.length
+                    ? 'Select category…'
+                    : 'No products in stock'}
+              </option>
+              {availableCategories.map((c) => {
                 const count = categoryCount(c)
                 return (
-                  <option key={c} value={c} disabled={!count}>
-                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(none in stock)'}
+                  <option key={c} value={c}>
+                    {c} ({count} {count === 1 ? 'product' : 'products'})
                   </option>
                 )
               })}
@@ -173,18 +202,43 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
           </div>
 
           <div className="form-group">
+            <label htmlFor="sale-batch">Batch ID</label>
+            <input
+              id="sale-batch"
+              className={`input-field ${errors.batch ? 'error' : ''}`}
+              value={batchRow ? `${batchRow.batch} · ${batchRow.stock} ${batchRow.stock === 1 ? 'unit' : 'units'} · expires ${batchRow.expiry || 'no date'}` : ''}
+              placeholder="Select a product first"
+              readOnly
+              disabled
+            />
+            {errors.batch
+              ? <span className="error-msg">{errors.batch}</span>
+              : batchRow && <span className="field-hint">FEFO (First Expired, First Out): the batch that expires soonest is sold first</span>}
+          </div>
+
+          <div className="form-group">
             <label htmlFor="sale-qty">Quantity *</label>
-            <input id="sale-qty" type="number" min="1" max={product?.stock} step="1" className={`input-field ${errors.qty ? 'error' : ''}`} value={form.qty} onChange={(e) => update('qty', e.target.value)} disabled={!product} />
+            <input
+              id="sale-qty"
+              type="number"
+              min="1"
+              max={batchRow ? batchRow.stock : product?.stock}
+              step="1"
+              className={`input-field ${errors.qty ? 'error' : ''}`}
+              value={form.qty}
+              onChange={(e) => update('qty', e.target.value)}
+              disabled={!batchRow}
+            />
             {errors.qty && <span className="error-msg">{errors.qty}</span>}
-            {!errors.qty && fromBatches && (
+            {!errors.qty && batchRow && (
               <span className="field-hint">
-                From {fromBatches.map((b) => `batch ${b.batch} (expires ${expiryOf(b.batch)}): ${b.qty} ${b.qty === 1 ? 'unit' : 'units'}`).join(', then ')}
+                From Batch ID {batchRow.batch} (expires {batchRow.expiry || 'no date'}): {qty} {qty === 1 ? 'unit' : 'units'}
               </span>
             )}
           </div>
 
           <div className="sale-summary">
-            <div><small>In Stock</small><strong>{product ? `${product.stock} units` : '—'}</strong></div>
+            <div><small>In Stock (Batch)</small><strong>{batchRow ? `${batchRow.stock} units` : (product ? `${product.stock} units` : '—')}</strong></div>
             <div><small>{moneyHeader('Unit Selling Price')}</small><strong>{product ? formatAmount(product.sellingPrice) : '—'}</strong></div>
             <div><small>{moneyHeader('Total Selling Price')}</small><strong className="sale-total">{formatAmount(total)}</strong></div>
           </div>

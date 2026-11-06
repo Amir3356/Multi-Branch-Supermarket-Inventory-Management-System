@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-// Pharmacy branches, loaded from the API (the Owner creates them from the Branches page)
+// Supermarket branches, loaded from the API (the Owner creates them from the Branches page)
 const branchesSlice = createSlice({
   name: 'branches',
   initialState: [],

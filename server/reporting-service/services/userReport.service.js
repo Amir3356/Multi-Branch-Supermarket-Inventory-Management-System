@@ -38,7 +38,7 @@ const millis = (value) => (value instanceof Date ? value.getTime() : DateTime.is
 
 /**
  * Each account as it stood at the end of the period (or now, for the current period): its last sign-in on or before
- * then, and its role, status and branch then, from the sign-in and change logs. `start`/`end` are in the pharmacy's zone.
+ * then, and its role, status and branch then, from the sign-in and change logs. `start`/`end` are in the store's zone.
  * Returns { summary: { dormantDays, asOf }, rows } (only the summary fields the User Report uses).
  */
 async function computeAccessReview(start, end) {

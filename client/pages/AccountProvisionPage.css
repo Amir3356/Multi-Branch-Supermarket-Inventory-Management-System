@@ -35,3 +35,10 @@
   accent-color: var(--primary-cyan);
   cursor: pointer;
 }
+
+/* Spinner on a row action while its request runs (e.g. "Resend invitation" waiting for the email to send) */
+.action-spin { animation: action-rotate 1s linear infinite; }
+@keyframes action-rotate { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .action-spin { animation: none; }
+}

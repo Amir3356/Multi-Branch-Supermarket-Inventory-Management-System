@@ -1,7 +1,7 @@
 // A staff account, as the API sends it (server: Accounts/Resources/AccountResource.php)
 
 /**
- * @typedef {'owner' | 'pharmacist' | 'cashier' | 'purchase_officer'} Role
+ * @typedef {'owner' | 'inventory_officer' | 'cashier' | 'purchase_officer'} Role
  * @typedef {'Pending' | 'Active' | 'Inactive'} AccountStatus
  *
  * @typedef {object} Account
@@ -9,13 +9,13 @@
  * @property {string} fullName
  * @property {string} email
  * @property {Role} role
- * @property {string} roleLabel           e.g. "Procurement Officer"
+ * @property {string} roleLabel           e.g. "Purchase Officer"
  * @property {string} branchId            'all' for the Owner
  * @property {string} branchName          'All Branches' for the Owner
  * @property {AccountStatus} status       Pending until the invitation is accepted
  * @property {boolean} [invitationExpired] only for Pending accounts
  * @property {string | null} lastLoginAt  ISO timestamp
- * @property {string} createdAt           YYYY-MM-DD
+ * @property {string | null} createdAt    ISO timestamp
  *
  * Sent to POST /accounts (new account: always invited) and PATCH /accounts/{id} (any subset)
  * @typedef {object} AccountPayload
@@ -29,15 +29,15 @@
 // Roles the Owner can give to staff accounts, with what each may open; each works at one branch.
 // The Owner account itself is not created here: it covers all branches and manages these accounts.
 export const ACCOUNT_ROLES = {
-  pharmacist: { label: 'Pharmacist (Inventory Officer)', hint: 'Inventory, stock transfers, damaged items, policy and reports' },
+  inventory_officer: { label: 'Inventory Officer', hint: 'Inventory, stock transfers, damaged items, settings and reports' },
   cashier: { label: 'Cashier', hint: 'Sales and reports' },
-  purchase_officer: { label: 'Procurement Officer', hint: 'Procurement for every branch, and reports', allBranches: true }
+  purchase_officer: { label: 'Purchase Officer', hint: 'Purchase orders for every branch, and reports', allBranches: true }
 }
 
 export const EMPTY_ACCOUNT_FORM = { fullName: '', email: '', role: '', branchId: '', status: 'Active' }
 
 /** The form filled in from an existing account */
-/** Works across every branch, so no branch is assigned (the Procurement Officer; the server agrees) */
+/** Works across every branch, so no branch is assigned (the Purchase Officer; the server agrees) */
 export const coversAllBranches = (role) => Boolean(ACCOUNT_ROLES[role]?.allBranches)
 
 export const accountToForm = (account) => ({ fullName: account.fullName, email: account.email, role: account.role, branchId: account.branchId === 'all' ? '' : account.branchId, status: account.status })

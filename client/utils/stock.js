@@ -79,6 +79,18 @@ export const fifoBatches = (rows) =>
     .filter((r) => r.stock > 0 && !isExpired(r.expiry))
     .sort((a, b) => (a.receivedAt || '').localeCompare(b.receivedAt || '') || String(a.batch).localeCompare(String(b.batch)))
 
+/** Batches in first-expired, first-out (FEFO) order: the earliest expiration date first, so it is sold before it
+ * expires. Batches without an expiry date go last; equal dates fall back to the earliest arrival. Expired and empty
+ * batches are left out, since they can't be sold. */
+export const fefoBatches = (rows) =>
+  rows
+    .filter((r) => r.stock > 0 && !isExpired(r.expiry))
+    .sort((a, b) =>
+      (a.expiry ? 0 : 1) - (b.expiry ? 0 : 1) ||
+      (a.expiry || '').localeCompare(b.expiry || '') ||
+      (a.receivedAt || '').localeCompare(b.receivedAt || '') ||
+      String(a.batch).localeCompare(String(b.batch)))
+
 /** Which batches `qty` units come from under FIFO, e.g. [{ batch: 'BT-00003', qty: 5 }, { batch: 'BT-00007', qty: 2 }];
  * null when the batches don't hold that many units */
 export function allocateFifo(rows, qty) {

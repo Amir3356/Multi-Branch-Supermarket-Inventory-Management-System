@@ -158,6 +158,9 @@ export async function endByOwner(req, id) {
     recordId: String(session.id),
     description: `${session.email ?? ''} was signed out on ${device} by the Owner.`,
     branchId: session.branch_id ?? null,
+    type: 'update',
+    before: { email: session.email, device, endedAt: session.ended_at },
+    after: { email: session.email, device, ended: 'Ended by the Owner' },
   })
 
   return { session, device, updated: await repository.withUser(session.id) }
@@ -176,6 +179,8 @@ export async function removeByOwner(req, id) {
     recordId: String(session.id),
     description: `${email}’s session on ${describeDevice(session.name)} was removed from the list${wasOpen ? ' (it was still open, so it was signed out).' : '.'}`,
     branchId: session.branch_id ?? null,
+    type: 'delete',
+    before: { email, device: describeDevice(session.name), ip: session.ip_address ?? null, open: wasOpen },
   })
   const sessions = new SessionService()
   if (wasOpen) sessions.notifyEnded([session.id], 'Ended by the Owner')

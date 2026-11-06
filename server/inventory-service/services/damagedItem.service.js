@@ -1,4 +1,4 @@
-import { audit, broadcast, money, nextId, pharmacyToday, transaction } from '../utils/index.js'
+import { audit, broadcast, money, nextId, storeToday, transaction } from '../utils/index.js'
 import { toResource } from '../models/damagedItem.model.js'
 import { insert, unitCost, visibleTo, withRecorder } from '../repositories/damagedItem.repository.js'
 import { stockBroadcaster, take } from './stock.service.js'
@@ -34,7 +34,7 @@ export async function record(req, data) {
       qty,
       reason: data.reason,
       loss_value: lossValue,
-      damage_date: pharmacyToday(),
+      damage_date: storeToday(),
       recorded_by: req.user.id,
     }),
   )
@@ -47,6 +47,7 @@ export async function record(req, data) {
     recordId: item.id,
     description: `${item.qty} × ${item.product} (batch ${item.batch}) written off: ${item.reason}. Loss ${money(item.loss_value)}.`,
     branchId: item.branch_id,
+    after: item,
   })
 
   return { item, damagedItem }

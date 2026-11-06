@@ -5,7 +5,7 @@ export const nextId = (records, prefix, pad = 0) => {
 }
 
 /** A random UUID (v4) for an Idempotency-Key. crypto.randomUUID only exists on HTTPS and localhost, so a plain-HTTP
- * address on the pharmacy's network builds one from crypto.getRandomValues instead. */
+ * address on the store's network builds one from crypto.getRandomValues instead. */
 export const newIdempotencyKey = () => {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID()
   const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16))

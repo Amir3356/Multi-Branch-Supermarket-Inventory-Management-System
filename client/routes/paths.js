@@ -9,6 +9,7 @@ export const PATHS = {
   inventory: '/inventory',
   sales: '/sales',
   purchases: '/purchases',
+  catalog: '/category-product',
   transfers: '/stock-transfers',
   damaged: '/damaged',
   expenses: '/expenses',

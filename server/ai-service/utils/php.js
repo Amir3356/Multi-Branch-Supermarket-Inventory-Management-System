@@ -124,7 +124,7 @@ export function dbTime(value) {
 /** Carbon's toIso8601String() in the value's own zone, e.g. '2026-11-05T13:15:00+03:00' */
 export const isoInZone = (dateTime) => dateTime.toFormat("yyyy-MM-dd'T'HH:mm:ssZZ")
 
-/** A string as a SQL literal (for the pharmacy's time zone name, which Laravel also wrote into the SQL) */
+/** A string as a SQL literal (for the store's time zone name, which Laravel also wrote into the SQL) */
 export const sqlString = (value) => `'${String(value).replace(/'/g, "''")}'`
 
 // Laravel's TrimStrings: whitespace plus BOM, zero-width space and left-to-right mark at either end

@@ -21,7 +21,7 @@ const timeout = int('SESSION_TIMEOUT_MINUTES', 30)
 
 export const config = Object.freeze({
   serviceRoot,
-  appName: env('APP_NAME', 'PharmaCare'),
+  appName: env('APP_NAME', 'SuperMart IMS'),
   env: env('NODE_ENV', 'development'),
   appUrl: env('APP_URL', 'http://localhost:8000').replace(/\/$/, ''),
   frontendUrl: env('FRONTEND_URL', 'http://localhost:5173').replace(/\/$/, ''),
@@ -44,7 +44,7 @@ export const config = Object.freeze({
   db: {
     host: env('DB_HOST', 'localhost'),
     port: int('DB_PORT', 5432),
-    database: env('DB_DATABASE', 'multi_branch_pharmacy'),
+    database: env('DB_DATABASE', 'multi_branch_supermarket'),
     user: env('DB_USERNAME', 'postgres'),
     password: env('DB_PASSWORD', ''),
     // Connection pool: most connections open at once, how long a request waits for a free one before failing,
@@ -61,7 +61,7 @@ export const config = Object.freeze({
     username: env('MAIL_USERNAME'),
     password: env('MAIL_PASSWORD'),
     fromAddress: env('MAIL_FROM_ADDRESS', 'no-reply@example.com'),
-    fromName: env('MAIL_FROM_NAME', 'PharmaCare'),
+    fromName: env('MAIL_FROM_NAME', 'SuperMart IMS'),
   },
 
   invitationExpireMinutes: int('INVITATION_EXPIRE_MINUTES', 10),
@@ -75,7 +75,7 @@ export const config = Object.freeze({
   deviceLocation: bool('DEVICE_LOCATION', true),
   accessReviewDormantDays: int('ACCESS_REVIEW_DORMANT_DAYS', 90),
   accessReviewSchedule: env('ACCESS_REVIEW_SCHEDULE', ''),
-  timezone: env('PHARMACY_TIMEZONE', 'Africa/Addis_Ababa'),
+  timezone: env('STORE_TIMEZONE', 'Africa/Addis_Ababa'),
 
   chapa: {
     mode: env('CHAPA_MODE', 'test'),

@@ -1,4 +1,4 @@
--- branch-service owns branches and the pharmacy policy. IF NOT EXISTS everywhere: safe on the Laravel-built database.
+-- branch-service owns branches and the store policy. IF NOT EXISTS everywhere: safe on the Laravel-built database.
 -- Other services refer to branches by id only (no cross-service foreign keys on a fresh install).
 
 create table if not exists branches (

@@ -39,13 +39,13 @@ export default function InventoryOfficerDashboard({ branchId }) {
     dispatch(loadExpenses()).catch(() => {})
   }, [dispatch])
 
-  const cards = dashboardCards('pharmacist', { inventory, purchases, incomingTransfers, damaged, expenses }, { money: formatMoney, settings, period })
+  const cards = dashboardCards('inventory_officer', { inventory, purchases, incomingTransfers, damaged, expenses }, { money: formatMoney, settings, period })
   // Chart axes and bars drop the cents on whole amounts
   const shortMoney = (v) => formatMoney(v).replace(/\.00$/, '')
 
   return (
     <>
-      <DashboardSection id="dashboard-stock-title" title="Stock right now" description="Live from Inventory. The period doesn’t change these.">
+      <DashboardSection centered id="dashboard-stock-title" title="Stock right now" description="Live from Inventory. The period doesn’t change these.">
         <CardGrid className="dashboard-stock-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'stock')} />
         <div className="charts-grid">
           <ChartCard title="Stock Status" subtitle="Batches by status">

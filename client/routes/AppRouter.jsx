@@ -14,6 +14,7 @@ import AccountProvisionPage from '../pages/AccountProvisionPage'
 import InventoryPage from '../pages/InventoryPage'
 import SalesPage from '../pages/SalesPage'
 import PurchasePage from '../pages/PurchasePage'
+import CategoryProductPage from '../pages/CategoryProductPage'
 import StockTransfersPage from '../pages/StockTransfersPage'
 import DamagedPage from '../pages/DamagedPage'
 import ReportsPage from '../pages/ReportsPage'
@@ -38,6 +39,7 @@ const SECTION_PAGES = {
   inventory: InventoryPage,
   sales: SalesPage,
   purchases: PurchasePage,
+  catalog: CategoryProductPage,
   transfers: StockTransfersPage,
   damaged: DamagedPage,
   expenses: ExpensesPage,

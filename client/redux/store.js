@@ -8,6 +8,7 @@ import productsReducer from '../features/inventory/store/productsSlice'
 import stockReducer from '../features/inventory/store/stockSlice'
 import salesReducer from '../features/sales/store/salesSlice'
 import purchasesReducer from '../features/purchases/store/purchasesSlice'
+import procurementCategoriesReducer from '../features/purchases/store/procurementCategoriesSlice'
 import transfersReducer from '../features/transfers/store/transfersSlice'
 import expensesReducer from '../features/expenses/store/expensesSlice'
 import damagedReducer from '../features/damaged/store/damagedSlice'
@@ -25,6 +26,7 @@ export const store = configureStore({
     stock: stockReducer,
     sales: salesReducer,
     purchases: purchasesReducer,
+    procurementCategories: procurementCategoriesReducer,
     transfers: transfersReducer,
     expenses: expensesReducer,
     damaged: damagedReducer,

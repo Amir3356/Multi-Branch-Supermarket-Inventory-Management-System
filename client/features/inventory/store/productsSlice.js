@@ -1,22 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// Starting categories for a supermarket
 const CATEGORIES = [
-  'Medicines',
-  'Cosmetics',
-  'Medical Supplies',
-  'Medical Equipment',
-  'Vitamins & Supplements',
-  'Baby & Mother Care',
-  'First Aid',
-  'Personal Care & Hygiene',
-  'Diabetes Care',
-  'Eye & Ear Care',
-  'Oral Care',
-  'Respiratory Care',
-  'Pain Relief',
-  'Herbal & Natural Products',
-  'Family Planning',
-  'Orthopedic Supports'
+  'Fruits & Vegetables',
+  'Dairy & Eggs',
+  'Meat & Fish',
+  'Bakery',
+  'Beverages',
+  'Snacks & Sweets',
+  'Grains, Rice & Pasta',
+  'Cooking Oil & Spices',
+  'Canned & Packaged Food',
+  'Frozen Food',
+  'Baby Products',
+  'Personal Care',
+  'Household & Cleaning',
+  'Kitchenware',
+  'Stationery',
+  'Electronics & Batteries'
 ]
 
 // The product catalog shared by every branch (loaded from the server), plus its categories. Prices are added here as
@@ -40,13 +41,17 @@ const productsSlice = createSlice({
       const product = state.items.find((p) => p.id === action.payload.id)
       if (product) Object.assign(product, action.payload.changes)
     },
+    // Deleted on the Products page (loading the catalog keeps products it doesn't list, so drop it here)
+    productRemoved(state, action) {
+      state.items = state.items.filter((p) => p.id !== action.payload)
+    },
     categoryAdded(state, action) {
       if (!state.categories.includes(action.payload)) state.categories.push(action.payload)
     }
   }
 })
 
-export const { productsLoaded, productAdded, productUpdated, categoryAdded } = productsSlice.actions
+export const { productsLoaded, productAdded, productUpdated, productRemoved, categoryAdded } = productsSlice.actions
 export const selectProducts = (state) => state.products.items
 export const selectCategories = (state) => state.products.categories
 export default productsSlice.reducer

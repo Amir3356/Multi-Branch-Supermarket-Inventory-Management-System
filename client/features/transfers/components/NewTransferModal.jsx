@@ -11,7 +11,7 @@ import { validateTransfer } from '../services/transferRules'
 const EMPTY_TRANSFER_FORM = { from: '', to: '', category: '', key: '', batch: '', qty: '' }
 
 // assignedBranchId: staff always send from their own branch (shown read-only); the Owner (null) picks any branch
-export default function NewTransferModal({ branches, assignedBranchId, inventory, categories, maxQty, onClose, onSave }) {
+export default function NewTransferModal({ branches, assignedBranchId, inventory, maxQty, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_TRANSFER_FORM, from: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
   const [isSaving, setIsSaving] = useState(false)
@@ -21,6 +21,8 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
 
   // Products come from the sending branch's stock, each listed once however many batches it came in
   const sourceStock = productsInStock(inventory.filter((i) => i.branchId === form.from))
+  // Categories as the Inventory page lists them for the sending branch: only those with products in stock there
+  const categories = [...new Set(sourceStock.map((i) => i.category))].sort((a, b) => a.localeCompare(b))
   const categoryCount = (category) => sourceStock.filter((i) => i.category === category).length
   const sourceProducts = sourceStock.filter((i) => i.category === form.category).sort((a, b) => a.name.localeCompare(b.name))
   const product = sourceProducts.find((i) => i.key === form.key)
@@ -53,12 +55,12 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newErrors = validateTransfer(form, product, batchRow, qty, maxQty)
+    const newErrors = validateTransfer(form, product, batchRow, qty, maxQty, branches.find((b) => b.id === form.to))
     setErrors(newErrors)
     if (Object.keys(newErrors).length) return
     setIsSaving(true)
     try {
-      // Saved on the server: the receiving branch sees it under Incoming and adds it with Add Medicine
+      // Saved on the server: the receiving branch sees it under Incoming and adds it with Receive Stock
       await onSave({
         from: form.from,
         to: form.to,
@@ -115,8 +117,9 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
               <label htmlFor="transfer-to">To Branch *</label>
               <select id="transfer-to" autoFocus={Boolean(assignedBranchId)} className={`input-field ${errors.to ? 'error' : ''}`} value={form.to} onChange={(e) => update('to', e.target.value)}>
                 <option value="">Select branch…</option>
-                {activeBranches.map((b) => (
-                  <option key={b.id} value={b.id} disabled={b.id === form.from}>{b.name}</option>
+                {/* Every branch is listed, deactivated ones marked: picking one is stopped on Send Transfer */}
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id} disabled={b.id === form.from}>{b.name}{b.status === 'Active' ? '' : ' (deactivated)'}</option>
                 ))}
               </select>
               {errors.to && <span className="error-msg">{errors.to}</span>}
@@ -131,8 +134,8 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
               {categories.map((c) => {
                 const count = categoryCount(c)
                 return (
-                  <option key={c} value={c} disabled={!count}>
-                    {c} {count ? `(${count} ${count === 1 ? 'product' : 'products'})` : '(none in stock)'}
+                  <option key={c} value={c}>
+                    {c} ({count} {count === 1 ? 'product' : 'products'})
                   </option>
                 )
               })}

@@ -3,10 +3,14 @@ import { TEMPLATES } from '../models/emailTemplate.model.js'
 import { config, logger } from '../utils/index.js'
 
 // MAIL_MAILER=log prints each email to the console instead of sending it (local development without SMTP)
+// Pooled: the SMTP connection stays open and signed in between emails, so a send skips the connect, TLS and login
+// round trips (and Gmail's slow greeting when it throttles new connections); it reconnects on its own when closed.
 const transport =
   config.mail.mailer === 'log'
     ? null
     : nodemailer.createTransport({
+        pool: true,
+        maxConnections: 2,
         host: config.mail.host,
         port: config.mail.port,
         secure: config.mail.port === 465,

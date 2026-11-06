@@ -4,31 +4,31 @@
  */
 export const ROLES = Object.freeze({
   OWNER: 'owner',
-  PHARMACIST: 'pharmacist',
+  INVENTORY_OFFICER: 'inventory_officer',
   CASHIER: 'cashier',
   PURCHASE_OFFICER: 'purchase_officer',
 })
 
 export const ROLE_LABELS = Object.freeze({
   owner: 'Owner',
-  pharmacist: 'Pharmacist',
+  inventory_officer: 'Inventory Officer',
   cashier: 'Cashier',
-  purchase_officer: 'Procurement Officer',
+  purchase_officer: 'Purchase Officer',
 })
 
 const SECTIONS = Object.freeze({
   owner: ['dashboard', 'accounts', 'branches', 'auditLogs', 'reports', 'salesReport', 'inventoryReport', 'financialReport', 'procurementReport', 'userReports', 'aiAssistance'],
-  pharmacist: ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications', 'aiAssistance'],
+  inventory_officer: ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications', 'aiAssistance'],
   cashier: ['dashboard', 'sales', 'reports', 'aiAssistance'],
-  purchase_officer: ['dashboard', 'purchases', 'reports', 'aiAssistance'],
+  purchase_officer: ['dashboard', 'purchases', 'catalog', 'reports', 'aiAssistance'],
 })
 
 /** Roles the Owner can invite. The Owner account itself is created from the command line or the seeder. */
-export const STAFF_ROLES = Object.freeze([ROLES.PHARMACIST, ROLES.CASHIER, ROLES.PURCHASE_OFFICER])
+export const STAFF_ROLES = Object.freeze([ROLES.INVENTORY_OFFICER, ROLES.CASHIER, ROLES.PURCHASE_OFFICER])
 
 export const roleLabel = (role) => ROLE_LABELS[role] ?? role
 
-/** Works across every branch, so no branch is assigned: the Owner, and the Procurement Officer who buys for all of them */
+/** Works across every branch, so no branch is assigned: the Owner, and the Purchase Officer who buys for all of them */
 export const coversAllBranches = (role) => role === ROLES.OWNER || role === ROLES.PURCHASE_OFFICER
 
 export const sectionsFor = (role) => SECTIONS[role] ?? []

@@ -1,6 +1,6 @@
 import { api } from '../utils/http'
 
-// The pharmacy's policy, shared by every user and branch
+// The store's policy, shared by every user and branch
 export const POLICY_ENDPOINTS = { policy: '/policy' }
 
 // Each call returns the API's JSON; failures throw ApiError

@@ -13,5 +13,5 @@ import * as transferController from '../controllers/transfer.controller.js'
 export const transferRouter = Router()
 
 transferRouter.get('/transfers', requireAuth, transferController.index)
-transferRouter.post('/transfers', requireRole('pharmacist', 'owner'), validateStore, transferController.store)
-transferRouter.post('/transfers/:transfer/receive', requireRole('pharmacist'), bindTransfer, validateReceive, transferController.receive)
+transferRouter.post('/transfers', requireRole('inventory_officer', 'owner'), validateStore, transferController.store)
+transferRouter.post('/transfers/:transfer/receive', requireRole('inventory_officer'), bindTransfer, validateReceive, transferController.receive)

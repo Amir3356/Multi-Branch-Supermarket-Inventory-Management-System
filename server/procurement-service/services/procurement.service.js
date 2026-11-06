@@ -27,6 +27,7 @@ export async function handleChapaCallback(txRef, req) {
 
 /**
  * Saves the order as Pending and starts Chapa's checkout; stock arrives once the payment is verified.
+ * CHAPA_MODE=fake has no checkout: the order is paid right here and checkoutUrl is null.
  * Returns { procurement (re-read), checkoutUrl }.
  */
 export async function create(req, data) {
@@ -47,11 +48,16 @@ export async function create(req, data) {
     recordId: procurement.id,
     description: `${procurement.qty} × ${procurement.product} from ${procurement.supplier} for ${money(procurement.total, procurement.currency)}; awaiting Chapa payment.`,
     branchId: procurement.branch_id,
+    type: 'create',
+    after: procurement,
   })
   // New Pending order: shows on other screens (e.g. the Owner's) right away
   procurementChanged(procurement)
 
-  return { procurement: (await procurements.find(procurement.id)) ?? procurement, checkoutUrl }
+  const saved = (await procurements.find(procurement.id)) ?? procurement
+  // No checkout page to visit (fake mode): confirm the payment now, as the officer's screen would after Chapa
+  if (!checkoutUrl) return { procurement: await sync(saved, req), checkoutUrl: null }
+  return { procurement: saved, checkoutUrl }
 }
 
 /** Checks the payment with Chapa (the Procurement page calls this when Chapa sends the officer back) */
@@ -101,6 +107,9 @@ export async function receive(req, procurement, data) {
     recordId: received.id,
     description: `${received.qty} × ${received.product} added as batch ${received.batch} (expires ${data.expiryDate}), selling at ${money(data.sellingPrice)}.`,
     branchId: received.branch_id,
+    type: 'approve',
+    before: procurement,
+    after: received,
   })
 
   return received

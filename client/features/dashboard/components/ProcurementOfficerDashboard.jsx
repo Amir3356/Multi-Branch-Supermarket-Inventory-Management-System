@@ -11,7 +11,7 @@ import { CardGrid, PeriodError, PeriodPicker } from './DashboardParts'
 
 const ICONS = { money: DollarSign, truck: Truck }
 
-// The Procurement Officer's dashboard, for every branch (or the one picked in the header): purchases for the chosen period
+// The Purchase Officer's dashboard, for every branch (or the one picked in the header): purchases for the chosen period
 export default function ProcurementOfficerDashboard() {
   const formatMoney = useFormatMoney()
   const settings = useSelector(selectSettings)

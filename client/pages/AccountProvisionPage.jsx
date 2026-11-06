@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle2, Clock, Pencil, Power, Send, Trash2, UserCog, UserPlus } from 'lucide-react'
+import { CheckCircle2, Clock, Loader2, Pencil, Power, Send, Trash2, UserCog, UserPlus } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatCard, StatusTag } from '../components'
 import { useBranchScope, useNow } from '../hooks'
 import { PATHS } from '../routes/paths'
+import { formatDate, formatTime } from '../utils/dates'
 import { selectCurrentUser } from '../features/auth/store/authSlice'
 import { signOut as signOutThunk } from '../features/auth/store/authThunks'
 import { selectAccounts } from '../features/accounts/store/accountsSlice'
@@ -135,7 +136,7 @@ export default function AccountProvisionPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader centered title="Account Provision" description="Invite staff by email: Pharmacist, Cashier, and Procurement Officer. They set their own password from the link.">
+      <PageHeader centered title="Account Provision" description="Invite staff by email: Inventory Officer, Cashier, and Purchase Officer. They set their own password from the link.">
         <button className="primary-action-btn" onClick={() => setEditingAccount({})}>
           <UserPlus size={16} /> Create Account
         </button>
@@ -185,15 +186,30 @@ export default function AccountProvisionPage() {
                     <StatusTag status={a.status} />
                     {isPending && a.invitationExpired && <div className="field-hint">Invitation expired</div>}
                   </td>
-                  <td className="nowrap">{a.createdAt}</td>
+                  <td className="nowrap">
+                    {a.createdAt ? (
+                      <>
+                        {formatDate(new Date(a.createdAt))}
+                        <div className="page-desc" style={{ margin: 0 }}>{formatTime(new Date(a.createdAt))}</div>
+                      </>
+                    ) : '—'}
+                  </td>
                   <td>
                     <div className="row-actions" style={{ justifyContent: 'flex-start' }}>
                       <button type="button" className="icon-btn" onClick={() => setEditingAccount(a)} disabled={locked || busy} aria-label={`Edit ${a.fullName}`} title={locked ? `${lockReason} can't be edited here` : 'Edit'}>
                         <Pencil size={15} />
                       </button>
                       {isPending ? (
-                        <button type="button" className="icon-btn" onClick={() => run(a, resendInvitation(a))} disabled={busy} aria-label={`Resend invitation to ${a.fullName}`} title="Resend invitation">
-                          <Send size={15} />
+                        <button
+                          type="button"
+                          className="icon-btn"
+                          onClick={() => run(a, resendInvitation(a))}
+                          disabled={busy}
+                          aria-busy={busy}
+                          aria-label={busy ? `Sending invitation to ${a.fullName}` : `Resend invitation to ${a.fullName}`}
+                          title={busy ? 'Sending invitation…' : 'Resend invitation'}
+                        >
+                          {busy ? <Loader2 size={15} className="action-spin" /> : <Send size={15} />}
                         </button>
                       ) : (
                         <button

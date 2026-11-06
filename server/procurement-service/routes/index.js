@@ -1,10 +1,11 @@
-import { config } from '../utils/index.js'
 import procurementsRouter from './procurement.routes.js'
-import fakeCheckoutRouter from './fakeCheckout.routes.js'
+import categoriesRouter from './category.routes.js'
+import internalRouter from './internal.routes.js'
 
 /** Mounts every feature router of this service */
 export function registerRoutes(app) {
-  // Registered first, as in Laravel, so e.g. POST /procurements/fake-checkout/verify still means "verify"
+  // Before the procurement routes, so /procurements/categories is never read as a procurement id
+  app.use(categoriesRouter)
   app.use(procurementsRouter)
-  if (config.chapa.mode === 'fake') app.use(fakeCheckoutRouter)
+  app.use('/internal', internalRouter)
 }

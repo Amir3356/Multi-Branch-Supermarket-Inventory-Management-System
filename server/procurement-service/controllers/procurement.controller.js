@@ -26,11 +26,14 @@ export async function index(req, res) {
   res.json({ data: rows.map(toResource) })
 }
 
-// Create Procurement modal (Procurement Officer): a Pending order plus Chapa's checkout page
+// Create Procurement modal (Purchase Officer): a Pending order plus Chapa's checkout page, or (CHAPA_MODE=fake) an
+// order that is already paid, with no checkout page
 export async function store(req, res) {
   const { procurement, checkoutUrl } = await procurementService.create(req, req.validated)
   res.status(201).json({
-    message: `Procurement ${procurement.id} created. Complete the payment on Chapa to receive the stock.`,
+    message: checkoutUrl
+      ? `Procurement ${procurement.id} created. Complete the payment on Chapa to receive the stock.`
+      : `Procurement ${procurement.id} created and paid. The receiving branch can now add the stock.`,
     procurement: toResource(procurement),
     checkoutUrl,
   })
@@ -49,7 +52,7 @@ export async function verify(req, res) {
   })
 }
 
-// Inventory Officer (Add Medicine): add a paid order's stock to their own branch, once
+// Inventory Officer (Receive Stock): add a paid order's stock to their own branch, once
 export async function receive(req, res) {
   const received = await procurementService.receive(req, req.procurement, req.validated)
   res.json({

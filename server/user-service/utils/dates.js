@@ -1,7 +1,7 @@
 import { config } from './config.js'
 import { DateTime } from './time.js'
 
-/** Now in the pharmacy's local time, so "today" matches the clock on the wall */
+/** Now in the store's local time, so "today" matches the clock on the wall */
 export const localNow = () => DateTime.now().setZone(config.timezone)
 
 /** A date string as Laravel's `date` rule and Carbon::parse read it, in `zone`; null when it isn't one */

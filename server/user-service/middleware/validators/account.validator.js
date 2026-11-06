@@ -18,8 +18,8 @@ export async function validateStoreAccount(req, res, next) {
     {
       fullName: { rules: [rule.required(), rule.string(), rule.max(120)] },
       email: { rules: [rule.required(), rule.email(), rule.max(255), rule.check(() => !emailTaken, EMAIL_TAKEN)] },
-      role: { rules: [rule.required(), rule.in(STAFF_ROLES, 'Choose Pharmacist, Cashier or Procurement Officer.')] },
-      // Pharmacists and Cashiers work at one branch; the Procurement Officer covers every branch, so none is set
+      role: { rules: [rule.required(), rule.in(STAFF_ROLES, 'Choose Inventory Officer, Cashier or Purchase Officer.')] },
+      // Inventory Officers and Cashiers work at one branch; the Purchase Officer covers every branch, so none is set
       branchId: {
         nullable: true,
         rules: [

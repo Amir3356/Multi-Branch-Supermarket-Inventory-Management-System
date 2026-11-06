@@ -1,14 +1,21 @@
-import { broadcast, describeDevice, limit, logger, roleLabel } from '../utils/index.js'
-import { branchName, counts, createAuditLog, search } from '../repositories/auditLog.repository.js'
+import { HttpError, broadcast, describeDevice, limit, logger, roleLabel, sectionsFor } from '../utils/index.js'
+import { branchName, counts, createAuditLog, recentView, search } from '../repositories/auditLog.repository.js'
+import { VIEWABLE_SECTIONS, inferActionType, sanitizeSnapshot } from '../models/auditLog.model.js'
+
+// The same person opening the same page again within this many minutes isn't recorded again
+const VIEW_REPEAT_MINUTES = 5
+// Views being recorded right now, so two requests arriving together (e.g. a double render) make one entry
+const viewsInFlight = new Set()
 
 const ANNOUNCE_AFTER_MS = 250
 let announceTimer = null
 
 /**
- * AuditLogger::record for the internal API: fills in what the caller doesn't send (role label, branch name, device),
- * writes the entry and tells the Owner's Audit Logs page. Returns the new id.
+ * AuditLogger::record for the internal API: fills in what the caller doesn't send (role label, branch name, device,
+ * the action's type), strips secrets from the before / after snapshots, writes the entry (permanently: the table
+ * refuses updates and deletes) and tells the Owner's Audit Logs page. Returns the new id.
  */
-export async function record({ module, action, recordId = null, description, branchId = null, branchName: givenBranchName = null, actor = null, actorName = null, ip = null, userAgent = null }) {
+export async function record({ module, action, recordId = null, description, branchId = null, branchName: givenBranchName = null, actor = null, actorName = null, ip = null, userAgent = null, type = null, before = null, after = null }) {
   const id = await createAuditLog({
     // timestamp(0) would round fractions of a second; Laravel's now() was written truncated
     occurred_at: new Date(Math.floor(Date.now() / 1000) * 1000),
@@ -24,9 +31,44 @@ export async function record({ module, action, recordId = null, description, bra
     description: limit(description, 2000),
     ip_address: ip,
     device: userAgent ? describeDevice(userAgent) : null,
+    action_type: type ?? inferActionType(action),
+    before_data: sanitizeSnapshot(before),
+    after_data: sanitizeSnapshot(after),
   })
   announce()
   return id
+}
+
+/**
+ * A signed-in user opened a page (the client reports it when the page mounts). Only pages their role can open are
+ * recorded, and the same page again within a few minutes isn't. Returns whether an entry was written.
+ */
+export async function recordPageView(req, section) {
+  const user = req.user
+  const allowed = section === 'aiAssistance' || sectionsFor(user.role).includes(section)
+  if (!allowed) throw new HttpError(403, 'Your role does not have access to this section.')
+
+  const { module, page } = VIEWABLE_SECTIONS[section]
+  const action = `Viewed ${page}`
+  const key = `${user.id}|${action}`
+  if (viewsInFlight.has(key)) return false
+  viewsInFlight.add(key)
+  try {
+    if (await recentView(user.id, module, action, VIEW_REPEAT_MINUTES)) return false
+    await record({
+      module,
+      action,
+      type: 'view',
+      description: `${user.fullName} opened the ${page} page${user.branchId && user.branchId !== 'all' ? '' : ' (all branches)'}.`,
+      branchId: user.branchId && user.branchId !== 'all' ? user.branchId : null,
+      actor: { id: user.id, fullName: user.fullName, role: user.role },
+      ip: req.clientIp,
+      userAgent: req.userAgent,
+    })
+    return true
+  } finally {
+    viewsInFlight.delete(key)
+  }
 }
 
 /**

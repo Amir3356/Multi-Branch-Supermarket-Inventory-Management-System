@@ -3,14 +3,14 @@
 #
 #   for s in */; do cp -n "$s.env.example" "$s.env"; done   # then give every .env the SAME INTERNAL_SERVICE_SECRET
 #   DB_PASSWORD=choose-one docker compose up --build
-#   docker compose exec auth-service npm run seed        # Owner (admin) credentials + demo staff
+#   docker compose exec auth-service npm run seed        # Owner (auth-service/seed/)
 #
 # Inside compose, the database address/password and the service addresses below override what the .env files say.
 # The gateway listens on http://localhost:8000; the other services are reachable only inside the compose network.
 x-service-env: &service-env
   DB_HOST: postgres
   DB_PORT: "5432"
-  DB_DATABASE: ${DB_DATABASE:-multi_branch_pharmacy}
+  DB_DATABASE: ${DB_DATABASE:-multi_branch_supermarket}
   DB_USERNAME: ${DB_USERNAME:-postgres}
   DB_PASSWORD: ${DB_PASSWORD:-postgres}
   AUTH_SERVICE_URL: http://auth-service:4001
@@ -34,7 +34,7 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-multi_branch_pharmacy}
+      POSTGRES_DB: ${DB_DATABASE:-multi_branch_supermarket}
       POSTGRES_USER: ${DB_USERNAME:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     volumes:

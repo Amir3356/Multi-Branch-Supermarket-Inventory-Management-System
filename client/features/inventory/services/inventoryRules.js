@@ -6,8 +6,8 @@ const isPositivePrice = (raw, value) => raw !== '' && !Number.isNaN(value) && va
 export const findProcurementProduct = (products, procurement) =>
   procurement ? findCatalogProduct(products, procurement.medId, procurement.product) : undefined
 
-// Field errors for Add Medicine: which arrived order (category and product), its expiry date, and the selling price
-export function validateMedicinePrices(form, procurement, product, sellingPrice) {
+// Field errors for Receive Stock: which arrived order (category and product), its expiry date, and the selling price
+export function validateReceivedStock(form, procurement, product, sellingPrice) {
   const errors = {}
   if (!form.category) errors.category = 'Select a category'
   if (!procurement) errors.purchaseId = form.category ? 'Select a product' : 'Select a category first'

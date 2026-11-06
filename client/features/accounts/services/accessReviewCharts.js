@@ -4,9 +4,9 @@
 // Roles in a fixed order with their categorical colours (validated: neighbouring slices and bars stay distinct)
 export const ROLE_SERIES = [
   { label: 'Owner', tone: 'role-1' },
-  { label: 'Pharmacist', tone: 'role-2' },
+  { label: 'Inventory Officer', tone: 'role-2' },
   { label: 'Cashier', tone: 'role-3' },
-  { label: 'Procurement Officer', tone: 'role-4' }
+  { label: 'Purchase Officer', tone: 'role-4' }
 ]
 
 // Account status: status colours, always shown with their label

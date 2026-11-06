@@ -25,4 +25,4 @@ export function schedule(expression, name, job, { timezone = 'UTC' } = {}) {
   )
 }
 
-export const pharmacyTimezone = () => config.timezone
+export const storeTimezone = () => config.timezone

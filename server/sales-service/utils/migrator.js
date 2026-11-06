@@ -10,7 +10,7 @@ import { pool } from './db.js'
 export async function runMigrations(service, dir) {
   const client = await pool.connect()
   try {
-    await client.query("select pg_advisory_lock(hashtext('pharmacare:migrations'))")
+    await client.query("select pg_advisory_lock(hashtext('supermart:migrations'))")
     await client.query(`create table if not exists service_migrations (
       service varchar(60) not null,
       name varchar(255) not null,
@@ -38,7 +38,7 @@ export async function runMigrations(service, dir) {
     }
     if (!ran) console.log(`${service}: nothing to migrate`)
   } finally {
-    await client.query("select pg_advisory_unlock(hashtext('pharmacare:migrations'))").catch(() => {})
+    await client.query("select pg_advisory_unlock(hashtext('supermart:migrations'))").catch(() => {})
     client.release()
   }
 }

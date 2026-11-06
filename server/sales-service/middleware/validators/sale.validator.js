@@ -1,4 +1,4 @@
-import { pharmacyToday, validationError } from '../../utils/index.js'
+import { storeToday, validationError } from '../../utils/index.js'
 import { activeBranchExists, batchExpiries } from '../../repositories/sale.repository.js'
 import { normalizeInput, phpFalsyString, phpInt, phpString } from '../../utils/php.js'
 import { collectErrors } from '../../utils/validation.js'
@@ -64,7 +64,7 @@ export async function validateStoreSale(req, res, next) {
   if (!Object.keys(errors).length) {
     const batches = Object.values(data.batches).map((b) => b.batch)
     const expiries = await batchExpiries(data.branchId, data.product, batches)
-    const today = pharmacyToday()
+    const today = storeToday()
     for (const batch of batches) {
       const add = (message) => (errors.batches ??= []).includes(message) || errors.batches.push(message)
       if (!Object.hasOwn(expiries, batch)) add(`Batch ${batch} isn’t in stock at this branch.`)

@@ -12,7 +12,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "migrate": "node migrate.js",
-    "seed": "node seed/admin.seed.js"
+    "seed": "node seed/index.js"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",

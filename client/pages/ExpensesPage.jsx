@@ -17,7 +17,7 @@ export default function ExpensesPage() {
   const { branchById, inScope, scopeLabel } = useBranchScope()
   const user = useSelector(selectCurrentUser)
   const expenses = useSelector(selectExpenses).filter((e) => inScope(e.branchId))
-  const canRecord = user?.role === 'pharmacist'
+  const canRecord = user?.role === 'inventory_officer'
   const [showModal, setShowModal] = useState(false)
   const [notice, setNotice] = useState(null)
 
@@ -48,7 +48,7 @@ export default function ExpensesPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title={`Expenses · ${scopeLabel}`} description="The branch's running costs: rent, transportation, utilities, salaries and more.">
+      <PageHeader centered title={`Expenses · ${scopeLabel}`} description="The branch's running costs: rent, transportation, utilities, salaries and more.">
         {canRecord && (
           <button className="primary-action-btn" onClick={() => setShowModal(true)}>
             <Plus size={16} /> Add Expense
