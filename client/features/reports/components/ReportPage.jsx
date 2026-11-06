@@ -152,7 +152,7 @@ export default function ReportPage({ kind, title, description, buildSpec, center
         <div className={loading ? 'report-body is-loading' : 'report-body'} aria-busy={loading}>
           <div className="stats-grid report-cards">
             {spec.cards.map((c) => (
-              <StatCard key={c.title} title={c.title} icon={CARD_ICONS[c.icon] || Package} tone={c.tone} value={c.value} chip={c.chip} chipTone={c.chipTone} />
+              <StatCard key={c.title} title={c.title} icon={CARD_ICONS[c.icon] || Package} tone={c.tone} value={c.value} chip={c.chip} chipTone={c.chipTone} hint={c.hint} />
             ))}
           </div>
 

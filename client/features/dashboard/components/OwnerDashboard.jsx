@@ -5,15 +5,14 @@ import { useBranchScope, useFormatMoney, useMoneyColumns } from '../../../hooks'
 import { realtime } from '../../../api/realtime'
 import { fetchOwnerDashboard } from '../../../api/ownerDashboardApi'
 import { dashboardCards } from '../services/dashboardCards'
-import { moneyOverTime, topSlices } from '../services/dashboardCharts'
+import { moneyOverTime, sliceTone, topSlices } from '../services/dashboardCharts'
 import { usePeriod } from '../hooks/usePeriod'
-import { BarChart, ChartCard, PieChart } from './Charts'
+import { ChartCard, ComposedChart, PieChart, RevenueSplitChart } from './Charts'
 import { CardGrid, DashboardSection, PeriodError, PeriodPicker } from './DashboardParts'
 
 const ICONS = { sales: ShoppingCart, procurement: PackageCheck, wallet: Wallet, damaged: PackageX, money: DollarSign, branch: Building2, staff: Users, card: CreditCard }
 
 // One colour per pie slice, the last (grey) for Other
-const PIE_TONES = ['teal', 'cyan', 'violet', 'amber', 'rose', 'green', 'orange', 'slate']
 
 // Without a live connection the figures refresh this often
 const FALLBACK_REFRESH_MS = 60000
@@ -96,9 +95,11 @@ export default function OwnerDashboard() {
                 <CardGrid className="dashboard-money-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'period')} />
                 <div className="charts-grid">
                   <ChartCard title="Revenue, Purchases and Expenses" subtitle={period.name}>
-                    <BarChart
+                    {/* Composed: Revenue and Purchases as bars, Expenses as a line, all in ETB on one axis */}
+                    <ComposedChart
                       columns={moneyOverTime(summary.daily, period.range)}
-                      series={[{ label: 'Revenue', tone: 'teal' }, { label: 'Purchases', tone: 'cyan' }, { label: 'Expenses', tone: 'amber' }]}
+                      bars={[{ label: 'Revenue', tone: 'role-1' }, { label: 'Purchases', tone: 'role-2' }]}
+                      lines={[{ label: 'Expenses', tone: 'role-3' }]}
                       format={shortMoney}
                       emptyText="No sales, purchases or expenses in this period."
                     />
@@ -107,13 +108,30 @@ export default function OwnerDashboard() {
                     <PieChart
                       items={topSlices(summary.topProducts.map((p) => ({ label: p.product, value: p.total, qty: p.qty }))).map((p, index) => ({
                         ...p,
-                        tone: PIE_TONES[index],
+                        tone: sliceTone(p, index),
                         detail: `${p.qty.toLocaleString()} ${p.qty === 1 ? 'unit' : 'units'} sold`
                       }))}
                       format={shortMoney}
                       emptyText="No sales in this period."
                     />
                   </ChartCard>
+                  {/* Where revenue goes: one bar split into what it paid for and the profit kept (the Net Profit card's figures) */}
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <ChartCard title={summary.totals.netProfit >= 0 ? 'Net Profit (est.)' : 'Net Loss (est.)'} subtitle={`Where your sales money goes · ${period.name}`}>
+                      <RevenueSplitChart
+                        revenue={summary.totals.sales}
+                        costs={[
+                          { label: 'Cost of items sold', value: summary.totals.costOfSales, tone: 'role-1' },
+                          { label: 'Expenses', value: summary.totals.expenses, tone: 'role-4' },
+                          { label: 'Damage loss', value: summary.totals.damageLoss, tone: 'role-5' }
+                        ]}
+                        profitTone="role-7"
+                        lossTone="status-critical"
+                        format={shortMoney}
+                        emptyText="No sales, expenses or damage in this period."
+                      />
+                    </ChartCard>
+                  </div>
                 </div>
               </DashboardSection>
 

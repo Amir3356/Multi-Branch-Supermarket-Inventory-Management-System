@@ -1198,6 +1198,10 @@ a.nav-item {
 .tone-role-2 { --tone: #d95926; }
 .tone-role-3 { --tone: #199e70; }
 .tone-role-4 { --tone: #c98500; }
+/* Slots 5-7 (pie slices): magenta, violet, green, validated on the white card */
+.tone-role-5 { --tone: #d55181; }
+.tone-role-6 { --tone: #6250d6; }
+.tone-role-7 { --tone: #008300; }
 .tone-status-good { --tone: #0ca30c; }
 .tone-status-warning { --tone: #d9a10f; }
 .tone-status-serious { --tone: var(--orange-text); }
@@ -1271,6 +1275,35 @@ a.nav-item {
 .wrap-labels .bar-label { white-space: normal; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; padding-inline: 2px; }
 .bar-chart .chart-legend { grid-column: 2; }
 .bar-chart-empty { position: absolute; inset: 0 0 var(--bar-label-h) 0; display: flex; align-items: center; justify-content: center; padding: 0 1rem; text-align: center; font-size: 0.85rem; color: var(--text-dim); pointer-events: none; }
+/* Composed chart (bars + a line on one axis): columns touch, so each one's centre is exactly where the line's point is */
+.composed-chart .bar-chart-plot { gap: 0; }
+.composed-chart .bar-group { padding: 0 2px; background-clip: content-box; }
+.composed-chart .bar-group-bars { position: relative; }
+.composed-line { position: absolute; left: 4px; right: 4px; top: 0; height: 200px; width: calc(100% - 8px); overflow: visible; pointer-events: none; z-index: 1; }
+.composed-line polyline { fill: none; stroke: var(--tone); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+/* 8px dot with a 2px ring in the card colour, so it stands off the bars and the line */
+.composed-dot { position: absolute; left: 50%; width: 8px; height: 8px; margin: 0 0 -4px -4px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 2px var(--bg-card); z-index: 2; pointer-events: none; }
+.legend-line { display: inline-block; width: 14px; height: 2px; border-radius: 1px; background: var(--tone); vertical-align: middle; margin-right: 0.4rem; }
+/* "Where revenue goes": one bar split into costs and profit, then a table of every part */
+.revenue-split-headline { margin: 0 0 0.9rem; font-size: 0.95rem; color: var(--text-main); }
+.revenue-split-headline span { color: var(--text-dim); }
+.revenue-split-bar { position: relative; display: flex; height: 40px; border-radius: 6px; overflow: visible; background: var(--border-subtle); }
+.revenue-split-segment { position: relative; display: flex; align-items: center; justify-content: center; background: var(--tone); box-shadow: inset -2px 0 0 var(--bg-card); min-width: 2px; }
+.revenue-split-segment:first-child { border-radius: 6px 0 0 6px; }
+.revenue-split-segment:last-child { border-radius: 0 6px 6px 0; box-shadow: none; }
+.revenue-split-segment em { font-style: normal; font-size: 0.78rem; font-weight: 700; color: #fff; }
+.revenue-split-marker { position: absolute; top: -6px; bottom: -6px; border-left: 2px solid var(--text-main); }
+/* Under a loss bar: "Revenue ends" at the marker, then a red bracket over the costs past it, named as the loss */
+.revenue-split-under { position: relative; height: 2.4rem; }
+.revenue-split-ends { position: absolute; top: 6px; transform: translateX(calc(-100% - 6px)); font-size: 0.7rem; color: var(--text-main); white-space: nowrap; }
+.revenue-split-loss { position: absolute; top: 4px; height: 8px; border: 2px solid var(--tone); border-top: none; border-radius: 0 0 4px 4px; box-sizing: border-box; }
+.revenue-split-loss { color: var(--danger-text); font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 1; padding-top: 12px; white-space: nowrap; }
+.revenue-split-table { width: 100%; margin-top: 1.4rem; border-collapse: collapse; font-size: 0.85rem; }
+.revenue-split-table td { padding: 0.35rem 0; border-bottom: 1px solid var(--border-subtle); color: var(--text-main); }
+.revenue-split-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.revenue-split-table .share { width: 16rem; padding-left: 1rem; color: var(--text-dim); }
+.revenue-split-table tr.result td { font-weight: 700; border-bottom: none; border-top: 2px solid var(--border-subtle); }
+.revenue-split-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--tone); margin-right: 0.55rem; vertical-align: -1px; }
 
 /* Search & filter bar above list tables (Inventory, Branches, Audit Logs) */
 .filter-bar {

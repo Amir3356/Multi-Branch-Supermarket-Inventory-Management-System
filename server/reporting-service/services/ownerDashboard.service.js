@@ -33,7 +33,7 @@ export async function summary(from, to, branchId) {
 
   const [now, daily, branches, topProducts] = await Promise.all([
     rightNow(branchId),
-    dailyFigures(sales, purchases, expenses),
+    dailyFigures(sales, purchases, expenses, damaged),
     branchFigures(start, end, from, to),
     ownerDashboardRepository.topProducts(sales),
   ])
@@ -60,21 +60,33 @@ export async function summary(from, to, branchId) {
   }
 }
 
-/** Sales, purchases and expenses per day of the period that had any */
-async function dailyFigures(sales, purchases, expenses) {
-  const [salesDays, purchaseDays, expenseDays] = await Promise.all([
+/**
+ * Sales, purchases and expenses per day of the period that had any, plus what the day's sold items cost, its damage
+ * loss and its net profit (sales − cost of sales − expenses − damage loss: the Net Profit card's formula, per day)
+ */
+async function dailyFigures(sales, purchases, expenses, damaged) {
+  const [salesDays, purchaseDays, expenseDays, costDays, damageDays] = await Promise.all([
     ownerDashboardRepository.dailySales(sales),
     ownerDashboardRepository.dailyPurchases(purchases),
     ownerDashboardRepository.dailyExpenses(expenses),
+    ownerDashboardRepository.dailyCostOfSales(sales),
+    ownerDashboardRepository.dailyDamage(damaged),
   ])
   const days = {}
   for (const r of salesDays) (days[r.day] ??= {}).sales = toFloat(r.amount)
   for (const r of purchaseDays) (days[r.day] ??= {}).purchases = toFloat(r.amount)
   for (const r of expenseDays) (days[r.day] ??= {}).expenses = toFloat(r.amount)
+  for (const r of costDays) (days[r.day] ??= {}).costOfSales = toFloat(r.amount)
+  for (const r of damageDays) (days[r.day] ??= {}).damageLoss = toFloat(r.amount)
   // ksort: every key is YYYY-MM-DD, so string order is date order
   return Object.keys(days)
     .sort()
-    .map((day) => ({ date: day, sales: days[day].sales ?? 0, purchases: days[day].purchases ?? 0, expenses: days[day].expenses ?? 0 }))
+    .map((day) => {
+      const d = days[day]
+      const [sold, bought, spent, cost, lost] = [d.sales ?? 0, d.purchases ?? 0, d.expenses ?? 0, d.costOfSales ?? 0, d.damageLoss ?? 0]
+      // Rounded to cents: sums of prices can carry float noise (813.0800000000002)
+      return { date: day, sales: sold, purchases: bought, expenses: spent, costOfSales: cost, damageLoss: lost, netProfit: Math.round((sold - cost - spent - lost) * 100) / 100 }
+    })
 }
 
 /** Every branch's figures for the period, side by side (the branch filter doesn't apply here) */

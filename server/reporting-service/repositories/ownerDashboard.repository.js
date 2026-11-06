@@ -54,6 +54,17 @@ export const dailySales = (sales) =>
 export const dailyPurchases = (purchases) =>
   query(`select ${localDay('created_at')} as day, sum(total) as amount from procurements where ${purchases.sql} group by day`, purchases.values)
 
+// Per day, for the Net Profit chart: what the items sold that day cost to buy (same costing as costOfSales) and the
+// damage written off that day
+export const dailyCostOfSales = (sales) =>
+  query(
+    `select ${localDay('sales.created_at')} as day, sum(sales.qty * coalesce(products.purchase_price, 0)) as amount from sales ${WITH_PRODUCT} where ${sales.sql} group by day`,
+    sales.values,
+  )
+
+export const dailyDamage = (damaged) =>
+  query(`select to_char(damage_date, 'YYYY-MM-DD') as day, sum(loss_value) as amount from damaged_items where ${damaged.sql} group by day`, damaged.values)
+
 export const dailyExpenses = (expenses) =>
   query(`select to_char(expense_date, 'YYYY-MM-DD') as day, sum(amount) as amount from expenses where ${expenses.sql} group by day`, expenses.values)
 

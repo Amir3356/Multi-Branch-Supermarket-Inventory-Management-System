@@ -148,6 +148,123 @@ export function BarChart({ columns, series, format = (v) => v.toLocaleString(), 
   )
 }
 
+/**
+ * Composed chart: side-by-side bars for `bars` series plus a line with dot markers for `lines` series, on one shared
+ * value axis (never two scales). Each column is { label, title, values[] }: the bar values first, then the line values.
+ * Columns are equal width with no gap between them, so a column's centre is exactly (i + 0.5) / n of the plot and the
+ * line's points sit over the dots.
+ */
+export function ComposedChart({ columns, bars, lines, format = (v) => v.toLocaleString(), emptyText, wholeNumbers = false }) {
+  const series = [...bars, ...lines]
+  const max = Math.max(...columns.flatMap((c) => c.values), 0)
+  const ticks = max ? niceTicks(max, wholeNumbers ? 1 : 0) : [0, 0, 0, 0, 0]
+  const top = ticks[ticks.length - 1] || 1
+  const labelEvery = Math.ceil(columns.length / 10)
+  const n = columns.length
+  const pct = (v) => (v / top) * 100
+  return (
+    <div className="bar-chart composed-chart">
+      <div className="bar-chart-scale">
+        {[...ticks].reverse().map((t, i) => <span key={i}>{max || i === ticks.length - 1 ? format(t) : ''}</span>)}
+      </div>
+      <div className="bar-chart-plot">
+        <div className="bar-chart-grid">
+          {ticks.map((t, i) => <span key={i} />)}
+        </div>
+        {!max && <p className="bar-chart-empty">{emptyText}</p>}
+        {/* The line, drawn under the dots; a single column has no line, only its dot */}
+        {max > 0 && n > 1 && lines.map((line, l) => (
+          <svg key={line.label} className="composed-line" viewBox={`0 0 ${n} 100`} preserveAspectRatio="none" aria-hidden="true">
+            <polyline
+              className={`tone-${line.tone}`}
+              points={columns.map((c, i) => `${i + 0.5},${100 - pct(c.values[bars.length + l])}`).join(' ')}
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        ))}
+        {columns.map((c, index) => (
+          <div key={c.title} className={`bar-group ${n === 1 ? 'single' : ''}`} title={`${c.title}\n${series.map((s, k) => `${s.label}: ${format(c.values[k])}`).join('\n')}`}>
+            <div className="bar-group-bars">
+              {bars.map((b, k) => {
+                const v = c.values[k]
+                return <span key={b.label} className={`bar tone-${b.tone}`} style={{ height: v ? `max(3px, ${pct(v)}%)` : 0 }} />
+              })}
+              {max > 0 && lines.map((line, l) => (
+                <span key={line.label} className={`composed-dot tone-${line.tone}`} style={{ bottom: `${pct(c.values[bars.length + l])}%` }} />
+              ))}
+            </div>
+            <span className="bar-label">{index % labelEvery === 0 ? c.label : ''}</span>
+          </div>
+        ))}
+      </div>
+      <ul className="chart-legend inline">
+        {bars.map((s) => <li key={s.label}><span className={`legend-dot tone-${s.tone}`} />{s.label}</li>)}
+        {lines.map((s) => <li key={s.label}><span className={`legend-line tone-${s.tone}`} />{s.label}</li>)}
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * "Where revenue goes": one bar for the period's revenue, split into what it paid for (`costs`: [{ label, value, tone }])
+ * and what was left as profit (`profitTone`). When costs are more than revenue the bar covers the costs instead, a
+ * marker shows where revenue ran out, and a bracket under the bar marks the part past it as the loss. A table under
+ * the bar lists every part with its amount and share of revenue, so nothing depends on colour alone.
+ */
+export function RevenueSplitChart({ revenue, costs, profitTone, lossTone, format = (v) => v.toLocaleString(), emptyText }) {
+  const spent = costs.reduce((total, c) => total + c.value, 0)
+  const result = Math.round((revenue - spent) * 100) / 100
+  const scale = Math.max(revenue, spent)
+  if (!scale) return <p className="chart-empty">{emptyText}</p>
+  const pct = (v) => (v / scale) * 100
+  const share = (v) => (revenue > 0 ? `${Math.round((v / revenue) * 100)}%` : '—')
+  // Plain words for a share: "63 ETB of every 100 ETB sold"
+  const per100 = (v) => (revenue > 0 ? Math.round((v / revenue) * 100) : null)
+  const inWords = (r) => {
+    const n = per100(r.value)
+    if (n === null) return '—'
+    return r.result && result < 0 ? `lost ${n} ETB for every 100 ETB sold` : `${n} ETB of every 100 ETB sold`
+  }
+  const segments = [...costs, ...(result > 0 ? [{ label: 'Net profit', value: result, tone: profitTone }] : [])].filter((s) => s.value > 0)
+  const rows = [...costs, { label: result >= 0 ? 'Net profit' : 'Net loss', value: Math.abs(result), tone: result >= 0 ? profitTone : lossTone, result: true }]
+  return (
+    <div className="revenue-split">
+      <p className="revenue-split-headline">
+        {result >= 0
+          ? <>You sold <strong>{format(revenue)}</strong> and kept <strong>{format(result)}</strong> as profit <span>({per100(result)} ETB of every 100 ETB sold)</span></>
+          : <>Costs were <strong>{format(spent)}</strong>, more than the <strong>{format(revenue)}</strong> you sold: a loss of <strong>{format(-result)}</strong></>}
+      </p>
+      <div className="revenue-split-bar" role="img" aria-label={rows.map((r) => `${r.label} ${format(r.value)}`).join(', ')}>
+        {segments.map((s) => (
+          <span key={s.label} className={`revenue-split-segment tone-${s.tone}`} style={{ width: `${pct(s.value)}%` }} title={`${s.label}: ${format(s.value)} (${inWords(s)})`}>
+            {pct(s.value) >= 9 && <em>{share(s.value)}</em>}
+          </span>
+        ))}
+        {/* A loss: where revenue ran out */}
+        {result < 0 && <span className="revenue-split-marker" style={{ left: `${pct(revenue)}%` }} />}
+      </div>
+      {/* …and a bracket under the costs past it: the loss */}
+      {result < 0 && (
+        <div className="revenue-split-under">
+          <span className="revenue-split-ends" style={{ left: `${pct(revenue)}%` }}>Sales money runs out</span>
+          <span className={`revenue-split-loss tone-${lossTone}`} style={{ left: `${pct(revenue)}%`, width: `${100 - pct(revenue)}%` }}>Loss {format(-result)}</span>
+        </div>
+      )}
+      <table className="revenue-split-table">
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.label} className={r.result ? 'result' : undefined}>
+              <td><span className={`revenue-split-swatch tone-${r.tone}`} />{r.label}</td>
+              <td className="num">{r.result && result < 0 ? '− ' : ''}{format(r.value)}</td>
+              <td className="num share">{inWords(r)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 // Polar point on the pie, angle in turns (0 = 12 o'clock, clockwise)
 const pointAt = (turn, r = 20) => [21 + r * Math.sin(turn * 2 * Math.PI), 21 - r * Math.cos(turn * 2 * Math.PI)]
 

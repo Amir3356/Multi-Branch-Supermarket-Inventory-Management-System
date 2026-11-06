@@ -4,7 +4,7 @@ import { useFormatMoney } from '../../../hooks'
 import { selectSettings } from '../../policy/store/settingsSlice'
 import { selectSales } from '../../sales/store/salesSlice'
 import { dashboardCards } from '../services/dashboardCards'
-import { salesOverTime, topSellingSlices } from '../services/dashboardCharts'
+import { salesOverTime, sliceTone, topSellingSlices } from '../services/dashboardCharts'
 import { usePeriod } from '../hooks/usePeriod'
 import { BarChart, ChartCard, PieChart } from './Charts'
 import { CardGrid, PeriodError, PeriodPicker } from './DashboardParts'
@@ -12,7 +12,6 @@ import { CardGrid, PeriodError, PeriodPicker } from './DashboardParts'
 const ICONS = { receipt: Receipt, sales: ShoppingCart, stock: Package }
 
 // One colour per pie slice, the last (grey) for Other
-const PIE_TONES = ['teal', 'cyan', 'violet', 'amber', 'rose', 'green', 'orange', 'slate']
 
 // The Cashier's dashboard: their branch's sales for the chosen period (Today's Sales is always today)
 export default function CashierDashboard({ branchId }) {
@@ -49,7 +48,7 @@ export default function CashierDashboard({ branchId }) {
                 <PieChart
                   items={topSellingSlices(sales, period.range).map((p, index) => ({
                     ...p,
-                    tone: PIE_TONES[index],
+                    tone: sliceTone(p, index),
                     detail: `${p.qty.toLocaleString()} ${p.qty === 1 ? 'unit' : 'units'} sold`
                   }))}
                   format={shortMoney}

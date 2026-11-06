@@ -92,7 +92,7 @@ export const salesOverTime = (sales, range) =>
 
 /** Pie slices for the products that brought in the most money in the period, largest first, with the units sold;
  * beyond the top `limit - 1`, the rest are added together as "Other" */
-export function topSellingSlices(sales, range, limit = 8) {
+export function topSellingSlices(sales, range, limit = PIE_TONES.length) {
   const byProduct = new Map()
   for (const s of sales.filter((x) => inPeriod(x.date, range))) {
     const row = byProduct.get(s.product) || { label: s.product, value: 0, qty: 0 }
@@ -104,12 +104,20 @@ export function topSellingSlices(sales, range, limit = 8) {
 }
 
 /** The largest `limit - 1` rows as they are, the rest added together as "Other (n products)" */
-export function topSlices(rows, limit = 8) {
+export function topSlices(rows, limit = PIE_TONES.length) {
   const ranked = [...rows].sort((a, b) => b.value - a.value)
   if (ranked.length <= limit) return ranked
   const rest = ranked.slice(limit - 1)
-  return [...ranked.slice(0, limit - 1), { label: `Other (${rest.length} products)`, value: sum(rest, (r) => r.value), qty: sum(rest, (r) => r.qty) }]
+  return [...ranked.slice(0, limit - 1), { label: `Other (${rest.length} products)`, value: sum(rest, (r) => r.value), qty: sum(rest, (r) => r.qty), other: true }]
 }
+
+// Pie slice colours, in a fixed order checked with the dataviz palette validator on the white card: every neighbour,
+// including the last slice next to the first, is told apart with normal and colour-blind vision. Slots 1-4 are the
+// role colours the other charts use. A pie shows at most this many products; the rest fold into a grey "Other".
+export const PIE_TONES = ['role-1', 'role-2', 'role-3', 'role-4', 'role-5', 'role-6', 'role-7']
+
+/** A slice's colour: its place in the fixed order, or neutral grey for "Other" */
+export const sliceTone = (slice, index) => (slice.other ? 'slate' : PIE_TONES[index])
 
 // The Owner's chart
 

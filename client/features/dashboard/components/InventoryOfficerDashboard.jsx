@@ -18,7 +18,10 @@ import { CardGrid, DashboardSection, PeriodError, PeriodPicker } from './Dashboa
 const ICONS = { procurement: PackageCheck, stock: Package, low: AlertTriangle, clock: Clock, expired: XCircle, empty: Ban, money: DollarSign, damaged: PackageX, wallet: Wallet }
 
 // Chart colour for each stock status
-const STATUS_TONE = { 'In Stock': 'green', 'Low Stock': 'amber', 'Expiring Soon': 'orange', Expired: 'rose', 'Out of Stock': 'slate' }
+// Stock states coloured by meaning, checked with the dataviz palette validator on the white card: green = fine,
+// blue = running low (order more), amber = expiring soon, red = expired, grey = none left. Every pair of neighbouring
+// slices is told apart with normal and colour-blind vision; the legend names each one.
+const STATUS_TONE = { 'In Stock': 'status-good', 'Low Stock': 'role-1', 'Expiring Soon': 'role-4', Expired: 'status-critical', 'Out of Stock': 'slate' }
 
 // The Inventory Officer's dashboard: their branch's stock right now, then spending for the chosen period
 export default function InventoryOfficerDashboard({ branchId }) {
@@ -45,6 +48,13 @@ export default function InventoryOfficerDashboard({ branchId }) {
 
   return (
     <>
+      {/* The period comes first, at the top like the other dashboards; it sets the Spending section below
+          (Stock right now is always live) */}
+      <div className="dashboard-toolbar">
+        <PeriodPicker state={period} errorId="dashboard-range-error" />
+        {!period.invalid && <p className="page-desc">{period.text} · sets the Spending section</p>}
+      </div>
+
       <DashboardSection centered id="dashboard-stock-title" title="Stock right now" description="Live from Inventory. The period doesn’t change these.">
         <CardGrid className="dashboard-stock-grid" icons={ICONS} cards={cards.filter((c) => c.group === 'stock')} />
         <div className="charts-grid">
@@ -53,7 +63,7 @@ export default function InventoryOfficerDashboard({ branchId }) {
           </ChartCard>
           <ChartCard title="Lowest Stock" subtitle={`Units on hand · low below ${settings.defaultMinStock}`}>
             <HorizontalBarChart
-              items={lowestStock(inventory).map((p) => ({ ...p, tone: p.value <= 0 ? 'rose' : p.value < settings.defaultMinStock ? 'amber' : 'green' }))}
+              items={lowestStock(inventory).map((p) => ({ ...p, tone: p.value <= 0 ? STATUS_TONE['Out of Stock'] : p.value < settings.defaultMinStock ? STATUS_TONE['Low Stock'] : STATUS_TONE['In Stock'] }))}
               format={(v) => `${v.toLocaleString()} units`}
               emptyText="No stock in this branch yet."
             />
@@ -65,7 +75,6 @@ export default function InventoryOfficerDashboard({ branchId }) {
         id="dashboard-spending-title"
         title="Spending"
         description={period.invalid ? 'Choose a valid date range.' : period.text}
-        actions={<PeriodPicker state={period} errorId="dashboard-range-error" />}
       >
         {period.invalid ? <PeriodError id="dashboard-range-error" /> : (
           <>
@@ -74,7 +83,7 @@ export default function InventoryOfficerDashboard({ branchId }) {
               <ChartCard title="Expenses and Damage Loss" subtitle={period.name}>
                 <BarChart
                   columns={spendingOverTime({ expenses, damaged }, period.range)}
-                  series={[{ label: 'Expenses', tone: 'cyan' }, { label: 'Damage Loss', tone: 'rose' }]}
+                  series={[{ label: 'Expenses', tone: 'role-1' }, { label: 'Damage Loss', tone: 'role-2' }]}
                   format={shortMoney}
                   emptyText="No expenses or damage in this period."
                 />

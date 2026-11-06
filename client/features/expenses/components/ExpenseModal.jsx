@@ -6,7 +6,7 @@ import { todayKey } from '../../../utils'
 import { EXPENSE_CATEGORIES, emptyExpenseForm } from '../model/expense'
 import { validateExpense } from '../services/expenseRules'
 
-// Record one of the branch's expenses: what it was for, how much, and the day it was paid
+// Record one of the branch's expenses: what it was for and how much. It is dated the day it is added.
 export default function ExpenseModal({ branchName, onClose, onSave }) {
   const today = todayKey()
   const [form, setForm] = useState(() => emptyExpenseForm(today))
@@ -28,9 +28,12 @@ export default function ExpenseModal({ branchName, onClose, onSave }) {
     if (Object.keys(newErrors).length) return
     setIsSaving(true)
     try {
-      await onSave(form)
+      // No date field: the expense is recorded on the day it is added (taken when Save is tapped)
+      await onSave({ ...form, date: todayKey() })
     } catch (error) {
-      setErrors({ ...error.fieldErrors, form: Object.keys(error.fieldErrors || {}).length ? undefined : error.message })
+      // A date error has no field on this form any more, so it shows at the top
+      const { date: dateError, ...fieldErrors } = error.fieldErrors || {}
+      setErrors({ ...fieldErrors, form: dateError || (Object.keys(fieldErrors).length ? undefined : error.message) })
       setIsSaving(false)
     }
   }
@@ -67,17 +70,10 @@ export default function ExpenseModal({ branchName, onClose, onSave }) {
             {errors.category && <span className="error-msg">{errors.category}</span>}
           </div>
 
-          <div className="modal-grid">
-            <div className="form-group">
-              <label htmlFor="expense-amount">{moneyHeader('Amount')} *</label>
-              <input id="expense-amount" type="number" min="0" step="0.01" placeholder="0.00" className={`input-field ${errors.amount ? 'error' : ''}`} value={form.amount} onChange={update('amount')} />
-              {errors.amount && <span className="error-msg">{errors.amount}</span>}
-            </div>
-            <div className="form-group">
-              <label htmlFor="expense-date">Expense Date *</label>
-              <input id="expense-date" type="date" max={today} className={`input-field ${errors.date ? 'error' : ''}`} value={form.date} onChange={update('date')} />
-              {errors.date && <span className="error-msg">{errors.date}</span>}
-            </div>
+          <div className="form-group">
+            <label htmlFor="expense-amount">{moneyHeader('Amount')} *</label>
+            <input id="expense-amount" type="number" min="0" step="0.01" placeholder="0.00" className={`input-field ${errors.amount ? 'error' : ''}`} value={form.amount} onChange={update('amount')} />
+            {errors.amount && <span className="error-msg">{errors.amount}</span>}
           </div>
 
           <div className="form-group">
