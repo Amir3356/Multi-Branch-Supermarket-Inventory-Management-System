@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle2, Clock, Loader2, Pencil, Power, Send, Trash2, UserCog, UserPlus } from 'lucide-react'
+import { CheckCircle2, Clock, Loader2, Pencil, Power, Send, Trash2, UserCog, UserPlus, UserX } from 'lucide-react'
 import { BranchTag, EmptyRow, Notice, PageHeader, StatCard, StatusTag } from '../components'
 import { useBranchScope, useNow } from '../hooks'
 import { PATHS } from '../routes/paths'
@@ -15,6 +15,8 @@ import { deleteSession, endSession, loadSessions } from '../features/accounts/st
 import { realtime, watchConnection } from '../api/realtime'
 import AccountModal from '../features/accounts/components/AccountModal'
 import SessionsPanel from '../features/accounts/components/SessionsPanel'
+import DormantAccountsPanel from '../features/accounts/components/DormantAccountsPanel'
+import { DEFAULT_DORMANT_DAYS, dormantAccounts } from '../features/accounts/services/accountRules'
 import './AccountProvisionPage.css'
 
 const FALLBACK_REFRESH_MS = 60000
@@ -33,9 +35,11 @@ export default function AccountProvisionPage() {
   const [notice, setNotice] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [busyId, setBusyId] = useState(null)
+  const [dormantDays, setDormantDays] = useState(DEFAULT_DORMANT_DAYS)
 
   useEffect(() => {
     dispatch(loadAccounts())
+      .then((meta) => meta.dormantDays && setDormantDays(meta.dormantDays))
       .catch((error) => setNotice({ type: 'error', text: error.message }))
       .finally(() => setIsLoading(false))
   }, [dispatch])
@@ -133,6 +137,12 @@ export default function AccountProvisionPage() {
   }
 
   const count = (status) => accounts.filter((a) => a.status === status).length
+  const dormant = dormantAccounts(accounts, dormantDays, now)
+
+  const handleDeactivateDormant = (account) => {
+    if (!window.confirm(`Deactivate ${account.fullName}'s account? They won't be able to sign in until you activate it again.`)) return
+    run(account, toggleAccountStatus(account))
+  }
 
   return (
     <div className="content-section-card">
@@ -148,6 +158,15 @@ export default function AccountProvisionPage() {
         <StatCard title="Total Accounts" icon={UserCog} tone="cyan" value={accounts.length} chip="Staff logins" />
         <StatCard title="Active" icon={CheckCircle2} tone="teal" value={count('Active')} chip="Can sign in" chipTone="positive" />
         <StatCard title="Pending" icon={Clock} tone="warning" value={count('Pending')} chip="Invitation sent" />
+        <StatCard
+          title="Dormant"
+          icon={UserX}
+          tone={dormant.length ? 'danger' : 'teal'}
+          value={dormant.length}
+          chip={dormant.length ? `No sign-in for ${dormantDays}+ days` : 'All in use'}
+          chipTone={dormant.length ? 'negative' : 'positive'}
+          hint={`Active staff accounts nobody has signed in to for ${dormantDays} days or more`}
+        />
       </div>
 
       <div className="table-responsive">
@@ -244,6 +263,8 @@ export default function AccountProvisionPage() {
           </tbody>
         </table>
       </div>
+
+      <DormantAccountsPanel accounts={dormant} dormantDays={dormantDays} branchById={branchById} busyId={busyId} onDeactivate={handleDeactivateDormant} />
 
       <SessionsPanel sessions={sessions} idleAfterMinutes={idleAfterMinutes} signOutAfterMinutes={signOutAfterMinutes} isLive={isLive} branchById={branchById} now={now} onEnd={handleEndSession} onDelete={handleDeleteSession} onSignOut={signOut} />
 

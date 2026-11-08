@@ -5,9 +5,11 @@ import { loadSessions } from './sessionsThunks'
 
 // Account thunks call the API and return the confirmation message; failures throw ApiError
 
+// Resolves to the list's meta: { dormantDays }
 export const loadAccounts = () => async (dispatch) => {
-  const { data } = await fetchAccounts()
+  const { data, meta } = await fetchAccounts()
   dispatch(accountsLoaded(data))
+  return meta ?? {}
 }
 
 // New accounts start as Pending: the API emails an invitation link to set a password

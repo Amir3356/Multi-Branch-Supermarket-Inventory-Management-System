@@ -1,5 +1,6 @@
 import * as accountService from '../services/account.service.js'
 import { presentAccountWithDetails } from '../models/account.model.js'
+import { config } from '../utils/index.js'
 
 /** Account Provision (Laravel's AccountController): HTTP in, JSON out */
 
@@ -7,7 +8,8 @@ const respondWith = async (account) => presentAccountWithDetails(await accountSe
 
 export async function index(req, res) {
   const rows = await accountService.list()
-  res.json({ data: rows.map(presentAccountWithDetails) })
+  // dormantDays: an Active account with no sign-in for this long counts as dormant (same rule as the access review)
+  res.json({ data: rows.map(presentAccountWithDetails), meta: { dormantDays: config.accessReviewDormantDays } })
 }
 
 export async function store(req, res) {
