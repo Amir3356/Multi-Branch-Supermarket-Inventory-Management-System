@@ -1394,9 +1394,22 @@ a.nav-item {
 .audit-details { min-width: 220px; max-width: 380px; font-size: 0.84rem; line-height: 1.45; color: var(--text-muted); }
 .audit-module { display: inline-block; padding: 0.15rem 0.55rem; border-radius: var(--radius-full); font-size: 0.74rem; font-weight: 600; white-space: nowrap; background: rgb(var(--accent-rgb) / 0.12); color: var(--primary-cyan); }
 .audit-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; }
-.audit-pager-buttons { display: flex; align-items: center; gap: 0.75rem; }
-.audit-pager-buttons .secondary-action-btn { display: inline-flex; align-items: center; gap: 0.3rem; }
-.audit-pager-buttons .secondary-action-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.audit-pager-buttons { display: flex; align-items: center; gap: 0.5rem; }
+.audit-pager-btn {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.audit-pager-btn:hover:not(:disabled) { background: rgb(var(--overlay-rgb) / 0.05); border-color: rgb(var(--overlay-rgb) / 0.2); }
+.audit-pager-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* Owner dashboard: branch filter beside the period, profit colours in the branch table */
 .dashboard-branch-filter { min-width: 180px; }
@@ -1473,19 +1486,6 @@ a.nav-item {
 /* Audit Logs: header chips, and the before / after panel under an opened row */
 .audit-header-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
 .audit-header-chips .stat-chip { display: inline-flex; align-items: center; gap: 0.35rem; }
-.audit-toggle-cell { width: 2.5rem; padding-right: 0 !important; }
-.data-table tr.audit-row-open td { background: rgb(var(--accent-rgb) / 0.05); }
-.data-table tr.audit-diff-row td { background: var(--bg-dark); padding: 1rem 1.25rem 1.25rem; }
-.audit-diff-title { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 0.82rem; font-weight: 700; color: var(--text-main); }
-.audit-diff-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; font-size: 0.82rem; }
-.audit-diff-table th, .audit-diff-table td { padding: 0.5rem 0.85rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-subtle); }
-.audit-diff-table thead th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim); background: rgb(var(--overlay-rgb) / 0.03); }
-.audit-diff-table tbody th { width: 12rem; font-size: 0.82rem; font-weight: 600; letter-spacing: normal; text-transform: none; color: var(--text-muted); }
-.audit-diff-table td { color: var(--text-main); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; max-width: 28rem; }
-.audit-diff-table tbody tr:last-child th, .audit-diff-table tbody tr:last-child td { border-bottom: none; }
-.audit-diff-table tr.changed th { color: var(--text-main); }
-.audit-diff-table td.was { background: rgba(200, 64, 44, 0.08); color: var(--danger-text); text-decoration: line-through; text-decoration-color: rgba(179, 54, 31, 0.45); }
-.audit-diff-table td.now { background: rgb(var(--accent-rgb) / 0.1); color: var(--primary-emerald); font-weight: 600; }
 
 /* Live arrivals: a new entry glows saffron and fades back over a few seconds */
 @keyframes audit-arrive { from { background: rgba(0, 0, 0, 0.08); } to { background: transparent; } }
@@ -1497,3 +1497,32 @@ a.nav-item {
   color: var(--primary-cyan); font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-align: left;
 }
 .audit-new-activity:hover { background: rgb(var(--accent-rgb) / 0.14); }
+
+/* Audit Logs: the Before and After columns. An update lists only the fields it changed: the old value (red, struck
+   through) under Before and the new one (green) under After. A create lists the new record under After, a delete the
+   removed record under Before. */
+.audit-snap-cell { min-width: 12rem; max-width: 18rem; vertical-align: top; }
+.audit-snap { display: flex; flex-direction: column; gap: 0.35rem; margin: 0; }
+.audit-snap-field { display: flex; flex-direction: column; gap: 0.05rem; padding: 0.3rem 0.5rem; border-radius: var(--radius-sm); }
+.audit-snap dt { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.02em; color: var(--text-dim); }
+.audit-snap dd { margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--text-main); overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.audit-snap.before.update .audit-snap-field,
+.audit-snap.before.delete .audit-snap-field { background: rgba(200, 64, 44, 0.07); }
+.audit-snap.before.update dd { color: var(--danger-text); text-decoration: line-through; text-decoration-color: rgba(179, 54, 31, 0.45); }
+.audit-snap.before.delete dd { color: var(--danger-text); }
+.audit-snap.after .audit-snap-field { background: rgba(21, 128, 61, 0.07); }
+.audit-snap.after dd { color: var(--primary-emerald); }
+.audit-snap-none { color: var(--text-dim); font-size: 0.82rem; }
+.audit-snap-more {
+  align-self: flex-start;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.audit-snap-more:hover { color: var(--text-main); border-color: rgb(var(--overlay-rgb) / 0.2); }

@@ -22,7 +22,9 @@ export default function AuditLogsPage() {
   const [branchId, setBranchId] = useState('all')
   const [searchText, setSearchText] = useState('')
   const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
+  // Cursor pagination: null = the newest entries; { older } / { newer } = a page next to the one shown before
+  const [cursor, setCursor] = useState(null)
+  const onNewest = cursor === null
   const [result, setResult] = useState({
     data: [],
     meta: null,
@@ -33,7 +35,7 @@ export default function AuditLogsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isLive, setIsLive] = useState(false)
-  // Entries that arrived live since the last load: highlighted for a moment on page 1; on older pages, counted in a
+  // Entries that arrived live since the last load: highlighted for a moment on the newest page; on older pages, counted in a
   // "new activity" button instead of shifting the rows being read
   const newestSeen = useRef(null)
   // The whole log's size at the last load (it ignores filters), so a later load knows how many arrived
@@ -48,12 +50,12 @@ export default function AuditLogsPage() {
     return () => clearTimeout(timer)
   }, [searchText])
 
-  // Any filter change starts again from page 1
+  // Any filter change starts again from the newest entries
   const filtersKey = `${from}|${to}|${module}|${type}|${branchId}|${search}`
   const [shownFilters, setShownFilters] = useState(filtersKey)
   if (shownFilters !== filtersKey) {
     setShownFilters(filtersKey)
-    setPage(1)
+    setCursor(null)
   }
 
   const load = useRef(() => {})
@@ -62,11 +64,11 @@ export default function AuditLogsPage() {
     let cancelled = false
     load.current = () => {
       setIsLoading(true)
-      fetchAuditLogs({ from, to, module, type, branchId, search, page })
+      fetchAuditLogs({ from, to, module, type, branchId, search, older: cursor?.older, newer: cursor?.newer })
         .then((data) => {
           if (cancelled) return
           const newest = data.data[0]?.id ?? null
-          if (page === 1) {
+          if (onNewest) {
             const previous = newestSeen.current
             setFreshIds(new Set(previous === null ? [] : data.data.filter((log) => log.id > previous).map((log) => log.id)))
             if (newest !== null) newestSeen.current = Math.max(newest, previous ?? 0)
@@ -85,7 +87,7 @@ export default function AuditLogsPage() {
     return () => {
       cancelled = true
     }
-  }, [from, to, module, type, branchId, search, page, period.invalid])
+  }, [from, to, module, type, branchId, search, cursor, onNewest, period.invalid])
 
   // New entries arrive live; without the connection, the list refreshes every minute
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function AuditLogsPage() {
 
   return (
     <div className="content-section-card">
-      <PageHeader title="Audit Logs" description="Every create, update, approve, reject, view and delete across the system: who did it, when, in which module, and the data before and after. Open a row to see what changed.">
+      <PageHeader title="Audit Logs" description="Every create, update, approve, reject, view and delete across the system: who did it, when, in which module, and the data before and after. The Before Snapshot and After Snapshot columns show what each action changed.">
         <div className="audit-header-chips">
         <span className="stat-chip neutral" title="The database refuses any change or deletion of an entry, whoever asks, the Owner included">
           <Lock size={13} /> Permanent record
@@ -188,26 +190,39 @@ export default function AuditLogsPage() {
           {error && <p className="error-msg" style={{ marginTop: '0.75rem' }}>{error}</p>}
 
           {unseenCount > 0 && (
-            <button type="button" className="audit-new-activity" onClick={() => setPage(1)}>
+            <button type="button" className="audit-new-activity" onClick={() => setCursor(null)}>
               <Radio size={14} /> {unseenCount} new {unseenCount === 1 ? 'action' : 'actions'} since you opened this page. Show newest
             </button>
           )}
 
           <AuditLogTable logs={logs} freshIds={freshIds} isLoading={isLoading && !logs.length} />
 
-          {meta && meta.last_page > 1 && (
-            <div className="audit-pager">
-              <span className="page-desc">Showing {meta.from}–{meta.to} of {meta.total}</span>
+          {meta && (meta.newer_cursor || meta.older_cursor) && (
+            <nav className="audit-pager" aria-label="Audit log pages">
+              <span className="page-desc">{meta.from}–{meta.to} of {meta.total}</span>
               <div className="audit-pager-buttons">
-                <button type="button" className="secondary-action-btn" onClick={() => setPage((p) => p - 1)} disabled={page <= 1 || isLoading}>
-                  <ChevronLeft size={16} /> Newer
+                <button
+                  type="button"
+                  className="audit-pager-btn"
+                  onClick={() => setCursor({ newer: meta.newer_cursor })}
+                  disabled={!meta.newer_cursor || isLoading}
+                  aria-label="Newer entries"
+                  title="Newer entries"
+                >
+                  <ChevronLeft size={18} />
                 </button>
-                <span className="page-desc">Page {meta.current_page} of {meta.last_page}</span>
-                <button type="button" className="secondary-action-btn" onClick={() => setPage((p) => p + 1)} disabled={page >= meta.last_page || isLoading}>
-                  Older <ChevronRight size={16} />
+                <button
+                  type="button"
+                  className="audit-pager-btn"
+                  onClick={() => setCursor({ older: meta.older_cursor })}
+                  disabled={!meta.older_cursor || isLoading}
+                  aria-label="Older entries"
+                  title="Older entries"
+                >
+                  <ChevronRight size={18} />
                 </button>
               </div>
-            </div>
+            </nav>
           )}
         </>
       )}

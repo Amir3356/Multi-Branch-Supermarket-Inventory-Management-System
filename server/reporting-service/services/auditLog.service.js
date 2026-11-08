@@ -15,10 +15,12 @@ let announceTimer = null
  * the action's type), strips secrets from the before / after snapshots, writes the entry (permanently: the table
  * refuses updates and deletes) and tells the Owner's Audit Logs page. Returns the new id.
  */
-export async function record({ module, action, recordId = null, description, branchId = null, branchName: givenBranchName = null, actor = null, actorName = null, ip = null, userAgent = null, type = null, before = null, after = null }) {
-  const id = await createAuditLog({
+export async function record({ module, action, recordId = null, description, branchId = null, branchName: givenBranchName = null, actor = null, actorName = null, ip = null, userAgent = null, type = null, before = null, after = null, occurredAt = null, sourceKey = null }) {
+  // When the action happened (sent by the caller, so an entry delivered late keeps its time), else now
+  const at = occurredAt ? new Date(occurredAt).getTime() : Date.now()
+  const { id, created } = await createAuditLog({
     // timestamp(0) would round fractions of a second; Laravel's now() was written truncated
-    occurred_at: new Date(Math.floor(Date.now() / 1000) * 1000),
+    occurred_at: new Date(Math.floor(at / 1000) * 1000),
     user_id: actor?.id ?? null,
     user_name: actor?.fullName ?? actorName ?? null,
     // Payments Chapa confirms on its own (callback, scheduled check) are the system's, not a person's
@@ -34,8 +36,9 @@ export async function record({ module, action, recordId = null, description, bra
     action_type: type ?? inferActionType(action),
     before_data: sanitizeSnapshot(before),
     after_data: sanitizeSnapshot(after),
+    source_key: sourceKey,
   })
-  announce()
+  if (created) announce()
   return id
 }
 
@@ -90,11 +93,35 @@ function announce() {
 }
 
 /**
- * The Owner's Audit Logs page: read only, newest first, filtered and paged on the server.
- * Returns { rows, total, page, totals } for the controller to shape.
+ * The Owner's Audit Logs page: read only, newest first, filtered and cursor-paged on the server. `filters.older` /
+ * `filters.newer` is a cursor from a previous page (an entry's position); neither = the newest page.
+ * Returns { rows, total, from, to, olderCursor, newerCursor, totals } for the controller to shape.
  */
 export async function list(filters, perPage) {
-  const page = filters.page !== undefined && filters.page !== null ? Number.parseInt(String(filters.page).trim(), 10) : 1
-  const [{ total, rows }, totals] = await Promise.all([search(filters, page, perPage), counts()])
-  return { rows, total, page, totals }
+  const cursor = filters.older ? { direction: 'older', ...decodeCursor(filters.older) } : filters.newer ? { direction: 'newer', ...decodeCursor(filters.newer) } : null
+  const [page, totals] = await Promise.all([search(filters, cursor, perPage), counts()])
+  const { rows, total, newerCount, hasOlder, hasNewer } = page
+  return {
+    rows,
+    total,
+    from: rows.length ? newerCount + 1 : null,
+    to: rows.length ? newerCount + rows.length : null,
+    olderCursor: hasOlder && rows.length ? encodeCursor(rows[rows.length - 1]) : null,
+    newerCursor: hasNewer && rows.length ? encodeCursor(rows[0]) : null,
+    totals,
+  }
+}
+
+/** An entry's position in the log as an opaque URL-safe token: its time and id */
+const encodeCursor = (row) => Buffer.from(JSON.stringify([row.occurred_at.toISOString(), row.id])).toString('base64url')
+
+function decodeCursor(token) {
+  try {
+    const [at, id] = JSON.parse(Buffer.from(String(token), 'base64url').toString('utf8'))
+    const date = new Date(at)
+    if (Number.isNaN(date.getTime()) || !Number.isSafeInteger(id)) throw new Error('bad cursor')
+    return { at: date, id }
+  } catch {
+    throw new HttpError(422, 'This page link is no longer valid. Go back to the newest entries.')
+  }
 }

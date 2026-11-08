@@ -47,6 +47,10 @@ export const config = Object.freeze({
     database: env('DB_DATABASE', 'multi_branch_supermarket'),
     user: env('DB_USERNAME', 'postgres'),
     password: env('DB_PASSWORD', ''),
+    // Migrations run as this (owner / admin) login; the service itself runs as DB_USERNAME, which may only read and
+    // write data, never alter tables or change the audit log. Left out = the same login as DB_USERNAME.
+    migrateUser: env('DB_MIGRATE_USERNAME', env('DB_USERNAME', 'postgres')),
+    migratePassword: env('DB_MIGRATE_USERNAME') ? env('DB_MIGRATE_PASSWORD', '') : env('DB_PASSWORD', ''),
     poolSize: int('DB_POOL_SIZE', 10),
   },
 

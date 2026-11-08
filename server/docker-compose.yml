@@ -2,7 +2,7 @@
 # (<name>/Dockerfile), reads its own <name>/.env, and applies its own migrations when it starts.
 #
 #   for s in */; do cp -n "$s.env.example" "$s.env"; done   # then give every .env the SAME INTERNAL_SERVICE_SECRET
-#   DB_PASSWORD=choose-one docker compose up --build
+#   DB_PASSWORD=choose-one DB_APP_PASSWORD=choose-another docker compose up --build
 #   docker compose exec auth-service npm run seed        # Owner (auth-service/seed/)
 #
 # Inside compose, the database address/password and the service addresses below override what the .env files say.
@@ -11,8 +11,12 @@ x-service-env: &service-env
   DB_HOST: postgres
   DB_PORT: "5432"
   DB_DATABASE: ${DB_DATABASE:-multi_branch_supermarket}
-  DB_USERNAME: ${DB_USERNAME:-postgres}
-  DB_PASSWORD: ${DB_PASSWORD:-postgres}
+  # The services run as a limited login (read / write data only; on audit_logs add and read only). Each service's
+  # migrations run first as the admin login below, which also creates or updates this one.
+  DB_USERNAME: ${DB_APP_USERNAME:-supermart_app}
+  DB_PASSWORD: ${DB_APP_PASSWORD:-supermart_app}
+  DB_MIGRATE_USERNAME: ${DB_USERNAME:-postgres}
+  DB_MIGRATE_PASSWORD: ${DB_PASSWORD:-postgres}
   AUTH_SERVICE_URL: http://auth-service:4001
   USER_SERVICE_URL: http://user-service:4002
   BRANCH_SERVICE_URL: http://branch-service:4003

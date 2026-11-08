@@ -3,6 +3,7 @@ import { servicePort } from './config.js'
 import { internalOnly } from '../middleware/internalOnly.js'
 import { HttpError } from './errors.js'
 import { pool } from './db.js'
+import { startAuditRelay } from './events.js'
 import { logger, setServiceName } from './logger.js'
 
 /**
@@ -17,7 +18,7 @@ import { logger, setServiceName } from './logger.js'
  * Public routes are mounted at the path the client uses minus the /api prefix (the gateway strips it):
  * the client's POST /api/sales arrives here as POST /sales. Service-to-service routes live under /internal/….
  */
-export function createService({ name, key, routes, onStart, bodyLimit = '1mb' }) {
+export function createService({ name, key, routes, onStart, attach, bodyLimit = '1mb' }) {
   setServiceName(name)
   const app = express()
   app.disable('x-powered-by')
@@ -58,8 +59,13 @@ export function createService({ name, key, routes, onStart, bodyLimit = '1mb' })
   const port = servicePort(key)
   const server = app.listen(port, () => {
     logger.info(`${name} listening on http://localhost:${port}`)
+    // Delivers audit entries waiting in the outbox (e.g. from before a restart), then keeps checking
+    startAuditRelay(name)
     onStart?.()
   })
+
+  // Extra listeners on the same HTTP server (e.g. reporting-service's audit WebSocket)
+  attach?.(server)
 
   const shutdown = () => {
     server.close(() => pool.end().finally(() => process.exit(0)))
