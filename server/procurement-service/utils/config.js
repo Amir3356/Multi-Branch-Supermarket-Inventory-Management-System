@@ -21,7 +21,7 @@ const timeout = int('SESSION_TIMEOUT_MINUTES', 30)
 
 export const config = Object.freeze({
   serviceRoot,
-  appName: env('APP_NAME', 'SuperMart IMS'),
+  appName: env('APP_NAME', 'Multi-Branch Supermarket Inventory'),
   env: env('NODE_ENV', 'development'),
   appUrl: env('APP_URL', 'http://localhost:8000').replace(/\/$/, ''),
   frontendUrl: env('FRONTEND_URL', 'http://localhost:5173').replace(/\/$/, ''),
@@ -61,7 +61,7 @@ export const config = Object.freeze({
     username: env('MAIL_USERNAME'),
     password: env('MAIL_PASSWORD'),
     fromAddress: env('MAIL_FROM_ADDRESS', 'no-reply@example.com'),
-    fromName: env('MAIL_FROM_NAME', 'SuperMart IMS'),
+    fromName: env('MAIL_FROM_NAME', 'Multi-Branch Supermarket Inventory'),
   },
 
   invitationExpireMinutes: int('INVITATION_EXPIRE_MINUTES', 10),
