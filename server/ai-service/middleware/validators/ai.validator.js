@@ -1,5 +1,5 @@
 import { HttpError, validationError } from '../../utils/index.js'
-import { cleanInput } from '../../utils/php.js'
+import { cleanInput } from '../../utils/dataUtils.js'
 
 /**
  * POST /ai/chat: the conversation, validated with Laravel's rules and messages, and the last message must be the
@@ -12,15 +12,13 @@ export function validateChat(req, res, next) {
   next()
 }
 
-// json_decode turned JSON objects and arrays alike into PHP arrays
-const isPhpArray = (value) => value !== null && typeof value === 'object'
+const isRecordOrArray = (value) => value !== null && typeof value === 'object'
 const entriesOf = (value) => (Array.isArray(value) ? value.map((item, i) => [String(i), item]) : Object.entries(value))
-const isEmpty = (value) => value === null || value === undefined || (typeof value === 'string' && value.trim() === '') || (isPhpArray(value) && entriesOf(value).length === 0)
-// Laravel's size for a field without numeric rules: a count for arrays, otherwise the string length
-const size = (value) => (isPhpArray(value) ? entriesOf(value).length : [...(value === true ? '1' : value === false ? '' : String(value))].length)
+const isEmpty = (value) => value === null || value === undefined || (typeof value === 'string' && value.trim() === '') || (isRecordOrArray(value) && entriesOf(value).length === 0)
+const size = (value) => (isRecordOrArray(value) ? entriesOf(value).length : [...(value === true ? '1' : value === false ? '' : String(value))].length)
 
 /**
- * Laravel's rules, messages and order for:
+ * Validates chat messages payload:
  *   messages: required|array|min:1|max:20, messages.*.role: required|string|in:user,assistant,
  *   messages.*.content: required|string|max:2000 ('Keep each message under 2000 characters.')
  * Returns [{ role, content }].
@@ -33,13 +31,13 @@ function validateMessages(data) {
   if (isEmpty(list)) {
     fail('messages', 'The messages field is required.')
   } else {
-    if (!isPhpArray(list)) fail('messages', 'The messages field must be an array.')
+    if (!isRecordOrArray(list)) fail('messages', 'The messages field must be an array.')
     if (size(list) < 1) fail('messages', 'The messages field must have at least 1 items.')
     if (size(list) > 20) fail('messages', 'The messages field must not have more than 20 items.')
   }
 
-  // Wildcard rules apply to the items that are arrays themselves; a missing key counts as present and null
-  const items = isPhpArray(list) ? entriesOf(list).filter(([, item]) => isPhpArray(item)) : []
+  // Wildcard rules apply to the items that are objects or arrays themselves
+  const items = isRecordOrArray(list) ? entriesOf(list).filter(([, item]) => isRecordOrArray(item)) : []
   for (const [key, item] of items) {
     const field = `messages.${key}.role`
     const role = item.role ?? null
@@ -48,7 +46,7 @@ function validateMessages(data) {
       continue
     }
     if (typeof role !== 'string') fail(field, `The ${field} field must be a string.`)
-    if (isPhpArray(role) || !['user', 'assistant'].includes(role === true ? '1' : role === false ? '' : String(role))) fail(field, `The selected ${field} is invalid.`)
+    if (isRecordOrArray(role) || !['user', 'assistant'].includes(role === true ? '1' : role === false ? '' : String(role))) fail(field, `The selected ${field} is invalid.`)
   }
   for (const [key, item] of items) {
     const field = `messages.${key}.content`
@@ -63,8 +61,7 @@ function validateMessages(data) {
   if (Object.keys(errors).length) throw validationError(errors)
 
   return entriesOf(list).map(([, m]) => {
-    // PHP failed reading ['role'] from a plain string item (500); other scalars read as null
     if (typeof m === 'string') throw new Error('A chat message is a string, not an object.')
-    return isPhpArray(m) ? { role: m.role, content: m.content } : { role: null, content: null }
+    return isRecordOrArray(m) ? { role: m.role, content: m.content } : { role: null, content: null }
   })
 }

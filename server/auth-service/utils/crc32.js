@@ -1,4 +1,4 @@
-// PHP's hash('crc32b'): the standard (zlib) CRC-32, as 8 lower-case hex digits. zlib.crc32 needs Node 22.2+.
+// Standard (zlib) CRC-32, as 8 lower-case hex digits.
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256)
   for (let n = 0; n < 256; n++) {

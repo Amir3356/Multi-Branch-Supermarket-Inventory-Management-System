@@ -1,5 +1,5 @@
 import { HttpError, audit, broadcast, isUniqueViolation, logger, money, nextId, serviceClient, transaction } from '../utils/index.js'
-import { nowSeconds, phpInt, phpRound } from '../utils/php.js'
+import { nowSeconds, roundNumber, toInt } from '../utils/dataUtils.js'
 import * as sales from '../repositories/sale.repository.js'
 import { IDEMPOTENCY_CONSTRAINT, ID_PREFIX, STATUS_PAID, TABLE, toResource } from '../models/sale.model.js'
 
@@ -15,8 +15,8 @@ export function visibleTo(user) {
  * already recorded (created = false) instead of selling the units twice.
  */
 export async function recordSale(req, data) {
-  const unitPrice = phpRound(data.unitPrice, 2)
-  const qty = phpInt(data.qty)
+  const unitPrice = roundNumber(data.unitPrice, 2)
+  const qty = toInt(data.qty)
   const { sale, created } = await recordOnce(req, {
     branch_id: data.branchId,
     customer: data.customer,
@@ -24,9 +24,9 @@ export async function recordSale(req, data) {
     product: data.product,
     med_id: data.medId ?? null,
     qty,
-    batches: Object.values(data.batches).map((b) => ({ batch: b.batch, qty: phpInt(b.qty) })),
+    batches: Object.values(data.batches).map((b) => ({ batch: b.batch, qty: toInt(b.qty) })),
     unit_price: unitPrice,
-    total: phpRound(unitPrice * qty, 2),
+    total: roundNumber(unitPrice * qty, 2),
     status: STATUS_PAID,
     sold_by: req.user.id,
     idempotency_key: data.idempotencyKey,
@@ -62,7 +62,7 @@ function sameSale(sale, data, unitPrice) {
     sale.branch_id === data.branchId &&
     sale.product === data.product &&
     sale.med_id === (data.medId ?? null) &&
-    sale.qty === phpInt(data.qty) &&
+    sale.qty === toInt(data.qty) &&
     Number(sale.unit_price) === unitPrice &&
     sale.customer === data.customer
   )

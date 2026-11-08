@@ -83,5 +83,5 @@ export function normalizeInput(body, keepRaw = ['password', 'password_confirmati
   return input
 }
 
-/** PHP's (string) cast for request values: null → '' */
+/** String cast for request values: null or undefined → '' */
 export const str = (value) => (value === null || value === undefined ? '' : String(value))

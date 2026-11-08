@@ -44,8 +44,7 @@ async function guardEmailRace(fn) {
   }
 }
 
-// PHP's array_filter() drops null, '' and '0'
-const phpFilled = (value) => value !== undefined && value !== null && value !== '' && value !== '0' && value !== false
+const isFilled = (value) => value !== undefined && value !== null && value !== '' && value !== '0' && value !== false
 
 /** Creates an invited account from validated input and emails the invitation; returns the users row */
 export async function create(req, input) {
@@ -84,7 +83,7 @@ export async function update(req, account, input) {
   }
 
   const next = { ...account }
-  for (const [column, key] of FIELDS) if (phpFilled(input[key])) next[column] = input[key]
+  for (const [column, key] of FIELDS) if (isFilled(input[key])) next[column] = input[key]
   // A role that covers every branch has no branch; the others must have one
   if (coversAllBranches(next.role)) next.branch_id = null
   else if (!next.branch_id) throw validationError({ branchId: 'Assign a branch for this role.' })

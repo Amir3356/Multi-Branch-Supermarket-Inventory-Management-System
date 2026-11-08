@@ -1,5 +1,5 @@
 import { DateTime, config, productKey, roleLabel } from '../utils/index.js'
-import { dbTime, groupBy, phpRound, sortBy, sortByDesc, sum, toFloat, toInt, truthy } from '../utils/php.js'
+import { dbTime, groupBy, roundNumber, sortBy, sortByDesc, sum, toFloat, toInt, truthy } from '../utils/dataUtils.js'
 import { DAYS, LIST_LIMIT } from '../models/roleSnapshot.model.js'
 import { currentPolicy } from '../repositories/policy.repository.js'
 import * as roleSnapshotRepository from '../repositories/roleSnapshot.repository.js'
@@ -11,7 +11,7 @@ import { summary } from './ownerDashboard.service.js'
  * for branch staff. No customer or staff names are included, since this is sent to an outside AI service.
  * Reads other services' tables (stock, sales, procurements, transfers, expenses, damaged items) read-only.
  */
-// Product names match ignoring case and surrounding spaces (PHP's mb_strtolower(trim()))
+// Product names match ignoring case and surrounding spaces
 const same = (a, b) => productKey(a) === productKey(b)
 // substr((string) $timestamp, 0, 10): the UTC date of a timestamp column, '' for null
 const utcDay = (value) => (value instanceof Date ? value.toISOString().slice(0, 10) : String(value ?? '').slice(0, 10))
@@ -48,7 +48,7 @@ export async function snapshotFor(user) {
   }
 
   const roles = { owner, inventory_officer: inventoryOfficer, cashier, purchase_officer: procurementOfficer }
-  // Branch staff always have a branch; PHP failed (500) for one without, and so does this
+  // Branch staff always have an assigned branch
   if (user.role !== 'owner' && user.role !== 'purchase_officer' && !branchId) throw new Error(`The ${user.role} has no branch for the AI snapshot.`)
   return { ...context, ...(await roles[user.role](s, branchId)) }
 }
@@ -219,10 +219,10 @@ function stockHealth(s, stock) {
     lowStockProducts: stock.filter((p) => p.stock > 0 && p.stock < s.minStock).length,
     outOfStockProducts: stock.filter((p) => p.stock <= 0).length,
     expiredBatches: expired,
-    expiredValueAtCost: phpRound(expiredValue, 2),
+    expiredValueAtCost: roundNumber(expiredValue, 2),
     expiringSoonBatches: expiring,
-    expiringSoonValueAtCost: phpRound(expiringValue, 2),
-    stockValueAtCost: phpRound(
+    expiringSoonValueAtCost: roundNumber(expiringValue, 2),
+    stockValueAtCost: roundNumber(
       sum(stock, (p) => p.stock * cost(s, p.product)),
       2,
     ),
@@ -239,7 +239,7 @@ function lowStock(s, stock, velocityHere) {
     .filter((p) => p.stock > 0 && p.stock < s.minStock)
     .map((p) => {
       const d = demand(p.product, velocityHere)
-      return { product: p.product, category: p.category, stock: p.stock, ...d, daysOfCover: d.avgDailySales > 0 ? phpRound(p.stock / d.avgDailySales, 1) : null }
+      return { product: p.product, category: p.category, stock: p.stock, ...d, daysOfCover: d.avgDailySales > 0 ? roundNumber(p.stock / d.avgDailySales, 1) : null }
     })
   return sortBy(list, (p) => p.daysOfCover ?? Number.MAX_SAFE_INTEGER).slice(0, LIST_LIMIT)
 }
@@ -251,7 +251,7 @@ function expiryList(s, stock, expired) {
     for (const b of p.batches) {
       const days = daysLeft(s, b.expiry)
       if (days === null || (expired ? days >= 0 : days < 0 || days > s.warningDays)) continue
-      list.push({ product: p.product, batch: b.batch, expiry: b.expiry, daysLeft: days, units: b.stock, valueAtCost: phpRound(b.stock * cost(s, p.product), 2) })
+      list.push({ product: p.product, batch: b.batch, expiry: b.expiry, daysLeft: days, units: b.stock, valueAtCost: roundNumber(b.stock * cost(s, p.product), 2) })
     }
   }
   list.sort((a, b) => a.daysLeft - b.daysLeft)
@@ -273,7 +273,7 @@ function stockAtRisk(s) {
 function slowMovers(s, stock, velocityHere) {
   const list = stock
     .filter((p) => p.stock > 0 && !velocityHere.has(productKey(p.product)))
-    .map((p) => ({ product: p.product, stock: p.stock, valueAtCost: phpRound(p.stock * cost(s, p.product), 2) }))
+    .map((p) => ({ product: p.product, stock: p.stock, valueAtCost: roundNumber(p.stock * cost(s, p.product), 2) }))
   return sortByDesc(list, 'valueAtCost').slice(0, 10)
 }
 
@@ -313,7 +313,7 @@ async function velocity(s, branchId) {
 
 function demand(product, velocityHere) {
   const units = velocityHere.get(productKey(product))?.units ?? 0
-  return { unitsSoldRecently: units, avgDailySales: phpRound(units / DAYS, 2) }
+  return { unitsSoldRecently: units, avgDailySales: roundNumber(units / DAYS, 2) }
 }
 
 async function damageByReason(s, branchId) {

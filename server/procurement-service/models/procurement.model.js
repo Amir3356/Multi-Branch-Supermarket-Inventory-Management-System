@@ -1,5 +1,5 @@
 import { iso8601 } from '../utils/index.js'
-import { localDate, ucfirst } from '../utils/php.js'
+import { localDate, ucfirst } from '../utils/dataUtils.js'
 
 // A purchase order bought for a branch and paid through Chapa; its Inventory Officer then adds the stock
 export const TABLE = 'procurements'

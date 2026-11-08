@@ -10,7 +10,7 @@ export async function index(req, res) {
 export async function updateSellingPrice(req, res) {
   const updated = await productService.setSellingPrice(req, req.product, req.validated)
 
-  // selling_price is the decimal:2 string ("12.50"), as the PHP message showed it
+  // selling_price is the decimal:2 string ("12.50")
   res.json({ message: `${updated.name} now sells for ${updated.selling_price} at every branch.`, product: toResource(updated) })
 }
 

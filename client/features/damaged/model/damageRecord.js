@@ -1,4 +1,4 @@
-// A write-off, as the API sends it (server: DamagedItems/Resources/DamagedItemResource.php)
+// A write-off, as the API sends it
 
 /**
  * @typedef {object} DamageRecord

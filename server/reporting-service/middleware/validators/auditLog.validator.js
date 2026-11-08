@@ -1,5 +1,5 @@
 import { z } from '../../utils/index.js'
-import { cleanInput } from '../../utils/php.js'
+import { cleanInput } from '../../utils/dataUtils.js'
 import { NULLABLE, afterOrEqual, dateFormat, inList, integer, max, minNumber, string, validateInput } from '../../utils/validation.js'
 import { ACTION_TYPES, MODULES, VIEWABLE_SECTIONS } from '../../models/auditLog.model.js'
 import { validateBody } from '../index.js'

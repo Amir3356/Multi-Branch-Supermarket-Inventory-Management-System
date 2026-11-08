@@ -1,5 +1,5 @@
 import { query } from '../utils/index.js'
-import { truthy } from '../utils/php.js'
+import { truthy } from '../utils/dataUtils.js'
 import { LIST_LIMIT } from '../models/roleSnapshot.model.js'
 
 /*

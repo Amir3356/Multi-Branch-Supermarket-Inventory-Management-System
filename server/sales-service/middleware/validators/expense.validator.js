@@ -1,5 +1,5 @@
 import { storeToday } from '../../utils/index.js'
-import { normalizeInput, phpFalsyString, phpString } from '../../utils/php.js'
+import { isFalsyString, normalizeInput, toStringVal } from '../../utils/dataUtils.js'
 import { validateRules } from '../../utils/validation.js'
 import { CATEGORIES } from '../../models/expense.model.js'
 
@@ -9,8 +9,8 @@ import { CATEGORIES } from '../../models/expense.model.js'
  */
 export async function validateStoreExpense(req, res, next) {
   const input = normalizeInput(req.body ?? {})
-  const description = phpString(input.description).trim()
-  const data = { ...input, description: phpFalsyString(description) ? null : description }
+  const description = toStringVal(input.description).trim()
+  const data = { ...input, description: isFalsyString(description) ? null : description }
   const today = storeToday()
 
   await validateRules(

@@ -1,6 +1,23 @@
 import { presentAuthUser } from '../utils/index.js'
 import * as auth from '../services/auth.service.js'
 
+const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
+
+function setAuthCookies(res, token) {
+  const cookieOptions = {
+    path: '/',
+    sameSite: 'lax',
+    maxAge: COOKIE_MAX_AGE_MS,
+  }
+  res.cookie('auth_token', token, cookieOptions)
+  res.cookie('token', token, cookieOptions)
+}
+
+function clearAuthCookies(res) {
+  res.clearCookie('auth_token', { path: '/' })
+  res.clearCookie('token', { path: '/' })
+}
+
 /**
  *   POST /auth/login             { email, password }                → { token, user }
  *   POST /auth/forgot-password   { email }                          → { message }        (throttle 5/min, shared)
@@ -11,7 +28,9 @@ import * as auth from '../services/auth.service.js'
  */
 
 export async function login(req, res) {
-  res.json(await auth.login(req, req.body))
+  const session = await auth.login(req, req.body)
+  if (session?.token) setAuthCookies(res, session.token)
+  res.json(session)
 }
 
 export async function forgotPassword(req, res) {
@@ -19,7 +38,9 @@ export async function forgotPassword(req, res) {
 }
 
 export async function resetPassword(req, res) {
-  res.json({ message: 'Your password was reset.', ...(await auth.resetPassword(req, req.body)) })
+  const result = await auth.resetPassword(req, req.body)
+  if (result?.token) setAuthCookies(res, result.token)
+  res.json({ message: 'Your password was reset.', ...result })
 }
 
 export async function me(req, res) {
@@ -28,5 +49,6 @@ export async function me(req, res) {
 
 export async function logout(req, res) {
   await auth.logout(req, req.body?.reason)
+  clearAuthCookies(res)
   res.json({ message: 'Signed out.' })
 }

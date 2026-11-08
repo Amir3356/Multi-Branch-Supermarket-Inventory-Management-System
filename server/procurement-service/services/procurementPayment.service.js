@@ -1,5 +1,5 @@
 import { audit, config, limit, logger, money, transaction } from '../utils/index.js'
-import { nowSeconds, phpFloat, phpRound, rawurlencode } from '../utils/php.js'
+import { nowSeconds, roundNumber, toFloat, rawurlencode } from '../utils/dataUtils.js'
 import { isPending } from '../models/procurement.model.js'
 import * as procurements from '../repositories/procurement.repository.js'
 import { chapaClient } from './chapa.service.js'
@@ -38,7 +38,7 @@ export async function startCheckout(procurement, payer) {
   return checkoutUrl
 }
 
-// PHP's explode($separator, $value, 2)
+// Splits key into at most 2 parts
 function splitOnce(value, separator) {
   const at = value.indexOf(separator)
   return at === -1 ? [value] : [value.slice(0, at), value.slice(at + separator.length)]
@@ -62,7 +62,7 @@ export async function sync(procurement, req = null) {
 
     const status = tx.status ?? null
     const amountMatches =
-      phpRound(phpFloat(tx.amount ?? 0), 2) >= phpRound(Number(locked.total), 2) && String(tx.currency ?? '').toUpperCase() === locked.currency
+      roundNumber(toFloat(tx.amount ?? 0), 2) >= roundNumber(Number(locked.total), 2) && String(tx.currency ?? '').toUpperCase() === locked.currency
 
     if (status === 'success' && amountMatches) {
       return procurements.update(

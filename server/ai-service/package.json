@@ -2,7 +2,7 @@
   "name": "ai-service",
   "private": true,
   "version": "1.0.0",
-  "description": "AI Assistance: role-specific recommendations and chat through OpenRouter",
+  "description": "AI Assistance: role-specific recommendations and chat through Google Gemini",
   "type": "module",
   "main": "index.js",
   "engines": {

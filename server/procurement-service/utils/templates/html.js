@@ -1,4 +1,4 @@
-/** Blade's {{ }}: PHP's htmlspecialchars (ENT_QUOTES) */
+/** HTML entity escaping for template strings */
 export const e = (value) =>
   String(value ?? '')
     .replace(/&/g, '&amp;')

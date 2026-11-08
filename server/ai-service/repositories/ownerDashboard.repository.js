@@ -1,5 +1,5 @@
 import { config, one, query } from '../utils/index.js'
-import { Params, sqlString } from '../utils/php.js'
+import { Params, sqlString } from '../utils/dataUtils.js'
 
 /**
  * A copy of reporting-service's ownerDashboard queries: the Owner's AI snapshot uses the same figures as the dashboard.

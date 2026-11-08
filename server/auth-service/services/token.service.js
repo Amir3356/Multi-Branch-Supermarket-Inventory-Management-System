@@ -1,12 +1,13 @@
-import { limit, notFound, presentAuthUser } from '../utils/index.js'
+import { config, limit, notFound, presentAuthUser } from '../utils/index.js'
 import * as sessionRecords from '../repositories/session.repository.js'
 import * as signIns from '../repositories/signIn.repository.js'
 import * as users from '../repositories/user.repository.js'
 import { generateSecret } from '../utils/tokens.js'
+import { signJwt } from '../utils/jwt.js'
 import { SessionService } from './session.service.js'
 
 /**
- * A new API token (one session) named after the browser that asked for it, plus the user payload:
+ * A new API JWT token (one session) named after the browser that asked for it, plus the user payload:
  * { token, user } (AuthUserResource, not wrapped). `sessions` is the request's SessionService.
  */
 export async function issue(userId, req, sessions) {
@@ -23,8 +24,21 @@ export async function issue(userId, req, sessions) {
   const user = await users.withBranch(userId)
   if (!user) throw notFound()
 
+  const expiresInSeconds = (config.tokenExpirationMinutes || 10080) * 60
+  const jwt = signJwt(
+    {
+      sub: user.id,
+      tokenId: token.id,
+      email: user.email,
+      role: user.role,
+      branchId: user.branch_id,
+    },
+    config.internalSecret,
+    { expiresIn: expiresInSeconds }
+  )
+
   return {
-    token: `${token.id}|${secret}`,
+    token: jwt,
     user: presentAuthUser(user),
   }
 }

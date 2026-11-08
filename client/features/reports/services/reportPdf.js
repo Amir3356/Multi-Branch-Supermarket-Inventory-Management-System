@@ -3,14 +3,14 @@
 // the screen always show the same figures and visual styling.
 
 const TONES = {
-  cyan: [31, 122, 77],
-  teal: [23, 96, 60],
-  green: [26, 107, 66],
+  cyan: [23, 23, 23],
+  teal: [0, 0, 0],
+  green: [21, 128, 61],
   amber: [212, 147, 15],
   orange: [210, 105, 42],
   rose: [210, 67, 47],
   violet: [122, 89, 196],
-  slate: [122, 133, 126],
+  slate: [142, 142, 142],
   'role-1': [57, 135, 229],
   'role-2': [217, 89, 38],
   'role-3': [25, 158, 112],
@@ -18,15 +18,15 @@ const TONES = {
   'status-good': [12, 163, 12],
   'status-warning': [217, 161, 15],
   'status-serious': [169, 84, 31],
-  'status-neutral': [95, 107, 99],
+  'status-neutral': [107, 107, 107],
   'status-critical': [208, 59, 59]
 }
 
-const INK = [28, 38, 32]
-const MUTED = [95, 107, 99]
-const GRID = [227, 223, 211]
-const HEAD = [31, 122, 77]
-const BORDER = [227, 223, 211]
+const INK = [13, 13, 13]
+const MUTED = [107, 107, 107]
+const GRID = [229, 229, 229]
+const HEAD = [23, 23, 23]
+const BORDER = [229, 229, 229]
 const MARGIN = 40
 
 const fill = (doc, tone) => doc.setFillColor(...(TONES[tone] || MUTED))
@@ -43,8 +43,8 @@ function drawStatCard(doc, card, x, y, w, h) {
   // Tone indicator in top-right
   const isWarn = card.tone === 'warning'
   const isDang = card.tone === 'danger'
-  const iconBg = isWarn ? [254, 243, 199] : isDang ? [254, 237, 235] : [235, 246, 240]
-  const iconFg = isWarn ? [180, 83, 9] : isDang ? [185, 28, 28] : [31, 122, 77]
+  const iconBg = isWarn ? [254, 243, 199] : isDang ? [254, 237, 235] : [243, 243, 243]
+  const iconFg = isWarn ? [180, 83, 9] : isDang ? [185, 28, 28] : [23, 23, 23]
   doc.setFillColor(...iconBg).roundedRect(x + w - 24, y + 7, 16, 16, 4, 4, 'F')
   doc.setFillColor(...iconFg).circle(x + w - 16, y + 15, 3, 'F')
 

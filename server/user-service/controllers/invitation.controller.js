@@ -10,5 +10,15 @@ export async function show(req, res) {
 
 /** Sets the password and signs the person straight in: the body is exactly a successful login's ({ token, user }) */
 export async function accept(req, res) {
-  res.json(await invitationService.acceptAndSignIn(req, req.params.token, req.body.password))
+  const session = await invitationService.acceptAndSignIn(req, req.params.token, req.body.password)
+  if (session?.token) {
+    const cookieOptions = {
+      path: '/',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    }
+    res.cookie('auth_token', session.token, cookieOptions)
+    res.cookie('token', session.token, cookieOptions)
+  }
+  res.json(session)
 }

@@ -29,7 +29,9 @@ export const PATHS = {
 // RBAC: the API sends each user's allowed `sections` (keys of PATHS); the first is their home page
 export const canOpen = (user, section) => {
   if (!user) return false
-  if (section === 'aiAssistance') return true
+  if (section === 'aiAssistance') {
+    return user?.role === 'owner'
+  }
   if (section === 'userReports') {
     return user?.role === 'owner' || Boolean(user?.sections?.includes('userReports'))
   }

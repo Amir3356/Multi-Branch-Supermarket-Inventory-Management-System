@@ -1,5 +1,5 @@
 import { storeToday } from '../../utils/index.js'
-import { normalizeInput, phpString } from '../../utils/php.js'
+import { normalizeInput, toStringVal } from '../../utils/dataUtils.js'
 import { validateRules } from '../../utils/validation.js'
 import { CURRENCIES } from '../../models/procurement.model.js'
 import { activeBranchExists } from '../../repositories/procurement.repository.js'
@@ -12,9 +12,9 @@ import { findByName as findCategoryByName } from '../../repositories/category.re
 export async function validateStoreProcurement(req, res, next) {
   const data = normalizeInput(req.body ?? {})
   for (const field of ['supplier', 'category', 'product']) {
-    if (Object.hasOwn(data, field)) data[field] = phpString(data[field]).trim()
+    if (Object.hasOwn(data, field)) data[field] = toStringVal(data[field]).trim()
   }
-  data.currency = phpString(Object.hasOwn(data, 'currency') ? data.currency : 'ETB').toUpperCase()
+  data.currency = toStringVal(Object.hasOwn(data, 'currency') ? data.currency : 'ETB').toUpperCase()
 
   const activeBranch = {
     name: 'exists',

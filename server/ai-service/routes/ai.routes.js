@@ -10,7 +10,7 @@ import * as aiController from '../controllers/ai.controller.js'
  */
 export const aiRouter = Router()
 
-const guard = [requireRole('owner', 'inventory_officer', 'cashier', 'purchase_officer'), throttle(20, 1, 'ai')]
+const guard = [requireRole('owner'), throttle(20, 1, 'ai')]
 
 aiRouter.get('/ai/recommendations', ...guard, aiController.recommendations)
 aiRouter.post('/ai/chat', ...guard, validateChat, aiController.chat)

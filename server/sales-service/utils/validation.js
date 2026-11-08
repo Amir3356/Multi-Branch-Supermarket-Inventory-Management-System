@@ -42,12 +42,12 @@ const DEFAULT_MESSAGES = {
 }
 
 const UUID = /^[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}$/
-const PHP_NUMERIC = /^[ \t\n\r\v\f]*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?[ \t\n\r\v\f]*$/
+const NUMERIC_REGEX = /^[ \t\n\r\v\f]*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?[ \t\n\r\v\f]*$/
 
-/** PHP's is_numeric */
-export const isNumeric = (value) => (typeof value === 'number' && Number.isFinite(value)) || (typeof value === 'string' && PHP_NUMERIC.test(value))
+/** Numeric string or number check */
+export const isNumeric = (value) => (typeof value === 'number' && Number.isFinite(value)) || (typeof value === 'string' && NUMERIC_REGEX.test(value))
 
-// A PHP array: a JSON list or object
+// Array or object container
 const isArrayLike = (value) => Array.isArray(value) || (value !== null && typeof value === 'object')
 const countOf = (value) => (Array.isArray(value) ? value.length : Object.keys(value).length)
 const keysOf = (value) => (Array.isArray(value) ? value.map((_, i) => String(i)) : Object.keys(value))
@@ -86,7 +86,7 @@ function parseRule(rule) {
   return { params: [], ...rule }
 }
 
-// Y-m-d as PHP's DateTime::createFromFormat parses it (lenient: overflowing days roll over), else date_create's guess
+// Parses Y-m-d calendar dates
 function parseDate(value) {
   if (typeof value !== 'string' && typeof value !== 'number') return null
   const text = String(value)

@@ -1,5 +1,5 @@
 import { abort, audit, broadcast, money, nextId, transaction } from '../utils/index.js'
-import { modelNotFound, nowSeconds, phpRound } from '../utils/php.js'
+import { modelNotFound, nowSeconds, roundNumber } from '../utils/dataUtils.js'
 import * as expenses from '../repositories/expense.repository.js'
 import { ID_PREFIX, MODEL_CLASS, TABLE } from '../models/expense.model.js'
 
@@ -19,7 +19,7 @@ export async function record(req, data) {
       branch_id: req.user.branchId,
       category: data.category,
       description: data.description ?? null,
-      amount: phpRound(data.amount, 2),
+      amount: roundNumber(data.amount, 2),
       expense_date: data.date,
       recorded_by: req.user.id,
       created_at: nowSeconds(),

@@ -1,4 +1,4 @@
-// A procurement (purchase order paid through Chapa), as the API sends it (server: Procurements/Resources/ProcurementResource.php)
+// A procurement (purchase order paid through Chapa), as the API sends it
 
 /**
  * @typedef {object} Procurement

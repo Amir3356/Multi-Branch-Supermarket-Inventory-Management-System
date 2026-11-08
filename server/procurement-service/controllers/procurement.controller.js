@@ -1,5 +1,5 @@
 import { config } from '../utils/index.js'
-import { normalizeInput, phpString, rawurlencode } from '../utils/php.js'
+import { normalizeInput, toStringVal, rawurlencode } from '../utils/dataUtils.js'
 import { paymentReturnPage } from '../utils/templates/paymentReturn.js'
 import { toResource } from '../models/procurement.model.js'
 import * as procurementService from '../services/procurement.service.js'
@@ -8,7 +8,7 @@ import * as procurementService from '../services/procurement.service.js'
 export async function chapaCallback(req, res) {
   // Laravel's $request->input(): query and body together, the body winning
   const input = normalizeInput({ ...req.query, ...(req.body ?? {}) })
-  const txRef = phpString(input.trx_ref ?? input.tx_ref ?? '')
+  const txRef = toStringVal(input.trx_ref ?? input.tx_ref ?? '')
   await procurementService.handleChapaCallback(txRef, req)
   res.json({ received: true })
 }

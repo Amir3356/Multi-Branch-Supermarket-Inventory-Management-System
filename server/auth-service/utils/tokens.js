@@ -24,7 +24,7 @@ export function generateSecret() {
   return `${entropy}${crc32b(entropy)}`
 }
 
-/** PHP's hash_equals for two hex digests */
+/** Timing-safe compare for two hex digests */
 export function hashEquals(known, given) {
   const a = Buffer.from(String(known ?? ''))
   const b = Buffer.from(String(given ?? ''))

@@ -1,10 +1,10 @@
 import { validationError, z } from './index.js'
 
 /**
- * Laravel-style field rules on top of zod, for request bodies whose messages must match the PHP FormRequests exactly.
- * Like Laravel: a failed `required` stops that field's other rules; otherwise every failing rule adds its message;
+ * Field rules and validation for request bodies.
+ * Like standard validation: a failed `required` stops that field's other rules; otherwise every failing rule adds its message;
  * an absent or null field without `required` skips its rules (nullable); and `after` hooks run even when rules failed.
- * Async rules (exists) are supported, which common's validate() (sync safeParse) can't do.
+ * Async rules (exists) are supported.
  *
  *   await validateRules({ qty: [required(), integer(), min(1)] }, req.body)
  */
@@ -12,7 +12,7 @@ import { validationError, z } from './index.js'
 const isEmpty = (value) =>
   value === undefined || value === null || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0)
 
-/** Laravel's TrimStrings + ConvertEmptyStringsToNull global middleware */
+/** Trims strings and converts empty strings to null */
 export function normalizeInput(value) {
   if (typeof value === 'string') {
     const trimmed = value.trim()
@@ -23,16 +23,16 @@ export function normalizeInput(value) {
   return value
 }
 
-/** PHP is_numeric: numbers, and numeric strings (optional sign, decimals, exponent) */
+/** Numeric check: numbers, and numeric strings (optional sign, decimals, exponent) */
 export const isNumeric = (value) =>
   (typeof value === 'number' && Number.isFinite(value)) ||
   (typeof value === 'string' && /^\s*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(value))
 
-/** PHP filter_var(FILTER_VALIDATE_INT), as Laravel's `integer` rule uses it */
+/** Integer validation rule */
 export const isInteger = (value) =>
   (typeof value === 'number' && Number.isInteger(value)) || (typeof value === 'string' && /^[+-]?(0|[1-9]\d*)$/.test(value))
 
-/** date_format:Y-m-d: the exact format and a real calendar day (2026-02-30 fails, as PHP's round trip check does) */
+/** date_format:Y-m-d: the exact format and a real calendar day */
 export const isYmd = (value) => {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
   const date = new Date(`${value}T00:00:00Z`)

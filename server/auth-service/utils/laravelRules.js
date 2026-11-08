@@ -14,7 +14,7 @@ export function laravelRules(spec) {
   })
 }
 
-/** PHP's is_numeric */
+/** Numeric value check */
 export function isNumeric(value) {
   if (typeof value === 'number') return Number.isFinite(value)
   return typeof value === 'string' && /^\s*[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?\s*$/.test(value)
@@ -66,7 +66,7 @@ function check(field, value, rules, data) {
   return messages
 }
 
-/** The request's email as LoginRequest & co. prepared it: strtolower(trim((string) $email)) — ASCII-only, like PHP 8 */
+/** Normalizes email input: lowercase and trimmed */
 export function normalizeEmail(value) {
   const text = value === null || value === undefined || typeof value === 'object' ? (value ? '[invalid]' : '') : value === true ? '1' : value === false ? '' : String(value)
   return text.trim().replace(/[A-Z]/g, (letter) => letter.toLowerCase())

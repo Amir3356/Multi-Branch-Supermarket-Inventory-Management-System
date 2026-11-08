@@ -1,5 +1,5 @@
 import { DateTime, productKey } from '../utils/index.js'
-import { groupBy, isoInZone, phpCompare, phpRound, sortBy, sortByDesc, sortByMany, sum, toFloat, toInt, truthy } from '../utils/php.js'
+import { compareValues, groupBy, isoInZone, roundNumber, sortBy, sortByDesc, sortByMany, sum, toFloat, toInt, truthy } from '../utils/dataUtils.js'
 import { STATUSES } from '../models/inventoryReport.model.js'
 import { currentPolicy } from '../repositories/policy.repository.js'
 import * as inventoryReportRepository from '../repositories/inventoryReport.repository.js'
@@ -38,9 +38,9 @@ export async function buildInventoryReport(p) {
       .map((b) => {
         const expiry = b.expiry_date ?? null
         const status =
-          expiry && phpCompare(expiry, today) < 0
+          expiry && compareValues(expiry, today) < 0
             ? 'Expired'
-            : expiry && phpCompare(expiry, soon) <= 0
+            : expiry && compareValues(expiry, soon) <= 0
               ? 'Expiring Soon'
               : productStatus.get(`${b.branch_id}|${b.product_key}`)
         return {
@@ -52,8 +52,8 @@ export async function buildInventoryReport(p) {
           expiry,
           units: b.units,
           unitCost: price(b, 'cost'),
-          valueAtCost: phpRound(b.units * price(b, 'cost'), 2),
-          valueAtSelling: phpRound(b.units * price(b, 'selling'), 2),
+          valueAtCost: roundNumber(b.units * price(b, 'cost'), 2),
+          valueAtSelling: roundNumber(b.units * price(b, 'selling'), 2),
           status,
         }
       }),
@@ -77,13 +77,13 @@ export async function buildInventoryReport(p) {
     totals: {
       products: [...products.values()].filter((pr) => pr.units > 0).length,
       units: toInt(sum(rows, 'units')),
-      valueAtCost: phpRound(sum(rows, 'valueAtCost'), 2),
-      valueAtSelling: phpRound(sum(rows, 'valueAtSelling'), 2),
+      valueAtCost: roundNumber(sum(rows, 'valueAtCost'), 2),
+      valueAtSelling: roundNumber(sum(rows, 'valueAtSelling'), 2),
       lowStock: lowStatuses.length,
       outOfStock: outOfStock.length,
       expiringSoon: withStatus('Expiring Soon').length,
       expired: withStatus('Expired').length,
-      expiredValue: phpRound(sum(withStatus('Expired'), 'valueAtCost'), 2),
+      expiredValue: roundNumber(sum(withStatus('Expired'), 'valueAtCost'), 2),
     },
     // Batches by what they need: fine, low, expiring, expired
     byStatus: STATUSES.map((s) => ({ status: s, batches: withStatus(s).length, units: toInt(sum(withStatus(s), 'units')) })),
@@ -91,7 +91,7 @@ export async function buildInventoryReport(p) {
       [...groupBy(rows, 'branch')].map(([branch, g]) => ({
         branch,
         units: toInt(sum(g, 'units')),
-        valueAtCost: phpRound(sum(g, 'valueAtCost'), 2),
+        valueAtCost: roundNumber(sum(g, 'valueAtCost'), 2),
         // Products below the minimum at this branch (a batch can show as expiring and still be low)
         lowStock: lowStatuses.filter(([key]) => key.startsWith(`${g[0].branchId}|`)).length,
         expiringSoon: withStatus('Expiring Soon', g).length,
@@ -100,7 +100,7 @@ export async function buildInventoryReport(p) {
       'valueAtCost',
     ),
     byCategory: sortByDesc(
-      [...groupBy(rows, 'category')].map(([category, g]) => ({ category, units: toInt(sum(g, 'units')), valueAtCost: phpRound(sum(g, 'valueAtCost'), 2) })),
+      [...groupBy(rows, 'category')].map(([category, g]) => ({ category, units: toInt(sum(g, 'units')), valueAtCost: roundNumber(sum(g, 'valueAtCost'), 2) })),
       'valueAtCost',
     ),
     movement: await movement(p, branchRows),

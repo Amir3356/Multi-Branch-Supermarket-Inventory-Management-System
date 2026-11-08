@@ -29,7 +29,7 @@ export async function locate(ip) {
 const ipv4ToInt = (ip) => ip.split('.').reduce((value, part) => (value << 8) + Number(part), 0) >>> 0
 const inV4 = (ip, base, bits) => bits === 0 || ipv4ToInt(ip) >>> (32 - bits) === ipv4ToInt(base) >>> (32 - bits)
 
-// PHP's FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+// Exclude private and reserved IP ranges
 const V4_RANGES = [
   ['10.0.0.0', 8], ['172.16.0.0', 12], ['192.168.0.0', 16], // private
   ['0.0.0.0', 8], ['127.0.0.0', 8], ['169.254.0.0', 16], ['240.0.0.0', 4], // reserved

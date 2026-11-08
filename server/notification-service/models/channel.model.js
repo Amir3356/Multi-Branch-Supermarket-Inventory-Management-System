@@ -1,5 +1,5 @@
 /**
- * Private channels and who may listen on each (the rules Laravel kept in routes/channels.php). `who` is the socket's
+ * Private channels and who may listen on each. `who` is the socket's
  * signed-in session: { user, tokenId }.
  */
 export const BRANCH_TOPICS = Object.freeze(['stock', 'sales', 'transfers', 'procurements', 'damaged', 'expenses'])

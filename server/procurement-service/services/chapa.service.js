@@ -1,5 +1,5 @@
 import { abort, config } from '../utils/index.js'
-import { rawurlencode } from '../utils/php.js'
+import { rawurlencode } from '../utils/dataUtils.js'
 
 /**
  * Chapa's hosted checkout (https://developer.chapa.co): initialize a transaction, send the person to its checkout_url,

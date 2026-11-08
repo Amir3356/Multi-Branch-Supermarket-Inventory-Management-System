@@ -1,4 +1,4 @@
-import { cleanInput } from '../../utils/php.js'
+import { cleanInput } from '../../utils/dataUtils.js'
 import { validateInput } from '../../utils/validation.js'
 import { PERIOD_RULES } from './report.validator.js'
 

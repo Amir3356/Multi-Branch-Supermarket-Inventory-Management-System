@@ -1,4 +1,4 @@
-// A signed-in session, as the API sends it (server: Sessions/Resources/SessionResource.php)
+// A signed-in session, as the API sends it
 
 /**
  * @typedef {object} ApiSession

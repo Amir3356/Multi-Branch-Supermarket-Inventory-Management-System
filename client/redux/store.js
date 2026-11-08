@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { onUnauthorized, setAuthToken } from '../utils/http'
-import { STORAGE_KEYS, writeJson } from '../utils'
+import { STORAGE_KEYS, deleteCookie, setCookie, writeJson } from '../utils'
 import authReducer, { sessionEnded } from '../features/auth/store/authSlice'
 import settingsReducer from '../features/policy/store/settingsSlice'
 import branchesReducer from '../features/branches/store/branchesSlice'
@@ -46,7 +46,14 @@ store.subscribe(() => {
   const state = store.getState()
   if (state.auth !== previous.auth) {
     setAuthToken(state.auth.token)
-    writeJson(STORAGE_KEYS.auth, state.auth.token ? { token: state.auth.token, user: state.auth.user } : null)
+    if (state.auth.token) {
+      setCookie('auth_token', state.auth.token, { maxAge: 7 * 86400 })
+    } else {
+      deleteCookie('auth_token')
+      deleteCookie('token')
+    }
+    // Only user profile details in localStorage; the token is stored in cookies
+    writeJson(STORAGE_KEYS.auth, state.auth.user ? { user: state.auth.user } : null)
   }
   if (state.settings !== previous.settings) writeJson(STORAGE_KEYS.settings, state.settings)
   if (state.notifications !== previous.notifications) writeJson(STORAGE_KEYS.notifications, state.notifications)

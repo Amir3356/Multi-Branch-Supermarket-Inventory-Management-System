@@ -1,4 +1,4 @@
-/** PHP's http_build_query: urlencode() each value (spaces as "+", "~" encoded) */
+/** Builds URL query string encoding each value (spaces as "+", "~" encoded) */
 export function httpBuildQuery(params) {
   const encode = (value) =>
     encodeURIComponent(String(value))

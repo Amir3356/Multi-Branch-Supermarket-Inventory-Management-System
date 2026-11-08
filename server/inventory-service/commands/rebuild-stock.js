@@ -1,4 +1,4 @@
-// npm run rebuild-stock (formerly php artisan stock:rebuild): repairs stock_batches by working every branch's stock
+// npm run rebuild-stock: repairs stock_batches by working every branch's stock
 // out again from received orders and transfers, transfers sent, sales, damaged items and corrections.
 import { pool } from '../utils/index.js'
 import { rebuildStock } from '../services/stockRebuild.service.js'

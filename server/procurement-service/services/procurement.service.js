@@ -1,5 +1,5 @@
 import { HttpError, abort, audit, money, serviceClient, transaction } from '../utils/index.js'
-import { modelNotFound, nowSeconds } from '../utils/php.js'
+import { modelNotFound, nowSeconds } from '../utils/dataUtils.js'
 import { MODEL_CLASS, awaitsReceipt } from '../models/procurement.model.js'
 import * as procurements from '../repositories/procurement.repository.js'
 import { procurementChanged } from './procurementEvents.service.js'

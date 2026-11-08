@@ -1,4 +1,4 @@
-// A branch, as the API sends it (server: Branches/Resources/BranchResource.php)
+// A branch, as the API sends it
 
 /**
  * @typedef {object} Branch

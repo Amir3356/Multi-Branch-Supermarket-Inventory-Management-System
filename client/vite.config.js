@@ -7,5 +7,10 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    watch: {
+      usePolling: true,
+      interval: 100,
+      ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**'],
+    },
   },
 })

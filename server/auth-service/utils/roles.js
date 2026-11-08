@@ -18,9 +18,9 @@ export const ROLE_LABELS = Object.freeze({
 
 const SECTIONS = Object.freeze({
   owner: ['dashboard', 'accounts', 'branches', 'auditLogs', 'reports', 'salesReport', 'inventoryReport', 'financialReport', 'procurementReport', 'userReports', 'aiAssistance'],
-  inventory_officer: ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications', 'aiAssistance'],
-  cashier: ['dashboard', 'sales', 'reports', 'aiAssistance'],
-  purchase_officer: ['dashboard', 'purchases', 'catalog', 'reports', 'aiAssistance'],
+  inventory_officer: ['dashboard', 'inventory', 'transfers', 'damaged', 'expenses', 'policy', 'reports', 'notifications'],
+  cashier: ['dashboard', 'sales', 'reports'],
+  purchase_officer: ['dashboard', 'purchases', 'catalog', 'reports'],
 })
 
 /** Roles the Owner can invite. The Owner account itself is created from the command line or the seeder. */

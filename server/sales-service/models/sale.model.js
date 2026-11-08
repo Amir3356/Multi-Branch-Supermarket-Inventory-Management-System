@@ -1,4 +1,4 @@
-import { localDate, ucfirst } from '../utils/php.js'
+import { localDate, ucfirst } from '../utils/dataUtils.js'
 
 // A sale recorded by a Cashier at their branch; its units leave stock through inventory-service
 export const TABLE = 'sales'

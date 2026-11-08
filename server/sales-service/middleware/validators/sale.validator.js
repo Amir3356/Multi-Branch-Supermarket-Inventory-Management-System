@@ -1,10 +1,9 @@
 import { storeToday, validationError } from '../../utils/index.js'
 import { activeBranchExists, batchExpiries } from '../../repositories/sale.repository.js'
-import { normalizeInput, phpFalsyString, phpInt, phpString } from '../../utils/php.js'
+import { isFalsyString, normalizeInput, toInt, toStringVal } from '../../utils/dataUtils.js'
 import { collectErrors } from '../../utils/validation.js'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-// PHP's date('M j, Y'): always English, whatever the machine's locale
 const shortDate = (ymd) => {
   const [year, month, day] = ymd.split('-').map(Number)
   return `${MONTHS[month - 1]} ${day}, ${year}`
@@ -13,10 +12,10 @@ const shortDate = (ymd) => {
 /** StoreSaleRequest: a Cashier's sale at their own, active branch. Leaves the validated input on req.validated. */
 export async function validateStoreSale(req, res, next) {
   const input = normalizeInput(req.body ?? {})
-  const customer = phpString(input.customer).trim()
+  const customer = toStringVal(input.customer).trim()
   const data = {
     ...input,
-    customer: phpFalsyString(customer) ? 'Walk-in Customer' : customer,
+    customer: isFalsyString(customer) ? 'Walk-in Customer' : customer,
     // Sent as the Idempotency-Key header: one per sale on the Cashier's screen, the same on every retry
     idempotencyKey: req.get('Idempotency-Key') ?? null,
   }
@@ -31,8 +30,8 @@ export async function validateStoreSale(req, res, next) {
   }
   const addsUpToQty = (value, fail) => {
     if (!Array.isArray(value) && (value === null || typeof value !== 'object')) return
-    const sum = Object.values(value).reduce((total, b) => total + phpInt(b && typeof b === 'object' ? (b.qty ?? 0) : 0), 0)
-    if (sum !== phpInt(data.qty)) fail('The batches must add up to the quantity sold.')
+    const sum = Object.values(value).reduce((total, b) => total + toInt(b && typeof b === 'object' ? (b.qty ?? 0) : 0), 0)
+    if (sum !== toInt(data.qty)) fail('The batches must add up to the quantity sold.')
   }
 
   const errors = await collectErrors(

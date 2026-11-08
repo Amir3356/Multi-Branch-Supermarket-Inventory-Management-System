@@ -1,5 +1,5 @@
 import { one, validationError } from './index.js'
-import { isNumeric } from './php.js'
+import { isNumeric } from './dataUtils.js'
 
 /**
  * Laravel's validator for query strings, with its rule order and messages. Query strings don't suit zod here because
@@ -32,9 +32,7 @@ const isYmd = (value) => {
 export const dateFormat = (field) => ({ test: isYmd, message: `The ${label(field)} field must match the format Y-m-d.` })
 
 /**
- * How after_or_equal reads a date: createFromFormat('!Y-m-d') (which lets days and months overflow), else PHP's
- * date_create(). The fallback is approximated with Date.parse; it only decides whether a value that already failed
- * date_format also gets the end-date message.
+ * Lenient date parser for after_or_equal comparison.
  */
 function parseLenient(value) {
   if (typeof value !== 'string' && typeof value !== 'number') return null

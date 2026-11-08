@@ -84,12 +84,10 @@ export const config = Object.freeze({
     baseUrl: env('CHAPA_BASE_URL', 'https://api.chapa.co/v1').replace(/\/$/, ''),
   },
 
-  openrouter: {
-    apiKey: env('OPENROUTER_API_KEY'),
-    baseUrl: env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1').replace(/\/$/, ''),
-    model: env('OPENROUTER_MODEL', 'apodex/apodex-1.1-mini:free'),
-    timeout: int('OPENROUTER_TIMEOUT', 60),
-    reasoning: bool('OPENROUTER_REASONING', true),
+  gemini: {
+    apiKey: env('GEMINI_API_KEY'),
+    model: env('GEMINI_MODEL', 'gemini-2.5-flash'),
+    timeout: int('GEMINI_TIMEOUT', 60),
   },
 })
 

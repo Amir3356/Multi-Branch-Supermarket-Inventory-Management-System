@@ -1,4 +1,4 @@
-// A staff account, as the API sends it (server: Accounts/Resources/AccountResource.php)
+// A staff account, as the API sends it
 
 /**
  * @typedef {'owner' | 'inventory_officer' | 'cashier' | 'purchase_officer'} Role

@@ -5,7 +5,7 @@ export const AI_ENDPOINTS = {
   chat: '/ai/chat'
 }
 
-// A little longer than the server's OPENROUTER_TIMEOUT (60 s), so the server's own error message arrives first
+// A little longer than the server's GEMINI_TIMEOUT (60 s), so the server's own error message arrives first
 const AI_TIMEOUT_MS = 75000
 
 // Each call returns the API's JSON; failures throw ApiError

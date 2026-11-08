@@ -1,3 +1,5 @@
+import { getCookie } from './cookies'
+
 // Thin fetch wrapper for the API gateway. Every call returns parsed JSON or throws ApiError.
 export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace(/\/$/, '')
 
@@ -18,7 +20,7 @@ export const setAuthToken = (token) => {
 }
 
 // The live-updates connection signs in with the same token
-export const getAuthToken = () => authToken
+export const getAuthToken = () => authToken || getCookie('auth_token') || getCookie('token')
 
 // Called when a signed-in request comes back 401 (token expired or revoked)
 export const onUnauthorized = (handler) => {
@@ -28,15 +30,17 @@ export const onUnauthorized = (handler) => {
 // `headers` adds request headers, e.g. { 'Idempotency-Key': … } so a retried POST can't record the same thing twice.
 // `timeoutMs` gives up waiting after that long (a slow or dropped connection) instead of hanging.
 export async function api(path, { method = 'GET', body, headers: extraHeaders, timeoutMs } = {}) {
+  const currentToken = getAuthToken()
   const headers = { Accept: 'application/json', ...extraHeaders }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
-  if (authToken) headers.Authorization = `Bearer ${authToken}`
+  if (currentToken) headers.Authorization = `Bearer ${currentToken}`
 
   let response
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
       headers,
+      credentials: 'include',
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: timeoutMs ? AbortSignal.timeout(timeoutMs) : undefined
     })
@@ -47,7 +51,7 @@ export async function api(path, { method = 'GET', body, headers: extraHeaders, t
 
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
-    if (response.status === 401 && authToken) unauthorizedHandler?.()
+    if (response.status === 401 && currentToken) unauthorizedHandler?.()
     const fieldErrors = Object.fromEntries(Object.entries(data.errors || {}).map(([field, messages]) => [field, messages[0]]))
     throw new ApiError(data.message || 'Something went wrong. Try again.', response.status, fieldErrors)
   }

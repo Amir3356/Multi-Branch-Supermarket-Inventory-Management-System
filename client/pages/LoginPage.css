@@ -100,7 +100,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(31, 122, 77, 0.15);
+  background: rgb(var(--accent-rgb) / 0.15);
   color: var(--primary-emerald);
   display: flex;
   align-items: center;
@@ -170,8 +170,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(31, 122, 77, 0.08);
-  border: 1px solid rgba(31, 122, 77, 0.2);
+  background: rgb(var(--accent-rgb) / 0.08);
+  border: 1px solid rgb(var(--accent-rgb) / 0.2);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
   margin-bottom: 1.5rem;
@@ -180,8 +180,8 @@
 }
 
 .demo-fill-btn {
-  background: rgba(31, 122, 77, 0.15);
-  border: 1px solid rgba(31, 122, 77, 0.3);
+  background: rgb(var(--accent-rgb) / 0.15);
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
   color: var(--text-main);
   font-size: 0.75rem;
   font-weight: 600;

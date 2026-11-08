@@ -1,4 +1,4 @@
-// A sale, as the API sends it (server: Sales/Resources/SaleResource.php)
+// A sale, as the API sends it
 
 /**
  * @typedef {object} Sale

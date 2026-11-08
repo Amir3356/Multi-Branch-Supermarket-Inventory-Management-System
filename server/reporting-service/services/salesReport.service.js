@@ -1,4 +1,4 @@
-import { phpRound, toFloat, toInt } from '../utils/php.js'
+import { roundNumber, toFloat, toInt } from '../utils/dataUtils.js'
 import * as salesReportRepository from '../repositories/salesReport.repository.js'
 
 /** Sales Report: what was sold in a period, where, by whom, and which products earn the most */
@@ -25,7 +25,7 @@ export async function buildSalesReport(p) {
       revenue,
       transactions: count,
       units: toInt(totals.units),
-      averageSale: count ? phpRound(revenue / count, 2) : 0,
+      averageSale: count ? roundNumber(revenue / count, 2) : 0,
       costOfSales,
       grossProfit: revenue - costOfSales,
     },

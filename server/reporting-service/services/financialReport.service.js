@@ -1,5 +1,5 @@
 import { DateTime } from '../utils/index.js'
-import { phpRound, toFloat, toInt, truthy } from '../utils/php.js'
+import { roundNumber, toFloat, toInt, truthy } from '../utils/dataUtils.js'
 import * as financialReportRepository from '../repositories/financialReport.repository.js'
 import { summary } from './ownerDashboard.service.js'
 
@@ -18,7 +18,7 @@ export async function buildFinancialReport(p) {
   const prevFrom = prevTo.minus({ days: days - 1 })
   const before = (await summary(prevFrom.toISODate(), prevTo.toISODate(), p.branchId)).totals
 
-  const margin = (part) => (t.sales > 0 ? phpRound((part / t.sales) * 100, 1) : null)
+  const margin = (part) => (t.sales > 0 ? roundNumber((part / t.sales) * 100, 1) : null)
 
   const expenses = p.dates('expense_date')
   const damaged = p.dates('damage_date')

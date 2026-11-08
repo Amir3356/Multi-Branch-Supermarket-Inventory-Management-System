@@ -62,8 +62,8 @@
   text-align: left;
   padding: 0.6rem 0.85rem;
   border-radius: var(--radius-md);
-  background: rgba(31, 122, 77, 0.08);
-  border: 1px solid rgba(31, 122, 77, 0.2);
+  background: rgb(var(--accent-rgb) / 0.08);
+  border: 1px solid rgb(var(--accent-rgb) / 0.2);
   color: var(--text-main);
   font-family: inherit;
   font-size: 0.84rem;
@@ -72,8 +72,8 @@
 }
 
 .ai-suggestion:hover:not(:disabled) {
-  background: rgba(31, 122, 77, 0.15);
-  border-color: rgba(31, 122, 77, 0.4);
+  background: rgb(var(--accent-rgb) / 0.15);
+  border-color: rgb(var(--accent-rgb) / 0.4);
 }
 
 .ai-message {
@@ -88,8 +88,8 @@
 
 .ai-message.user {
   align-self: flex-end;
-  background: rgba(31, 122, 77, 0.1);
-  border: 1px solid rgba(31, 122, 77, 0.22);
+  background: rgb(var(--accent-rgb) / 0.1);
+  border: 1px solid rgb(var(--accent-rgb) / 0.22);
   color: var(--text-main);
   border-bottom-right-radius: 4px;
 }

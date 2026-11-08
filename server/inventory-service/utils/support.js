@@ -18,7 +18,7 @@ export const MODELS = Object.freeze({
  */
 export const nowSeconds = () => new Date(Math.floor(Date.now() / 1000) * 1000)
 
-/** PHP round($value, 2): half away from zero, without binary float surprises such as 1.005 → 1.00 */
+/** Rounds to 2 decimals: half away from zero, without binary float surprises such as 1.005 → 1.00 */
 export const roundMoney = (value) => {
   const n = Number(value)
   return Math.sign(n) * Math.round((Math.abs(n) + Number.EPSILON) * 100) / 100

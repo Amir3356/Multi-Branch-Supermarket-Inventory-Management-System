@@ -37,7 +37,7 @@ export async function rebuildStock() {
   })
 }
 
-// Sort keys like PHP's sortBy on these values: null first, then by time
+// Sort keys on these values: null first, then by time
 const time = (value) => (value === null || value === undefined ? -Infinity : new Date(value).getTime())
 const stableSortBy = (items, key) => items.map((item, i) => [item, i]).sort(([a, i], [b, j]) => time(a[key]) - time(b[key]) || i - j).map(([item]) => item)
 const dateOnly = (value) => (value ? String(value).slice(0, 10) : null)
@@ -134,5 +134,5 @@ async function replay(client) {
 }
 
 const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0)
-// PHP compared (string) received_at, '' for none: ISO text of a UTC time sorts the same way
+// Compare received_at ISO text, '' for none
 const isoOrEmpty = (value) => (value ? new Date(value).toISOString() : '')

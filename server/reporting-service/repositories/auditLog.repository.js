@@ -1,5 +1,5 @@
 import { DateTime, config, one, query } from '../utils/index.js'
-import { Params, dbTime, truthy } from '../utils/php.js'
+import { Params, dbTime, truthy } from '../utils/dataUtils.js'
 
 /** Writes one entry (reporting-service is the only writer of audit_logs); returns its id */
 export async function createAuditLog(entry) {

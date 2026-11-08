@@ -1,5 +1,5 @@
 import { DateTime, config, productKey } from '../utils/index.js'
-import { dbTime, groupBy, phpCompare, phpRound, sortBy, sortByDesc, sum, toFloat, toInt } from '../utils/php.js'
+import { compareValues, dbTime, groupBy, roundNumber, sortBy, sortByDesc, sum, toFloat, toInt } from '../utils/dataUtils.js'
 import * as forecasterRepository from '../repositories/forecaster.repository.js'
 
 /**
@@ -60,7 +60,7 @@ export async function buildForecast(minStock) {
     const rate = rates.get(key)?.rate ?? 0
     const product = rates.get(key)?.product ?? group[0]?.product ?? null
     const branch = branches.get(branchId) ?? branchId
-    const sellable = group.filter((b) => !b.expiry_date || phpCompare(b.expiry_date, todayKey) >= 0)
+    const sellable = group.filter((b) => !b.expiry_date || compareValues(b.expiry_date, todayKey) >= 0)
     const units = toInt(sum(sellable, 'units'))
     const ordered = onOrder.get(key) ?? 0
     const cost = costs.get(key2) ?? 0
@@ -73,7 +73,7 @@ export async function buildForecast(minStock) {
           branch,
           product,
           unitsLeft: units,
-          sellsPerDay: phpRound(rate, 2),
+          sellsPerDay: roundNumber(rate, 2),
           daysLeft: Math.floor(cover),
           runsOutOn: units > 0 ? runOut.toISODate() : 'already out of stock',
         })
@@ -88,9 +88,9 @@ export async function buildForecast(minStock) {
           suggestedQty: suggested,
           unitsLeft: units,
           alreadyOnOrder: ordered,
-          sellsPerDay: phpRound(rate, 2),
+          sellsPerDay: roundNumber(rate, 2),
           orderBy: orderBy <= today ? 'now' : orderBy.toISODate(),
-          estimatedCost: phpRound(suggested * cost, 2),
+          estimatedCost: roundNumber(suggested * cost, 2),
         })
       }
     }
@@ -114,18 +114,17 @@ export async function buildForecast(minStock) {
           daysToExpiry,
           unitsInBatch: b.units,
           unitsLikelyUnsold: unsold,
-          valueAtRisk: phpRound(unsold * cost, 2),
+          valueAtRisk: roundNumber(unsold * cost, 2),
           betterBranch: fasterBranch(rates, branches, branchId, key2, rate),
         })
       }
     }
   }
 
-  // usort is stable in PHP 8, as Array.prototype.sort is here
   stockOuts.sort((a, b) => a.daysLeft - b.daysLeft)
   const orderKey = (r) => (r.orderBy === 'now' ? '0' : r.orderBy)
-  reorders.sort((a, b) => phpStrcmp(orderKey(a), orderKey(b)))
-  expiryRisk.sort((a, b) => phpCompare(b.valueAtRisk, a.valueAtRisk))
+  reorders.sort((a, b) => stringCompare(orderKey(a), orderKey(b)))
+  expiryRisk.sort((a, b) => compareValues(b.valueAtRisk, a.valueAtRisk))
 
   const revenue = await revenueForecast(since, window, historyDays, branches)
 
@@ -142,7 +141,7 @@ export async function buildForecast(minStock) {
   }
 }
 
-const phpStrcmp = (a, b) => Math.sign(Buffer.compare(Buffer.from(a), Buffer.from(b)))
+const stringCompare = (a, b) => Math.sign(Buffer.compare(Buffer.from(a), Buffer.from(b)))
 
 /** Next 30 days' revenue at the recent daily average, per branch, with the trend once there is enough history */
 async function revenueForecast(since, window, historyDays, branches) {
@@ -155,15 +154,15 @@ async function revenueForecast(since, window, historyDays, branches) {
       (await forecasterRepository.revenueBetween(dbTime(since.minus({ days: WINDOW_DAYS }).toUTC()), dbTime(since.toUTC())))
         ?.total,
     )
-    trend = before > 0 ? phpRound(((total - before) / before) * 100, 1) : null
+    trend = before > 0 ? roundNumber(((total - before) / before) * 100, 1) : null
   }
 
   return {
-    expected: phpRound((total / window) * 30, 2),
-    dailyAverage: phpRound(total / window, 2),
+    expected: roundNumber((total / window) * 30, 2),
+    dailyAverage: roundNumber(total / window, 2),
     trendVsPrevious30DaysPercent: trend,
     byBranch: sortByDesc(
-      [...branches].map(([id, name]) => ({ branch: name, expected: phpRound((toFloat(recent.get(id) ?? 0) / window) * 30, 2) })),
+      [...branches].map(([id, name]) => ({ branch: name, expected: roundNumber((toFloat(recent.get(id) ?? 0) / window) * 30, 2) })),
       'expected',
     ),
   }
@@ -172,11 +171,11 @@ async function revenueForecast(since, window, historyDays, branches) {
 /** Another branch that sells this product faster, where expiring units could be sent */
 function fasterBranch(rates, branches, branchId, key, rate) {
   const candidates = [...branches.keys()]
-    .filter((id) => id !== branchId)
-    .map((id) => ({ branch: branches.get(id), rate: rates.get(`${id}|${key}`)?.rate ?? 0 }))
-    .filter((b) => b.rate > rate)
+  .filter((id) => id !== branchId)
+  .map((id) => ({ branch: branches.get(id), rate: rates.get(`${id}|${key}`)?.rate ?? 0 }))
+  .filter((b) => b.rate > rate)
   const best = sortByDesc(candidates, 'rate')[0]
-  return best ? `${best.branch} (sells ${phpRound(best.rate, 2)} a day)` : null
+  return best ? `${best.branch} (sells ${roundNumber(best.rate, 2)} a day)` : null
 }
 
 /** What needs attention, most urgent first */

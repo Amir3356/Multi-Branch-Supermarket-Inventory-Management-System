@@ -1,4 +1,4 @@
-// The signed-in user and the auth payloads (server: Auth/Resources/AuthUserResource.php, Auth/Requests/*)
+// The signed-in user and the auth payloads
 
 /**
  * @typedef {object} AuthUserExtras

@@ -142,9 +142,20 @@ export default function DashboardLayout() {
   }, [sessionChecked, liveBranchIds, dispatch])
 
   // Signed out the moment this session is ended elsewhere (the Owner, deactivation, password reset),
-  // pushed over the WebSocket; the token's id is the part before "|"
+  // pushed over the WebSocket; the token's session id comes from the JWT payload or before "|"
   const { token } = useSelector(selectAuth)
-  const sessionId = token?.split('|')[0]
+  const sessionId = useMemo(() => {
+    if (!token) return null
+    if (token.includes('.')) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        return String(payload.tokenId || payload.sub)
+      } catch {
+        return null
+      }
+    }
+    return token.split('|')[0]
+  }, [token])
   useEffect(() => {
     const echo = realtime()
     if (!sessionChecked || !echo || !sessionId) return undefined

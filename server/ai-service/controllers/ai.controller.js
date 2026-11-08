@@ -1,4 +1,4 @@
-import { cleanInput } from '../utils/php.js'
+import { cleanInput } from '../utils/dataUtils.js'
 import { answer, recommendations as recommendationsFor } from '../services/ai.service.js'
 
 // $request->boolean(): FILTER_VALIDATE_BOOLEAN's true values

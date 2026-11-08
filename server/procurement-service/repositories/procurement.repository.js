@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { nextId, one, pool, query } from '../utils/index.js'
-import { nowSeconds, phpInt, phpRound } from '../utils/php.js'
+import { nowSeconds, roundNumber, toInt } from '../utils/dataUtils.js'
 import { ID_PREFIX, TABLE, UPDATABLE_COLUMNS } from '../models/procurement.model.js'
 
 // Every database read and write for procurements
@@ -34,9 +34,9 @@ function randomSuffix(length = 12) {
 /** A Pending order with the next free id (PO-00001, …) and a unique Chapa transaction reference. Call in a transaction. */
 export async function createPending(client, data, createdBy) {
   const id = await nextId(client, TABLE, ID_PREFIX)
-  const qty = phpInt(data.qty)
+  const qty = toInt(data.qty)
   // The officer enters the order's Total Cost; Chapa charges exactly that, and the unit price is derived from it
-  const total = phpRound(data.totalCost, 2)
+  const total = roundNumber(data.totalCost, 2)
   const now = nowSeconds()
   return one(
     `insert into procurements (id, branch_id, created_by, supplier, category, product, med_id, qty, unit_price, total, currency, status, tx_ref, created_at, updated_at)
@@ -51,7 +51,7 @@ export async function createPending(client, data, createdBy) {
       data.product,
       data.medId ?? null,
       qty,
-      phpRound(total / qty, 2).toFixed(2),
+      roundNumber(total / qty, 2).toFixed(2),
       total.toFixed(2),
       data.currency,
       `${id}-${randomSuffix()}`,

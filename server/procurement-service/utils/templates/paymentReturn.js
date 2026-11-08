@@ -1,6 +1,6 @@
 import { e, json } from './html.js'
 
-/** The old views/payment-return.blade.php: closes the checkout popup, or (opened as a full page) opens the app */
+/** Payment return page: closes the checkout popup, or (opened as a full page) opens the app */
 export const paymentReturnPage = ({ appUrl }) => `<!doctype html>
 <html lang="en">
 <head>

@@ -1,4 +1,4 @@
-// npm run create-owner (Laravel's `php artisan owner:create`): the Owner isn't invited by anyone, so the first
+// npm run create-owner: the Owner isn't invited by anyone, so the first
 // account is created here. It then provisions every staff account from the web app.
 import readline from 'node:readline/promises'
 import { ACCOUNT_STATUSES, ROLES, hashPassword, pool, transaction } from '../utils/index.js'

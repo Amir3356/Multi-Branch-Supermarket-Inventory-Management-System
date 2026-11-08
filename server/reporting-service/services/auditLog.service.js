@@ -45,7 +45,7 @@ export async function record({ module, action, recordId = null, description, bra
  */
 export async function recordPageView(req, section) {
   const user = req.user
-  const allowed = section === 'aiAssistance' || sectionsFor(user.role).includes(section)
+  const allowed = sectionsFor(user.role).includes(section)
   if (!allowed) throw new HttpError(403, 'Your role does not have access to this section.')
 
   const { module, page } = VIEWABLE_SECTIONS[section]

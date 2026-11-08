@@ -4,9 +4,17 @@ import * as users from '../repositories/user.repository.js'
 import { SessionService } from './session.service.js'
 import { TOKENABLE_TYPE } from '../models/session.model.js'
 import { hashEquals, parseToken, sha256 } from '../utils/tokens.js'
+import { verifyJwt } from '../utils/jwt.js'
 
-/** Sanctum's PersonalAccessToken::findToken: by id and a timing-safe hash compare, or by hash for a token without "|" */
+/** Finds token by JWT payload, or by personal_access_tokens id/hash */
 async function findToken(plain) {
+  if (typeof plain !== 'string' || !plain) return null
+
+  const jwtPayload = verifyJwt(plain, config.internalSecret)
+  if (jwtPayload?.tokenId) {
+    return repository.find(jwtPayload.tokenId)
+  }
+
   const parsed = parseToken(plain)
   if (!parsed) return null
   if (parsed.id === null) return repository.findByHash(sha256(parsed.secret))

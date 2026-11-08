@@ -8,7 +8,7 @@ export const findProduct = (id, client) => one('select * from products where id 
 
 /**
  * Sets the shared prices of a product (either may be null: left as is) and who set them; returns the product row, or
- * null when it isn't in the catalog. Postgres rounds to 2 decimals on save, as PHP's round($x, 2) did.
+ * null when it isn't in the catalog. Postgres rounds to 2 decimals on save.
  * Like Eloquent's update(), nothing is written (updated_at kept) when the values are already the same.
  */
 export async function setPrices(client, id, purchasePrice, sellingPrice, byUserId) {

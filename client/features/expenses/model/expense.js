@@ -1,4 +1,4 @@
-// A branch expense, as the API sends it (server: Expenses/Resources/ExpenseResource.php)
+// A branch expense, as the API sends it
 
 /**
  * @typedef {object} Expense

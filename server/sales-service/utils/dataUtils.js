@@ -1,10 +1,9 @@
 import { DateTime, HttpError, config } from './index.js'
 
 /**
- * Small PHP/Laravel behaviours the old code relied on implicitly, so responses and stored values stay identical.
+ * Data normalization, rounding, formatting and parsing helpers.
  */
 
-// Laravel's TrimStrings + ConvertEmptyStringsToNull global middleware: every string input is trimmed, '' becomes null
 const TRIM = /^[\s﻿​‎]+|[\s﻿​‎]+$/g
 export function normalizeInput(value) {
   if (typeof value === 'string') {
@@ -16,27 +15,27 @@ export function normalizeInput(value) {
   return value
 }
 
-/** PHP's (string) cast */
-export function phpString(value) {
+/** Converts a value to string representation */
+export function toStringVal(value) {
   if (value === null || value === undefined || value === false) return ''
   if (value === true) return '1'
   if (typeof value === 'object') return 'Array'
   return String(value)
 }
 
-/** PHP's truthiness of a string ("" and "0" are falsy), for `trim(...) ?: default` */
-export const phpFalsyString = (value) => value === '' || value === '0'
+/** Checks whether a string value is empty or "0" */
+export const isFalsyString = (value) => value === '' || value === '0'
 
-/** PHP's (int) cast */
-export function phpInt(value) {
+/** Converts value to an integer */
+export function toInt(value) {
   if (typeof value === 'boolean') return value ? 1 : 0
   if (typeof value === 'number') return Number.isFinite(value) ? Math.trunc(value) : 0
   if (typeof value === 'string') return Math.trunc(Number.parseFloat(value)) || 0
   return 0
 }
 
-/** PHP's round($value, $precision): half away from zero, with PHP's pre-rounding (round(1.005, 2) = 1.01) */
-export function phpRound(value, precision = 2) {
+/** Rounds a number to the specified precision (half away from zero) */
+export function roundNumber(value, precision = 2) {
   const n = Number(value)
   if (!Number.isFinite(n)) return 0
   const factor = 10 ** precision
@@ -46,14 +45,14 @@ export function phpRound(value, precision = 2) {
 
 export const ucfirst = (value) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : value)
 
-/** A timestamp shown as its date in the store's time zone (Carbon ->setTimezone(...)->toDateString()) */
+/** Returns a timestamp formatted as an ISO date string in the configured store timezone */
 export function localDate(value) {
   if (!value) return null
   return DateTime.fromJSDate(value instanceof Date ? value : new Date(value), { zone: 'utc' }).setZone(config.timezone).toISODate()
 }
 
-/** now() as Laravel stored it in a timestamp(0) column: whole seconds */
+/** Returns the current date truncated to whole seconds */
 export const nowSeconds = () => new Date(Math.floor(Date.now() / 1000) * 1000)
 
-/** Laravel's route-model binding miss: 404 "No query results for model [App\…\Expense] EXP-00001" */
+/** Generates a 404 HttpError for missing entities */
 export const modelNotFound = (model, id) => new HttpError(404, `No query results for model [${model}] ${id}`)

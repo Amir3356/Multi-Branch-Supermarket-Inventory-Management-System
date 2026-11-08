@@ -83,14 +83,6 @@ export const config = Object.freeze({
     secretKey: env('CHAPA_SECRET_KEY'),
     baseUrl: env('CHAPA_BASE_URL', 'https://api.chapa.co/v1').replace(/\/$/, ''),
   },
-
-  openrouter: {
-    apiKey: env('OPENROUTER_API_KEY'),
-    baseUrl: env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1').replace(/\/$/, ''),
-    model: env('OPENROUTER_MODEL', 'apodex/apodex-1.1-mini:free'),
-    timeout: int('OPENROUTER_TIMEOUT', 60),
-    reasoning: bool('OPENROUTER_REASONING', true),
-  },
 })
 
 /** The port a service listens on: PORT, else the port in its own *_SERVICE_URL */
