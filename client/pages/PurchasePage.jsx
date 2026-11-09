@@ -330,6 +330,8 @@ export default function PurchasePage() {
           products={products}
           categories={categories}
           suppliers={[...new Set(allPurchases.map((p) => p.supplier))].sort()}
+          // A Batch ID is bought once: every Batch ID with an order that didn't fail
+          boughtBatches={new Set(allPurchases.filter((p) => p.productBatch && p.status !== 'Failed').map((p) => p.productBatch))}
           formatMoney={formatMoney}
           onClose={() => setShowNewPurchase(false)}
           onSave={handleCreatePurchase}

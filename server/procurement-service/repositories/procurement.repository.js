@@ -94,3 +94,7 @@ export async function activeBranchExists(branchId) {
 
 /** A catalog product by id (products belong to inventory-service; reading them is allowed): its name, category and Batch ID */
 export const catalogProduct = (id) => one('select id, name, category, batch from products where id = $1', [id])
+
+/** Whether a catalog Batch ID already has an order (pending or paid; a failed one doesn't count) */
+export const batchBought = async (productBatch) =>
+  Boolean(await one("select 1 from procurements where product_batch = $1 and status <> 'failed' limit 1", [productBatch]))

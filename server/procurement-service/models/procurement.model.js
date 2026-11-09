@@ -42,3 +42,6 @@ export function toResource(p) {
     expiryDate: p.expiry_date ?? null,
   }
 }
+
+/** A Batch ID is bought once; buying the product again needs a new Batch ID */
+export const BATCH_BOUGHT = 'This Batch ID was already bought. To buy this product again, add it again on the Category & Product page: it gets a new Batch ID.'

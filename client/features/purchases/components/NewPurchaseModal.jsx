@@ -10,7 +10,7 @@ import { EMPTY_PURCHASE_FORM, toProcurementPayload, unitPriceFrom } from '../mod
 import { validatePurchase } from '../services/purchaseRules'
 
 // Category and Product Name come from what the Purchase Officer adds on the Category & Product page (sidebar). An officer's Receiving Branch is the branch the Owner assigned them in Account Provision, and can't be changed.
-export default function NewPurchaseModal({ branches, assignedBranchId, products, categories, suppliers, formatMoney, onClose, onSave }) {
+export default function NewPurchaseModal({ branches, assignedBranchId, products, categories, suppliers, boughtBatches = new Set(), formatMoney, onClose, onSave }) {
   const [form, setForm] = useState({ ...EMPTY_PURCHASE_FORM, branchId: assignedBranchId || '' })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -24,7 +24,10 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
   // The same product can be in a category more than once, each with its own Batch ID: names are listed once, then the
   // officer picks which Batch ID they are buying
   const productNames = [...new Set(categoryProducts.map((p) => p.name))]
-  const batches = categoryProducts.filter((p) => p.name === form.productName).sort((a, b) => String(a.batch).localeCompare(String(b.batch)))
+  // A Batch ID is bought once: those with an order already (pending or paid) aren't offered again
+  const openBatches = (name) => categoryProducts.filter((p) => p.name === name && !boughtBatches.has(p.batch))
+  const batches = openBatches(form.productName).sort((a, b) => String(a.batch).localeCompare(String(b.batch)))
+  const allBought = Boolean(form.productName) && batches.length === 0
   const product = batches.find((p) => p.id === form.medId)
   const qty = Number(form.qty)
   const totalCost = Number(form.totalCost)
@@ -40,7 +43,7 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
       }
       if (field === 'productName') {
         // Only one Batch ID for this product: picked straight away
-        const only = categoryProducts.filter((p) => p.name === value)
+        const only = openBatches(value)
         next.medId = only.length === 1 ? only[0].id : ''
       }
       return next
@@ -147,13 +150,15 @@ export default function NewPurchaseModal({ branches, assignedBranchId, products,
           <div className="form-group">
             <label htmlFor="purchase-batch">Batch ID *</label>
             <select id="purchase-batch" className={`input-field ${errors.medId ? 'error' : ''}`} value={form.medId} onChange={(e) => update('medId', e.target.value)} disabled={!form.productName}>
-              <option value="">{!form.productName ? 'Select a product first' : `Select Batch ID… (${batches.length} for ${form.productName})`}</option>
+              <option value="">{!form.productName ? 'Select a product first' : allBought ? 'All Batch IDs already bought' : `Select Batch ID… (${batches.length} for ${form.productName})`}</option>
               {batches.map((p) => (
                 <option key={p.id} value={p.id}>{p.batch || p.id}</option>
               ))}
             </select>
             {errors.medId
               ? <span className="error-msg">{errors.medId}</span>
+              : allBought
+              ? <span className="field-hint">Every Batch ID of {form.productName} was already bought. To buy it again, add it again on the Category & Product page: it gets a new Batch ID.</span>
               : form.productName && batches.length > 1 && <span className="field-hint">{form.productName} is in {form.category} {batches.length} times; the Batch ID says which one you are buying.</span>}
           </div>
 

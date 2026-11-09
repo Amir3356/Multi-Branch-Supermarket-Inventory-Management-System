@@ -1,6 +1,6 @@
-import { HttpError, abort, audit, money, serviceClient, transaction } from '../utils/index.js'
+import { HttpError, abort, audit, isUniqueViolation, money, serviceClient, transaction, validationError } from '../utils/index.js'
 import { modelNotFound, nowSeconds } from '../utils/dataUtils.js'
-import { MODEL_CLASS, awaitsReceipt } from '../models/procurement.model.js'
+import { BATCH_BOUGHT, MODEL_CLASS, awaitsReceipt } from '../models/procurement.model.js'
 import * as procurements from '../repositories/procurement.repository.js'
 import { procurementChanged } from './procurementEvents.service.js'
 import { startCheckout, sync } from './procurementPayment.service.js'
@@ -31,7 +31,14 @@ export async function handleChapaCallback(txRef, req) {
  * Returns { procurement (re-read), checkoutUrl }.
  */
 export async function create(req, data) {
-  const procurement = await transaction((client) => procurements.createPending(client, data, req.user.id))
+  let procurement
+  try {
+    procurement = await transaction((client) => procurements.createPending(client, data, req.user.id))
+  } catch (error) {
+    // Two orders for the same Batch ID at the same moment: the database lets only one through
+    if (isUniqueViolation(error, 'procurements_product_batch_bought_once')) throw validationError({ medId: BATCH_BOUGHT })
+    throw error
+  }
 
   let checkoutUrl
   try {

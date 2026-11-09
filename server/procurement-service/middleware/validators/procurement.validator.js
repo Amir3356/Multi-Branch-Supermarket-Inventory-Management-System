@@ -2,8 +2,9 @@ import { storeToday } from '../../utils/index.js'
 import { normalizeInput, toStringVal } from '../../utils/dataUtils.js'
 import { validateRules } from '../../utils/validation.js'
 import { CURRENCIES } from '../../models/procurement.model.js'
-import { activeBranchExists, catalogProduct } from '../../repositories/procurement.repository.js'
+import { activeBranchExists, batchBought, catalogProduct } from '../../repositories/procurement.repository.js'
 import { findByName as findCategoryByName } from '../../repositories/category.repository.js'
+import { BATCH_BOUGHT } from '../../models/procurement.model.js'
 
 /**
  * StoreProcurementRequest. The total is worked out from the Total Cost, never taken as a unit price from the browser.
@@ -40,6 +41,10 @@ export async function validateStoreProcurement(req, res, next) {
       return Boolean(matches)
     },
   }
+  // A Batch ID is bought once: another order (pending or paid) for it means it's taken
+  const notBoughtYet = async (value, fail) => {
+    if (data.productBatch && (await batchBought(data.productBatch))) fail(BATCH_BOUGHT)
+  }
   // A Purchase Officer receives stock only into the branch the Owner assigned them in Account Provision
   const assignedBranchOnly = (value, fail) => {
     const user = req.user
@@ -55,7 +60,7 @@ export async function validateStoreProcurement(req, res, next) {
       supplier: ['required', 'string', 'max:255'],
       category: ['required', 'string', 'max:120', knownCategory],
       product: ['required', 'string', 'max:255'],
-      medId: ['nullable', 'string', 'max:20', knownProduct],
+      medId: ['nullable', 'string', 'max:20', knownProduct, notBoughtYet],
       qty: ['required', 'integer', 'min:1', 'max:1000000'],
       // What the whole order costs; the unit price is worked out from it (Total Cost ÷ Quantity)
       totalCost: ['required', 'numeric', 'gt:0', 'max:10000000000'],

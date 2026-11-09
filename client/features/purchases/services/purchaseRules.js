@@ -7,7 +7,7 @@ export function validatePurchase(form, { product, qty, totalCost, assignedBranch
   if (!form.category) errors.category = 'Select a category'
   if (!form.category) errors.productName = 'Select a category first'
   else if (!form.productName) errors.productName = 'Select a product'
-  else if (!product) errors.medId = 'Select a Batch ID'
+  else if (!product) errors.medId = 'Select a Batch ID that hasn’t been bought yet'
   if (!Number.isInteger(qty) || qty < 1) errors.qty = 'Enter a whole number of at least 1'
   if (form.totalCost === '' || Number.isNaN(totalCost) || totalCost <= 0) errors.totalCost = 'Enter a total cost greater than 0'
   return errors
