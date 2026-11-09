@@ -39,8 +39,8 @@ export async function createPending(client, data, createdBy) {
   const total = roundNumber(data.totalCost, 2)
   const now = nowSeconds()
   return one(
-    `insert into procurements (id, branch_id, created_by, supplier, category, product, med_id, qty, unit_price, total, currency, status, tx_ref, created_at, updated_at)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending', $12, $13, $13)
+    `insert into procurements (id, branch_id, created_by, supplier, category, product, med_id, product_batch, qty, unit_price, total, currency, status, tx_ref, created_at, updated_at)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending', $13, $14, $14)
      returning *`,
     [
       id,
@@ -50,6 +50,7 @@ export async function createPending(client, data, createdBy) {
       data.category,
       data.product,
       data.medId ?? null,
+      data.productBatch ?? null,
       qty,
       roundNumber(total / qty, 2).toFixed(2),
       total.toFixed(2),
@@ -90,3 +91,6 @@ export async function remove(id) {
 export async function activeBranchExists(branchId) {
   return Boolean(await one("select 1 from branches where id = $1 and status = 'active'", [branchId]))
 }
+
+/** A catalog product by id (products belong to inventory-service; reading them is allowed): its name, category and Batch ID */
+export const catalogProduct = (id) => one('select id, name, category, batch from products where id = $1', [id])

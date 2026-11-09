@@ -28,10 +28,11 @@ export default function CatalogEntryModal({ categories, products, onClose, onAdd
     : form.category
   const categoryExists = Boolean(categoryName) && sortedCategories.some((c) => c.toLowerCase() === categoryName.toLowerCase())
   const categoryProducts = categoryExists
-    ? products.filter((p) => p.category.toLowerCase() === categoryName.toLowerCase()).map((p) => p.name).sort((a, b) => a.localeCompare(b))
+    ? [...new Set(products.filter((p) => p.category.toLowerCase() === categoryName.toLowerCase()).map((p) => p.name))].sort((a, b) => a.localeCompare(b))
     : []
   const typedProduct = form.newProduct.trim()
   const productName = creatingProduct ? categoryProducts.find((n) => n.toLowerCase() === typedProduct.toLowerCase()) ?? typedProduct : form.product
+  // Already in this category: saving adds another entry of it with its own Batch ID (how the officer tells them apart)
   const productExists = Boolean(productName) && categoryProducts.some((n) => n.toLowerCase() === productName.toLowerCase())
 
   const update = (field) => (e) => {
@@ -50,7 +51,6 @@ export default function CatalogEntryModal({ categories, products, onClose, onAdd
     if (!form.category) return setErrors({ category: 'Select a category, or create a new one.' })
     if (creatingCategory && !typedCategory) return setErrors({ newCategory: 'Enter the new category name.' })
     if (creatingProduct && !typedProduct) return setErrors({ newProduct: 'Enter the new product name.' })
-    if (productExists) return setErrors({ product: `${productName} is already in ${categoryName}. Pick another product or create a new one.` })
     if (categoryExists && !productName) return setErrors({ product: `${categoryName} already exists. Pick "Create new product" to add one to it.` })
 
     setIsSaving(true)
@@ -136,7 +136,7 @@ export default function CatalogEntryModal({ categories, products, onClose, onAdd
             </select>
             {errors.product
               ? <span className="error-msg">{errors.product}</span>
-              : productExists && <span className="field-hint">{productName} is already in {categoryName}.</span>}
+              : productExists && <span className="field-hint">{productName} is already in {categoryName}. Saving adds another batch of it with its own Batch ID.</span>}
           </div>
 
           {creatingProduct && (
@@ -154,7 +154,14 @@ export default function CatalogEntryModal({ categories, products, onClose, onAdd
               />
               {errors.newProduct
                 ? <span className="error-msg">{errors.newProduct}</span>
-                : typedProduct && <span className="field-hint">{productExists ? `${productName} is already in ${categoryName}.` : `It will be added to ${categoryName || 'the new category'}.`}</span>}
+                : typedProduct && <span className="field-hint">{productExists ? `${productName} is already in ${categoryName}. Saving adds another batch of it with its own Batch ID.` : `It will be added to ${categoryName || 'the new category'}.`}</span>}
+            </div>
+          )}
+
+          {productName && (
+            <div className="form-group">
+              <label htmlFor="catalog-batch">Batch ID</label>
+              <input id="catalog-batch" className="input-field" value="Generated automatically when you save" readOnly disabled />
             </div>
           )}
 

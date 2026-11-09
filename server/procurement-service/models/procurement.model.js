@@ -37,6 +37,8 @@ export function toResource(p) {
     receivedAt: iso8601(p.received_at),
     // The batch number generated when the stock was added (older orders: their procurement ID)
     batch: p.batch,
+    // The catalog Batch ID the Purchase Officer chose when ordering
+    productBatch: p.product_batch ?? null,
     expiryDate: p.expiry_date ?? null,
   }
 }

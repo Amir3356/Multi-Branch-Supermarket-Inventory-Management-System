@@ -32,7 +32,7 @@
  * @property {'ETB' | 'USD'} currency
  */
 
-export const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', category: '', medId: '', qty: '', totalCost: '' }
+export const EMPTY_PURCHASE_FORM = { branchId: '', supplier: '', category: '', productName: '', medId: '', qty: '', totalCost: '' }
 
 /** The unit purchase price a Total Cost works out to, or null until both numbers are valid */
 export const unitPriceFrom = (totalCost, qty) => (Number.isInteger(qty) && qty > 0 && totalCost > 0 ? Math.round((totalCost / qty) * 100) / 100 : null)

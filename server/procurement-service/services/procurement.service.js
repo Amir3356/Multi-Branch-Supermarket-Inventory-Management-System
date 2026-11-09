@@ -67,7 +67,7 @@ export function verify(procurement, req) {
 
 /** Adds a paid order's stock to the Inventory Officer's branch, once. Returns the updated row. */
 export async function receive(req, procurement, data) {
-  // The "Procurement receipt" recipe: inventory-service generates the batch number (BT-00001, …), adds the units and
+  // The "Procurement receipt" recipe: inventory-service files the units under the order's Batch ID, adds them and
   // sets the product's shared prices (what one unit cost on this order, what it sells for at every branch). The
   // reference makes a retry after a failed save get the same batch back instead of adding the units twice.
   const received = await transaction(async (client) => {
@@ -84,6 +84,8 @@ export async function receive(req, procurement, data) {
         product: locked.product,
         category: locked.category,
         medId: locked.med_id,
+        // Stock goes in under the Batch ID the Purchase Officer bought (a new one if the branch already has it)
+        batch: locked.product_batch,
         expiry: data.expiryDate,
         units: locked.qty,
         receivedAt: receivedAt.toISOString(),

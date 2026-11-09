@@ -110,7 +110,9 @@ export function allocateFifo(rows, qty) {
 export function productsInStock(inventoryRows) {
   const byProduct = new Map()
   for (const row of inventoryRows) {
-    const id = `${row.medId}-${row.branchId}`
+    // One entry per product name in a category at a branch: the same product added more than once (each with its own
+    // Batch ID) is listed once, with all its batches, so FEFO / FIFO picks across them
+    const id = `${row.branchId}|${String(row.category).toLowerCase()}|${String(row.name).toLowerCase()}`
     const entry = byProduct.get(id) || { ...row, key: id, batches: [] }
     entry.batches.push(row)
     byProduct.set(id, entry)

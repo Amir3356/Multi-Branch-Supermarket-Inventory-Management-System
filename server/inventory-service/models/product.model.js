@@ -6,7 +6,7 @@ export const toResource = (p) => ({
   id: p.id,
   name: p.name,
   category: p.category,
-  // Set when the Purchase Officer saved it; its stock is received under this batch
+  // Generated when the Purchase Officer saves it (BT-00001, …)
   batch: p.batch ?? null,
   purchasePrice: p.purchase_price === null || p.purchase_price === undefined ? null : Number(p.purchase_price),
   sellingPrice: p.selling_price === null || p.selling_price === undefined ? null : Number(p.selling_price),

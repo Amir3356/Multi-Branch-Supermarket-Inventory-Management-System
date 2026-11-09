@@ -66,7 +66,7 @@ export default function NewTransferModal({ branches, assignedBranchId, inventory
         to: form.to,
         category: product.category,
         product: product.name,
-        medId: product.medId,
+        medId: batchRow?.medId ?? product.medId,
         batch: form.batch,
         expiry: batchRow.expiry,
         qty

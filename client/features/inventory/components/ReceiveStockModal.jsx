@@ -9,11 +9,11 @@ import { useEscapeKey, useMoneyColumns } from '../../../hooks'
 import { todayKey } from '../../../utils'
 import { findProcurementProduct, validateReceivedStock } from '../services/inventoryRules'
 
-const EMPTY_FORM = { category: '', purchaseId: '', expiryDate: '', sellingPrice: '' }
+const EMPTY_FORM = { category: '', productName: '', purchaseId: '', expiryDate: '', sellingPrice: '' }
 
-// Inventory's Receive Stock: the Inventory Officer picks the category and product of stock that arrived (a paid order for
-// this branch not added yet), enters the expiration date on the package and the selling price, and
-// adds the units to stock under a batch number the system generates. They don't enter Inventory by themselves; until
+// Inventory's Receive Stock: the Inventory Officer picks the category, the product and then the Batch ID of stock that
+// arrived (a paid order for this branch not added yet: the Batch ID the Purchase Officer bought), enters the expiration
+// date on the package and the selling price, and adds the units to stock under that Batch ID. They don't enter Inventory by themselves; until
 // then the Purchase Officer sees the delivery as Pending.
 // `arrivals`: paid orders and incoming transfers for this branch, not added yet. A transfer brings its expiry date
 // with it (fixedExpiry), so that field is read-only for it.
@@ -29,10 +29,11 @@ export default function ReceiveStockModal({ arrivals, products, branchName, form
 
   const categories = [...new Set(procurements.map((p) => p.category))].sort()
   const categoryOrders = procurements.filter((p) => p.category === form.category).sort((a, b) => a.product.localeCompare(b.product))
-  // The same product can be waiting more than once: those show where each came from to tell them apart; transfers
-  // always say which branch sent them
-  const repeated = (name) => categoryOrders.filter((p) => p.product === name).length > 1
-  const procurement = categoryOrders.find((p) => p.id === form.purchaseId)
+  // Each product name once; the same product waiting more than once is told apart by its Batch ID
+  const productNames = [...new Set(categoryOrders.map((p) => p.product))]
+  const productOrders = categoryOrders.filter((p) => p.product === form.productName)
+  const batchLabel = (p) => p.kind === 'transfer' ? `${p.batch} · ${p.note}` : `${p.productBatch || 'New batch'} · ${p.note}`
+  const procurement = productOrders.find((p) => p.id === form.purchaseId)
   const product = findProcurementProduct(products, procurement)
   const sellingPrice = Number(form.sellingPrice)
   // Stock that has already expired can't be added
@@ -45,7 +46,14 @@ export default function ReceiveStockModal({ arrivals, products, branchName, form
   const update = (field, value) => {
     setForm((prev) => {
       const next = { ...prev, [field]: value }
-      if (field === 'category') Object.assign(next, { purchaseId: '', sellingPrice: '' })
+      if (field === 'category') Object.assign(next, { productName: '', purchaseId: '', sellingPrice: '' })
+      if (field === 'productName') {
+        // Only one order of this product waiting: its Batch ID is picked straight away
+        const only = categoryOrders.filter((p) => p.product === value)
+        next.purchaseId = only.length === 1 ? only[0].id : ''
+        const picked = only.length === 1 ? only[0] : null
+        next.sellingPrice = picked ? String(findProcurementProduct(products, picked)?.sellingPrice ?? '') : ''
+      }
       // A product already on sale starts from its current selling price
       if (field === 'purchaseId') {
         const picked = procurements.find((p) => p.id === value)
@@ -57,7 +65,7 @@ export default function ReceiveStockModal({ arrivals, products, branchName, form
       ...prev,
       [field]: undefined,
       form: undefined,
-      ...(field === 'category' ? { purchaseId: undefined } : {}),
+      ...(field === 'category' || field === 'productName' ? { productName: undefined, purchaseId: undefined } : {}),
       ...(field === 'purchaseId' ? { sellingPrice: undefined } : {})
     }))
   }
@@ -118,19 +126,28 @@ export default function ReceiveStockModal({ arrivals, products, branchName, form
             </div>
             <div className="form-group">
               <label htmlFor="stock-product">Product Name *</label>
-              <select id="stock-product" className={`input-field ${errors.purchaseId ? 'error' : ''}`} value={form.purchaseId} onChange={(e) => update('purchaseId', e.target.value)} disabled={!form.category}>
+              <select id="stock-product" className={`input-field ${errors.productName ? 'error' : ''}`} value={form.productName} onChange={(e) => update('productName', e.target.value)} disabled={!form.category}>
                 <option value="">{form.category ? 'Select product…' : 'Select a category first'}</option>
-                {categoryOrders.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.product}{repeated(p.product) || p.kind === 'transfer' ? ` · ${p.note}` : ''}
-                  </option>
+                {productNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
                 ))}
               </select>
-              {errors.purchaseId && <span className="error-msg">{errors.purchaseId}</span>}
+              {errors.productName && <span className="error-msg">{errors.productName}</span>}
             </div>
           </div>
 
-          {readOnlyField('stock-batch', 'Batch ID', 'Generated automatically when you add the stock')}
+          <div className="form-group">
+            <label htmlFor="stock-batch">Batch ID *</label>
+            <select id="stock-batch" className={`input-field ${errors.purchaseId ? 'error' : ''}`} value={form.purchaseId} onChange={(e) => update('purchaseId', e.target.value)} disabled={!form.productName}>
+              <option value="">{form.productName ? `Select Batch ID… (${productOrders.length} waiting)` : 'Select a product first'}</option>
+              {productOrders.map((p) => (
+                <option key={p.id} value={p.id}>{batchLabel(p)}</option>
+              ))}
+            </select>
+            {errors.purchaseId
+              ? <span className="error-msg">{errors.purchaseId}</span>
+              : <span className="field-hint">The Batch ID the Purchase Officer bought; the stock is added under it.</span>}
+          </div>
 
           <div className="modal-grid">
             {readOnlyField('stock-qty', 'Quantity', procurement ? `${procurement.qty} units` : '—')}

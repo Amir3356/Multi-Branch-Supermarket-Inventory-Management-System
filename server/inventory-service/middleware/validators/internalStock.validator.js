@@ -27,6 +27,8 @@ const receiveSchema = z.object({
   product: text('product'),
   category: text('category'),
   medId: z.string({ error: 'The medId field must be a string.' }).max(20).nullish(),
+  // The catalog Batch ID the Purchase Officer bought (procurements.product_batch)
+  batch: z.string({ error: 'The batch field must be a string.' }).max(50).nullish(),
   expiry: z.iso.date({ error: 'The expiry field must be a date (YYYY-MM-DD).' }).nullish(),
   units: units('units'),
   receivedAt: z.iso.datetime({ offset: true, error: 'The receivedAt field must be an ISO 8601 date and time.' }).nullish(),

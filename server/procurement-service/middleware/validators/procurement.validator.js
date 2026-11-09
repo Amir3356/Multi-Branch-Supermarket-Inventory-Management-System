@@ -2,7 +2,7 @@ import { storeToday } from '../../utils/index.js'
 import { normalizeInput, toStringVal } from '../../utils/dataUtils.js'
 import { validateRules } from '../../utils/validation.js'
 import { CURRENCIES } from '../../models/procurement.model.js'
-import { activeBranchExists } from '../../repositories/procurement.repository.js'
+import { activeBranchExists, catalogProduct } from '../../repositories/procurement.repository.js'
 import { findByName as findCategoryByName } from '../../repositories/category.repository.js'
 
 /**
@@ -29,6 +29,17 @@ export async function validateStoreProcurement(req, res, next) {
       return Boolean(category)
     },
   }
+  // The catalog entry (its Batch ID) the officer picked: it must be that category's product of that name
+  const knownProduct = {
+    name: 'exists',
+    test: async (value) => {
+      if (value === null || value === undefined || value === '') return true
+      const product = await catalogProduct(String(value))
+      const matches = product && product.category.toLowerCase() === toStringVal(data.category).toLowerCase() && product.name.toLowerCase() === toStringVal(data.product).toLowerCase()
+      if (matches) data.productBatch = product.batch
+      return Boolean(matches)
+    },
+  }
   // A Purchase Officer receives stock only into the branch the Owner assigned them in Account Provision
   const assignedBranchOnly = (value, fail) => {
     const user = req.user
@@ -44,7 +55,7 @@ export async function validateStoreProcurement(req, res, next) {
       supplier: ['required', 'string', 'max:255'],
       category: ['required', 'string', 'max:120', knownCategory],
       product: ['required', 'string', 'max:255'],
-      medId: ['nullable', 'string', 'max:20'],
+      medId: ['nullable', 'string', 'max:20', knownProduct],
       qty: ['required', 'integer', 'min:1', 'max:1000000'],
       // What the whole order costs; the unit price is worked out from it (Total Cost ÷ Quantity)
       totalCost: ['required', 'numeric', 'gt:0', 'max:10000000000'],
@@ -54,6 +65,7 @@ export async function validateStoreProcurement(req, res, next) {
     {
       'branchId.exists': 'Choose an active branch.',
       'category.exists': 'Choose a category from the list. Add new ones on the Category & Product page.',
+      'medId.exists': 'Choose a Batch ID of this product from the list.',
       'currency.in': 'Chapa only accepts payments in ETB or USD. Change the currency in Policy settings.',
     },
   )

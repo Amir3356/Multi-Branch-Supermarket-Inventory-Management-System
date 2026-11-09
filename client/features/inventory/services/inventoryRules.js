@@ -10,7 +10,9 @@ export const findProcurementProduct = (products, procurement) =>
 export function validateReceivedStock(form, procurement, product, sellingPrice) {
   const errors = {}
   if (!form.category) errors.category = 'Select a category'
-  if (!procurement) errors.purchaseId = form.category ? 'Select a product' : 'Select a category first'
+  if (!form.category) errors.productName = 'Select a category first'
+  else if (!form.productName) errors.productName = 'Select a product'
+  else if (!procurement) errors.purchaseId = 'Select a Batch ID'
   else if (!product) errors.purchaseId = "This product isn't in the catalog yet. Reload the page and try again."
   // A transfer brings its expiry date with it (fixedExpiry); a paid order's is entered from the package
   if (!procurement?.fixedExpiry) {

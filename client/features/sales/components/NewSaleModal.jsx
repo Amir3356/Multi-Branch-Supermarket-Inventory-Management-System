@@ -62,7 +62,9 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
   // Once that batch is sold out, the next sale takes the next one to expire.
   const batchRow = product ? fefoBatches(product.batches)[0] || null : null
   const qty = Number(form.qty)
-  const total = product && Number.isInteger(qty) && qty > 0 ? product.sellingPrice * qty : 0
+  // The batch being sold says which catalog entry (and so which selling price) the units belong to
+  const unitPrice = batchRow?.sellingPrice ?? product?.sellingPrice
+  const total = product && Number.isInteger(qty) && qty > 0 ? unitPrice * qty : 0
   const fromBatches = batchRow && Number.isInteger(qty) && qty > 0 ? [{ batch: batchRow.batch, qty }] : null
 
   const update = (field, value) => {
@@ -111,10 +113,10 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
         customer: form.customer.trim() || 'Walk-in Customer',
         category: product.category,
         product: product.name,
-        medId: product.medId,
+        medId: batchRow?.medId ?? product.medId,
         batch: batchRow?.batch || form.batch,
         qty,
-        unitPrice: product.sellingPrice,
+        unitPrice,
         batches: fromBatches
       }, idempotencyKey)
     } catch (error) {
@@ -239,7 +241,7 @@ export default function NewSaleModal({ branches, inventory, categories, onClose,
 
           <div className="sale-summary">
             <div><small>In Stock (Batch)</small><strong>{batchRow ? `${batchRow.stock} units` : (product ? `${product.stock} units` : '—')}</strong></div>
-            <div><small>{moneyHeader('Unit Selling Price')}</small><strong>{product ? formatAmount(product.sellingPrice) : '—'}</strong></div>
+            <div><small>{moneyHeader('Unit Selling Price')}</small><strong>{product ? formatAmount(unitPrice) : '—'}</strong></div>
             <div><small>{moneyHeader('Total Selling Price')}</small><strong className="sale-total">{formatAmount(total)}</strong></div>
           </div>
 

@@ -280,6 +280,7 @@ export default function PurchasePage() {
               {isAllBranches && <th>Receiving Branch</th>}
               <th>Category</th>
               <th>Product Name</th>
+              <th>Batch ID</th>
               <th>Quantity</th>
               <th>{moneyHeader('Unit Purchase Price')}</th>
               <th>{moneyHeader('Total Cost')}</th>
@@ -295,6 +296,7 @@ export default function PurchasePage() {
                 {isAllBranches && <td><BranchTag branch={branchById(po.branchId)} /></td>}
                 <td>{po.category}</td>
                 <td className="fw-600">{po.product}</td>
+                <td className="nowrap">{po.productBatch ? <span className="batch-badge">{po.productBatch}</span> : '—'}</td>
                 <td>{po.qty.toLocaleString()} units</td>
                 <td>{formatAmount(po.purchasePrice)}</td>
                 <td className="fw-600">{formatAmount(po.total)}</td>
@@ -313,7 +315,7 @@ export default function PurchasePage() {
               </tr>
             ))}
             {filteredPurchases.length === 0 && (
-              <EmptyRow colSpan={isAllBranches ? 10 : 9}>
+              <EmptyRow colSpan={isAllBranches ? 11 : 10}>
                 {filtersActive ? 'No purchase records match the filters.' : 'No procurement records found.'}
               </EmptyRow>
             )}

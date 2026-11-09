@@ -34,10 +34,6 @@ export async function setPrices(client, id, purchasePrice, sellingPrice, byUserI
   return updated ?? findProduct(id, client)
 }
 
-/** Another product in this category with the same name, ignoring case (optionally not the one being edited) */
-export const findSameName = (category, name, exceptId = null) =>
-  one('select * from products where category = $1 and lower(name) = lower($2) and id is distinct from $3', [category, name, exceptId])
-
 /** A new catalog product with its Batch ID, without prices (they are set when stock is received). Call in a transaction. */
 export function createProduct(client, { id, name, category, batch }) {
   const now = nowSeconds()

@@ -2,7 +2,7 @@ import { HttpError, broadcast, nextId, productKey, transaction } from '../utils/
 import { toResource as presentProduct } from '../models/product.model.js'
 import { claim, findByReference, markReleased, reclaim, saveResult } from '../repositories/stockMovement.repository.js'
 import { findProduct, setPrices } from '../repositories/product.repository.js'
-import { putBack } from '../repositories/stock.repository.js'
+import { findByKey, putBack } from '../repositories/stock.repository.js'
 import { add, inBatchOrder, presentRows, stockBroadcaster, takeMany } from './stock.service.js'
 import { nowSeconds } from '../utils/support.js'
 
@@ -66,11 +66,12 @@ export function releaseStock({ reference }) {
 }
 
 /**
- * Units arriving from a paid procurement: under a newly generated Batch ID (BT-00001, …), the units added, and the product's shared prices set
+ * Units arriving from a paid procurement: under the Batch ID the Purchase Officer bought (`batch`, from the catalog)
+ * when this branch doesn't hold that batch yet, else under a newly generated one (BT-00001, …), the units added, and the product's shared prices set
  * when it is in the catalog and prices are given. → { batch, product } (ProductResource, or null).
  */
 export async function receiveStock(input, user) {
-  const { reference, branchId, product, category, medId, expiry, units, receivedAt, purchasePrice, sellingPrice } = input
+  const { reference, branchId, product, category, medId, batch: boughtBatch, expiry, units, receivedAt, purchasePrice, sellingPrice } = input
   const pricesGiven = purchasePrice != null || sellingPrice != null
 
   const { result, pricesSet } = await transaction(async (client) => {
@@ -84,8 +85,10 @@ export async function receiveStock(input, user) {
         : await findProduct(medId, client)
       : null
 
-    // Each receipt gets its own Batch ID, generated here when the Inventory Officer adds the stock
-    const batch = await nextId(client, 'batches', 'BT')
+    // The Batch ID the Purchase Officer bought. The same batch received again at this branch (bought twice) gets a
+    // new number, so each delivery keeps its own expiry date; orders with no Batch ID get one generated too.
+    const taken = boughtBatch ? await findByKey(client, branchId, productKey(product), boughtBatch) : null
+    const batch = boughtBatch && !taken ? boughtBatch : await nextId(client, 'batches', 'BT')
     await add(client, stockBroadcaster(client), {
       branchId,
       product,
