@@ -1,9 +1,13 @@
+import * as cache from '../utils/cache.js'
+import { PRODUCTS_KEY, PRODUCTS_TTL_SECONDS } from '../services/catalog.service.js'
 import { toResource } from '../models/product.model.js'
 import * as productService from '../services/product.service.js'
 
 /** GET /products */
+/** GET /products: the whole catalog, cached until a product or its prices change (catalog.service.js) */
 export async function index(req, res) {
-  res.json({ data: (await productService.list()).map(toResource) })
+  const data = await cache.remember(PRODUCTS_KEY, PRODUCTS_TTL_SECONDS, async () => (await productService.list()).map(toResource))
+  res.json({ data })
 }
 
 /** PUT /products/:product/selling-price (req.product from bindProduct, req.validated from the validator) */

@@ -1,0 +1,61 @@
+# Prometheus: collects metrics every 15 s from every microservice (GET /metrics) and from the PostgreSQL, Redis and
+# Kafka exporters. Grafana reads them from here (http://prometheus:9090). Targets are Docker Compose service names.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: services
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - auth-service:4001
+          - user-service:4002
+          - branch-service:4003
+          - inventory-service:4004
+          - sales-service:4005
+          - procurement-service:4006
+          - reporting-service:4007
+          - ai-service:4008
+          - notification-service:4009
+
+  - job_name: postgres
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+
+  - job_name: redis
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  - job_name: kafka
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ['cadvisor:8080']
+    metric_relabel_configs:
+      # /system.slice/docker-<64 hex>.scope → container_id="<first 12 hex>", to join with docker_container_info
+      - source_labels: [id]
+        regex: '/system\.slice/docker-([0-9a-f]{12})[0-9a-f]*\.scope'
+        target_label: container_id
+
+  - job_name: docker-info
+    static_configs:
+      - targets: ['docker-info-exporter:9417']
+
+  - job_name: nginx
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+
+  - job_name: tempo
+    static_configs:
+      - targets: ['tempo:3200']
+
+  - job_name: loki
+    static_configs:
+      - targets: ['loki:3100']
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']

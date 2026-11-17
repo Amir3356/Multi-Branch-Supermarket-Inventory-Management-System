@@ -1,11 +1,13 @@
 import * as branchService from '../services/branch.service.js'
 import { presentBranch } from '../models/branch.model.js'
+import * as cache from '../utils/cache.js'
 
 /** Branches (Laravel's BranchController): HTTP in, JSON out */
 
+/** GET /branches: every screen reads it, so it's cached (cleared whenever a branch or an account changes) */
 export async function index(req, res) {
-  const rows = await branchService.list()
-  res.json({ data: rows.map(presentBranch) })
+  const data = await cache.remember(branchService.BRANCHES_KEY, branchService.BRANCHES_TTL_SECONDS, async () => (await branchService.list()).map(presentBranch))
+  res.json({ data })
 }
 
 export async function store(req, res) {

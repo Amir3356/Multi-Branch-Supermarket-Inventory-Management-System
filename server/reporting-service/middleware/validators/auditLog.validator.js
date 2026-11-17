@@ -25,7 +25,7 @@ export async function validateAuditLogFilters(req, res, next) {
 
 const optionalText = z.preprocess((value) => (typeof value === 'number' ? String(value) : value), z.string().nullish().default(null))
 
-/** An entry another service pushes over the audit WebSocket ('audit:record'; see services/auditSocket.service.js) */
+/** An audit entry another service streamed to Kafka (topic audit.events; see services/auditConsumer.service.js) */
 export const AUDIT_ENTRY = z.object({
   module: z.string({ error: 'The module field is required.' }).min(1, { error: 'The module field is required.' }),
   action: z.string({ error: 'The action field is required.' }).min(1, { error: 'The action field is required.' }),

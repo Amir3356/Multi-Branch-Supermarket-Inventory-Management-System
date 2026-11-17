@@ -1,16 +1,23 @@
 import { audit, broadcast } from '../utils/index.js'
 import * as policies from '../repositories/policy.repository.js'
 import { presentPolicy } from '../models/policy.model.js'
+import * as cache from '../utils/cache.js'
 
 /**
  * The store's policy (Laravel's PolicyController logic and PolicyBroadcaster). The live payload is what the old
  * event's broadcastWith() sent (PolicyChanged: the policy resource).
  */
 
-/** Every open screen re-flags its stock at once */
-export const policyChanged = (policy) => broadcast('policy', 'policy.changed', { policy: presentPolicy(policy) })
+const POLICY_KEY = 'policy:current'
 
-export const current = () => policies.current()
+/** Every open screen re-flags its stock at once; the cached copy is cleared first */
+export async function policyChanged(policy) {
+  await cache.forget(POLICY_KEY)
+  broadcast('policy', 'policy.changed', { policy: presentPolicy(policy) })
+}
+
+/** The store's policy, cached (it changes only when the Inventory Officer saves Settings) */
+export const current = () => cache.remember(POLICY_KEY, 600, () => policies.current())
 
 /** Saves the validated values ({ defaultMinStock, expiryWarningDays } as integers); returns the saved policy */
 export async function update(req, { defaultMinStock, expiryWarningDays }) {

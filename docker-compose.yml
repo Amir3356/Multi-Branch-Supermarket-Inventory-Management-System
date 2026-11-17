@@ -23,6 +23,13 @@ x-service-env: &service-env
   DB_PASSWORD: ${DB_APP_PASSWORD:-supermart_app}
   DB_MIGRATE_USERNAME: ${DB_USERNAME:-postgres}
   DB_MIGRATE_PASSWORD: ${DB_PASSWORD:-postgres}
+  # The shared cache. Optional: while Redis is unreachable every service reads from PostgreSQL instead.
+  REDIS_URL: redis://redis:6379
+  # Event streaming: audit entries and live updates flow through Kafka topics (see server/*/utils/kafka.js)
+  KAFKA_BROKERS: kafka:9092
+  # Distributed tracing: each service sends its spans to Tempo (OpenTelemetry, OTLP over HTTP)
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
+  TRACE_SAMPLE_RATIO: "1"
   AUTH_SERVICE_URL: http://auth-service:4001
   USER_SERVICE_URL: http://user-service:4002
   BRANCH_SERVICE_URL: http://branch-service:4003
@@ -39,6 +46,10 @@ x-service: &service
   depends_on:
     postgres:
       condition: service_healthy
+    redis:
+      condition: service_started
+    kafka:
+      condition: service_healthy
 
 services:
   postgres:
@@ -53,6 +64,45 @@ services:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       retries: 10
+
+  # Cache only: nothing is saved to disk, and when the 128 MB fill up the least recently used entries go first
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  # Apache Kafka, one node in KRaft mode (no ZooKeeper): the event-streaming backbone. Topics are created by the
+  # services (audit.events, audit.events.dlq, realtime.events); the log is kept on the kafkadata volume.
+  kafka:
+    image: apache/kafka:3.8.0
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+    volumes:
+      - kafkadata:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
 
   api-gateway:
     <<: *service
@@ -96,5 +146,129 @@ services:
     build: ./server/notification-service
     env_file: ./server/notification-service/.env
 
+  # ---- Monitoring: Prometheus collects metrics, Grafana shows them (http://localhost:3000, no sign-in) -------------
+  # Config in server/monitoring/. Every service exposes GET /metrics inside the Docker network (never through the gateway).
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: unless-stopped
+    # The remote-write receiver lets Tempo store its service-graph metrics here
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=15d", "--web.enable-remote-write-receiver"]
+    volumes:
+      - ./server/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheusdata:/prometheus
+    # Only on this machine, for checking targets (http://localhost:9090/targets)
+    ports: ["127.0.0.1:9090:9090"]
+
+  # Grafana Tempo: stores traces (OpenTelemetry) for 3 days; Grafana reads them
+  tempo:
+    image: grafana/tempo:2.5.0
+    restart: unless-stopped
+    # Root, so it can write to the named volume
+    user: "0"
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./server/monitoring/tempo.yaml:/etc/tempo.yaml:ro
+      - tempodata:/var/tempo
+    depends_on: [prometheus]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: unless-stopped
+    depends_on: [prometheus, tempo, loki]
+    environment:
+      # No sign-in: everyone who opens Grafana is an anonymous viewer (can look, can't edit). Reachable only from this
+      # machine (port below), since there is no password.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_BASIC_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/00-sm-home.json
+    volumes:
+      - ./server/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./server/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports: ["127.0.0.1:3000:3000"]
+
+  # Grafana Loki stores every container's logs (7 days); Promtail reads them from Docker and sends them to Loki
+  loki:
+    image: grafana/loki:3.1.0
+    restart: unless-stopped
+    user: "0"
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    volumes:
+      - ./server/monitoring/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - lokidata:/loki
+
+  promtail:
+    image: grafana/promtail:3.1.0
+    restart: unless-stopped
+    command: ["-config.file=/etc/promtail/promtail.yaml"]
+    volumes:
+      - ./server/monitoring/promtail/promtail.yaml:/etc/promtail/promtail.yaml:ro
+      # Read-only access to Docker, to find this project's containers and read their logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on: [loki]
+
+  # cAdvisor: CPU, memory and network traffic of every container (Network & Microservices dashboards)
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    restart: unless-stopped
+    privileged: true
+    # Reports containers by cgroup (docker-<id>.scope); names come from docker-info-exporter (this Docker uses the
+    # containerd image store, which cAdvisor cannot read container names from)
+    command: ["--docker_only=false", "--raw_cgroup_prefix_whitelist=/system.slice/docker-", "--docker=unix:///nonexistent/docker.sock", "--containerd=/nonexistent/containerd.sock", "--housekeeping_interval=15s", "--store_container_labels=false"]
+    devices: ["/dev/kmsg"]
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+
+  # Container id → compose service names, so cAdvisor's per-container metrics show service names
+  docker-info-exporter:
+    build: ./server/monitoring/docker-info-exporter
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # nginx exporter: the gateway's connections and requests (reads its internal status page on port 8081)
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.1.0
+    restart: unless-stopped
+    command: ["--nginx.scrape-uri=http://api-gateway:8081/stub_status"]
+    depends_on: [api-gateway]
+
+  # Exporters: turn PostgreSQL, Redis and Kafka statistics into Prometheus metrics
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_DATABASE:-multi_branch_supermarket}?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.62.0
+    restart: unless-stopped
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    depends_on: [redis]
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.7.0
+    restart: unless-stopped
+    command: ["--kafka.server=kafka:9092"]
+    depends_on:
+      kafka:
+        condition: service_healthy
+
 volumes:
   pgdata:
+  kafkadata:
+  prometheusdata:
+  grafanadata:
+  tempodata:
+  lokidata:

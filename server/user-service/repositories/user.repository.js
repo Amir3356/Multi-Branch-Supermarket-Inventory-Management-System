@@ -1,4 +1,15 @@
 import { ACCOUNT_COLUMNS, ROLES, one, pool, query } from '../utils/index.js'
+import * as cache from '../utils/cache.js'
+
+/**
+ * A changed account must not be served from caches: auth-service's copy for the sign-in check, and the branch list's
+ * staff counts. Cleared now and again once the transaction commits (so nothing re-caches the old row in between).
+ */
+function accountChanged(client, id) {
+  const clear = () => cache.forget(`auth:user:${id}`, 'branches:list')
+  clear()
+  client?.afterCommit?.(clear)
+}
 
 // Every database read and write for user accounts (Laravel's UserRepository)
 
@@ -37,7 +48,10 @@ export async function create(client, { fullName, email, role, branchId = null, s
      returning id, full_name, email, role, branch_id, status, last_login_at, created_at, updated_at`,
     [fullName, email, password, role, branchId, status, emailVerified],
     client,
-  )
+  ).then((user) => {
+    accountChanged(client, user.id)
+    return user
+  })
 }
 
 const UPDATABLE = ['full_name', 'email', 'role', 'branch_id', 'status']
@@ -48,6 +62,7 @@ export async function update(client, id, changes) {
   if (!columns.length) return
   const sets = columns.map((column, index) => `${column} = $${index + 2}`)
   await client.query(`update users set ${sets.join(', ')}, updated_at = now() where id = $1`, [id, ...columns.map((column) => changes[column])])
+  accountChanged(client, id)
 }
 
 /**
@@ -59,9 +74,13 @@ export async function activate(client, id, passwordHash) {
     `update users set password = $2, status = 'active', email_verified_at = now(), last_login_at = now(), updated_at = now() where id = $1`,
     [id, passwordHash],
   )
+  accountChanged(client, id)
 }
 
-export const remove = (client, id) => client.query('delete from users where id = $1', [id])
+export async function remove(client, id) {
+  await client.query('delete from users where id = $1', [id])
+  accountChanged(client, id)
+}
 
 /**
  * A reset link sent to the old address must stop working. password_reset_tokens belongs to auth-service, but there is

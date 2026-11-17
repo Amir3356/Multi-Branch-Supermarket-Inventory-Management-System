@@ -2,7 +2,7 @@ import { config, limit, notFound, presentAuthUser } from '../utils/index.js'
 import * as sessionRecords from '../repositories/session.repository.js'
 import * as signIns from '../repositories/signIn.repository.js'
 import * as users from '../repositories/user.repository.js'
-import { generateSecret } from '../utils/tokens.js'
+import { newJwtId } from '../utils/tokens.js'
 import { signJwt } from '../utils/jwt.js'
 import { SessionService } from './session.service.js'
 
@@ -13,8 +13,9 @@ import { SessionService } from './session.service.js'
 export async function issue(userId, req, sessions) {
   const device = limit(req.userAgent || 'Unknown device', 120, '')
 
-  const secret = generateSecret()
-  const token = await sessionRecords.createFor(userId, device, secret)
+  // The JWT's unique ID ties it to this session row
+  const jwtId = newJwtId()
+  const token = await sessionRecords.createFor(userId, device, jwtId)
   // Kept for access reviews of past periods
   await signIns.record(userId)
   // Shown to the Owner in Session Monitoring
@@ -28,6 +29,7 @@ export async function issue(userId, req, sessions) {
   const jwt = signJwt(
     {
       sub: user.id,
+      jti: jwtId,
       tokenId: token.id,
       email: user.email,
       role: user.role,

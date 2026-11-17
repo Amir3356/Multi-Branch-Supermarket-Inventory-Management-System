@@ -1,9 +1,10 @@
-import { HttpError, broadcast, nextId, productKey, transaction } from '../utils/index.js'
+import { HttpError, nextId, productKey, transaction } from '../utils/index.js'
 import { toResource as presentProduct } from '../models/product.model.js'
 import { claim, findByReference, markReleased, reclaim, saveResult } from '../repositories/stockMovement.repository.js'
 import { findProduct, setPrices } from '../repositories/product.repository.js'
 import { findByKey, putBack } from '../repositories/stock.repository.js'
 import { add, inBatchOrder, presentRows, stockBroadcaster, takeMany } from './stock.service.js'
+import { catalogChanged } from './catalog.service.js'
 import { nowSeconds } from '../utils/support.js'
 
 /**
@@ -105,7 +106,7 @@ export async function receiveStock(input, user) {
     return { result, pricesSet: Boolean(catalogRow && pricesGiven) }
   })
 
-  if (pricesSet) broadcast('products', 'products.changed', {})
+  if (pricesSet) await catalogChanged()
   return result
 }
 

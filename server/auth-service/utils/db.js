@@ -1,6 +1,7 @@
 import pg from 'pg'
 import { config } from './config.js'
 import { logger } from './logger.js'
+import { SpanKind, inTrace, traced } from './tracing.js'
 
 // The database stores every timestamp in UTC (columns are `timestamp without time zone`, as Laravel created them).
 // Send JS Dates as UTC, and read timestamps back as UTC, whatever the machine's time zone.
@@ -11,6 +12,29 @@ pg.types.setTypeParser(pg.types.builtins.DATE, (value) => value)
 // bigint ids and counts as numbers (ids never get near 2^53)
 pg.types.setTypeParser(pg.types.builtins.INT8, (value) => (value === null ? null : Number(value)))
 // numeric (money) stays a string, exactly as stored, e.g. "120.50"; convert where arithmetic is needed
+
+// Tracing: every promise-style query (pool.query and client.query in transactions) is a span of the current trace,
+// named after its SQL command and table, with the statement (no parameter values) attached
+const QUERY_NAME = /^\s*(select|insert\s+into|update|delete\s+from|with|begin|commit|rollback)\b(?:[\s\S]*?\b(?:from|into|update)\s+([a-z_][a-z0-9_.]*))?/i
+function traceQueries(prototype) {
+  const original = prototype.query
+  prototype.query = function (config, values, callback) {
+    // Outside a traced request (background jobs, metrics) nothing is recorded; callback-style calls (pg's own internals,
+    // e.g. pool.query → client.query) and cursors aren't wrapped twice
+    if (!inTrace() || typeof callback === 'function' || typeof values === 'function' || typeof config?.submit === 'function') {
+      return original.call(this, config, values, callback)
+    }
+    const text = typeof config === 'string' ? config : String(config?.text ?? '')
+    const match = QUERY_NAME.exec(text)
+    const name = match ? `pg ${match[1].split(/\s+/)[0].toUpperCase()}${match[2] ? ` ${match[2]}` : ''}` : 'pg query'
+    return traced(name, {
+      kind: SpanKind.CLIENT,
+      attributes: { 'db.system': 'postgresql', 'db.statement': text.replace(/\s+/g, ' ').trim().slice(0, 500) },
+    }, () => original.call(this, config, values))
+  }
+}
+traceQueries(pg.Pool.prototype)
+traceQueries(pg.Client.prototype)
 
 export const pool = new pg.Pool({
   host: config.db.host,

@@ -1,4 +1,5 @@
 import { ACCOUNT_COLUMNS, one, query } from '../utils/index.js'
+import * as cache from '../utils/cache.js'
 import { nowSeconds } from '../utils/timestamps.js'
 
 // The users reads auth needs, and the two columns it owns (password, last_login_at). user-service owns the rest.
@@ -7,6 +8,20 @@ import { nowSeconds } from '../utils/timestamps.js'
 export async function findByEmail(email) {
   return one('select * from users where email = $1', [email])
 }
+
+/**
+ * The user for the sign-in check, cached briefly without the password hash. user-service clears it (auth:user:<id>)
+ * the moment it changes the account (role, branch, status, deletion).
+ */
+export const findCached = (id) =>
+  cache.remember(`auth:user:${id}`, 30, async () => {
+    const user = await find(id)
+    if (!user) return null
+    const { password, remember_token: rememberToken, ...safe } = user
+    void password
+    void rememberToken
+    return safe
+  })
 
 export async function find(id) {
   return one('select * from users where id = $1', [id])

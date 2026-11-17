@@ -26,6 +26,10 @@ export const config = Object.freeze({
   appUrl: env('APP_URL', 'http://localhost:8000').replace(/\/$/, ''),
   frontendUrl: env('FRONTEND_URL', 'http://localhost:5173').replace(/\/$/, ''),
   internalSecret: env('INTERNAL_SERVICE_SECRET', 'dev-internal-secret'),
+  // The shared cache (Redis); empty = no cache, everything is read from the database
+  redisUrl: env('REDIS_URL', ''),
+  // Event streaming (Apache Kafka): comma-separated brokers
+  kafkaBrokers: env('KAFKA_BROKERS', 'localhost:9092'),
   trustedProxies: env('TRUSTED_PROXIES', ''),
 
   gatewayPort: int('GATEWAY_PORT', 8000),

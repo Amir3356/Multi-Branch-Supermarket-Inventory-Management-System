@@ -1,24 +1,29 @@
-import { io } from 'socket.io-client'
-import { config } from './config.js'
 import { pool } from './db.js'
+import { TOPICS, publish, setKafkaClientId } from './kafka.js'
 import { logger } from './logger.js'
+import { gauge } from './metrics.js'
+import { traceHeaders } from './tracing.js'
 import { serviceClient } from './serviceClient.js'
 
 /**
- * Side effects owned by other services, sent fire-and-forget: a stopped notification or reporting service never slows
- * or breaks the action that triggered them. Audit entries also survive a stopped reporting-service (see audit()).
+ * Side effects owned by other services, sent fire-and-forget through Kafka: a stopped notification or reporting service
+ * never slows or breaks the action that triggered them. Audit entries also survive a stopped Kafka (see audit()).
  * Inside a transaction, call them from client.afterCommit(() => ...) so a rolled-back change is never announced.
  */
 
 /**
- * Pushes a live update to every browser subscribed to a channel (notification-service, Socket.IO).
+ * Pushes a live update to every browser subscribed to a channel: streamed through Kafka's realtime.events topic to
+ * notification-service, which emits it over Socket.IO. While Kafka is unreachable it is posted to notification-service
+ * directly instead, so screens still update.
  *   broadcast('branch.BR-01.sales', 'sale.recorded', { sale })
  * The client listens with realtime().private('branch.BR-01.sales').listen('.sale.recorded', handler).
  */
 export function broadcast(channel, event, data = {}) {
-  serviceClient('notification')
-    .post('/internal/broadcast', { channel, event, data }, { timeoutMs: 5_000 })
-    .catch((error) => logger.warn('Live update not sent', { channel, event, error: error.message }))
+  publish(TOPICS.REALTIME, [{ key: channel, value: JSON.stringify({ channel, event, data }) }]).catch(() =>
+    serviceClient('notification')
+      .post('/internal/broadcast', { channel, event, data }, { timeoutMs: 5_000 })
+      .catch((error) => logger.warn('Live update not sent', { channel, event, error: error.message })),
+  )
 }
 
 /**
@@ -36,7 +41,7 @@ export function broadcast(channel, event, data = {}) {
  *             reporting-service strips secrets (passwords, tokens) before storing them.
  *
  * Delivery is durable (a transactional outbox): the entry is first saved in this database's audit_outbox table, then
- * pushed to reporting-service over a WebSocket and removed once reporting-service acknowledges it is stored. A stopped or slow reporting-service only delays
+ * streamed to Kafka (topic audit.events), which reporting-service consumes; it leaves the outbox once Kafka has stored it. A stopped or slow reporting-service only delays
  * entries; nothing is lost, and the time recorded is when the action happened, not when it was delivered.
  */
 export function audit(req, { module, action, recordId = null, description, branchId = null, actor = null, actorName = null, branchName = null, type = null, before = null, after = null }) {
@@ -56,28 +61,29 @@ export function audit(req, { module, action, recordId = null, description, branc
     ip: req?.clientIp ?? null,
     userAgent: req?.userAgent ?? null,
     occurredAt: new Date().toISOString(),
+    // The request's trace, so the audit log write later joins the same trace (sent as Kafka headers, not stored)
+    traceContext: traceHeaders(),
   }
   saveToOutbox(entry)
 }
 
-// ---- Audit outbox relay (WebSocket) -------------------------------------------------------------------------------
+// ---- Audit outbox relay (Kafka) ------------------------------------------------------------------------------------
 //
-// Entries go to reporting-service over one Socket.IO connection per service (path /internal/audit-socket, which the
-// gateway never exposes; the handshake carries INTERNAL_SERVICE_SECRET). Each entry is acknowledged once stored, and
-// only then removed from the outbox. Nothing polls: an entry is pushed the moment it is saved, and whatever waited
-// while reporting-service was down is pushed the moment the connection comes back.
+// Entries are streamed to Kafka's audit.events topic (key = this service, so its entries stay in order on one
+// partition); reporting-service consumes the topic and writes the audit log. An entry leaves the outbox only once
+// Kafka has stored it. Nothing polls: entries are sent the moment they're saved; after a failed send (Kafka down)
+// the relay tries again with a growing pause, and at start-up it sends whatever was left from before.
 
-const OUTBOX_BATCH = 50
-const ACK_TIMEOUT_MS = 5_000
+const OUTBOX_BATCH = 100
+const RETRY_MIN_MS = 2_000
 const RETRY_MAX_MS = 30_000
-// After reporting-service refused an entry (e.g. its database hiccuped) while the connection stayed up
-const REFUSED_RETRY_MS = 10_000
 // Entries that couldn't even be saved to the outbox (database unreachable for a moment): kept here and retried
 const unsaved = []
-let socket = null
 let relaying = false
 let relayAgain = false
-let refusedRetry = null
+let retryTimer = null
+let retryDelay = RETRY_MIN_MS
+let warned = false
 
 // This service's name (createService passes it to startAuditRelay); the outbox keeps each service's entries apart
 let outboxName = 'service'
@@ -114,52 +120,35 @@ async function retryUnsaved() {
   }
 }
 
-/** The connection to reporting-service, opened on first use; Socket.IO reconnects by itself after a drop */
-function auditSocket() {
-  if (socket) return socket
-  socket = io(config.services.reporting, {
-    path: '/internal/audit-socket',
-    auth: { secret: config.internalSecret, service: outboxService() },
-    transports: ['websocket'],
-    reconnectionDelay: 1_000,
-    reconnectionDelayMax: RETRY_MAX_MS,
-  })
-  let warned = false
-  socket.on('connect', () => {
-    if (warned) logger.info('Audit connection to reporting-service is back; sending waiting entries')
-    warned = false
-    relayAuditsSoon()
-  })
-  socket.on('connect_error', (error) => {
-    if (!warned) logger.warn('Audit connection to reporting-service failed; entries wait in the outbox', { error: error.message })
-    warned = true
-  })
-  return socket
-}
-
 function relayAuditsSoon() {
   setImmediate(() => relayAudits().catch((error) => logger.warn('Audit relay failed', { error: error.message })))
 }
 
+function retryLater() {
+  if (retryTimer) return
+  retryTimer = setTimeout(() => {
+    retryTimer = null
+    relayAuditsSoon()
+  }, retryDelay)
+  retryTimer.unref?.()
+  retryDelay = Math.min(RETRY_MAX_MS, retryDelay * 2)
+}
+
 /**
- * Pushes this service's waiting audit entries to reporting-service, oldest first, removing each once acknowledged.
- * Rows are locked while being sent (FOR UPDATE SKIP LOCKED), so several copies of a service never send one twice; if
- * a send is stored but its removal isn't, the entry's sourceKey makes reporting-service ignore the repeat.
+ * Publishes this service's waiting audit entries to Kafka, oldest first, in batches, removing them once Kafka has
+ * stored them. Rows are locked while being sent (FOR UPDATE SKIP LOCKED), so several copies of a service never send one
+ * twice; if a send is stored but the removal isn't, the entry's sourceKey makes reporting-service ignore the repeat.
  */
 async function relayAudits() {
-  const ws = auditSocket()
-  // Not connected: the 'connect' handler runs this again as soon as the connection is up
-  if (!ws.connected) return
   if (relaying) {
     relayAgain = true
     return
   }
   relaying = true
-  let refused = false
+  let failed = false
   try {
     for (;;) {
       const client = await pool.connect()
-      let sent = 0
       let rows = []
       try {
         await client.query('begin')
@@ -167,58 +156,62 @@ async function relayAudits() {
           'select id, payload from audit_outbox where service = $1 order by id limit $2 for update skip locked',
           [outboxService(), OUTBOX_BATCH],
         ))
-        for (const row of rows) {
-          let reply
+        if (rows.length) {
           try {
-            reply = await ws.timeout(ACK_TIMEOUT_MS).emitWithAck('audit:record', { ...row.payload, sourceKey: `${outboxService()}:${row.id}` })
+            await publish(
+              TOPICS.AUDIT,
+              rows.map((row) => {
+                const { traceContext, ...entry } = row.payload
+                return {
+                  key: outboxService(),
+                  value: JSON.stringify({ ...entry, sourceKey: `${outboxService()}:${row.id}` }),
+                  headers: { ...(traceContext ?? {}), source: outboxService() },
+                }
+              }),
+            )
           } catch (error) {
-            // No acknowledgement in time, or the connection dropped: stop here, reconnect resumes
-            await client.query('update audit_outbox set attempts = attempts + 1, last_error = $2 where id = $1', [row.id, `No acknowledgement: ${error.message}`.slice(0, 500)])
-            break
+            failed = true
+            await client.query('update audit_outbox set attempts = attempts + 1, last_error = $2 where id = any($1::bigint[])', [
+              rows.map((row) => row.id),
+              String(error.message).slice(0, 500),
+            ])
+            if (!warned) logger.warn('Kafka unavailable; audit entries wait in the outbox', { error: error.message })
+            warned = true
           }
-          if (!reply?.ok) {
-            refused = true
-            await client.query('update audit_outbox set attempts = attempts + 1, last_error = $2 where id = $1', [row.id, String(reply?.error ?? 'refused').slice(0, 500)])
-            // A malformed entry can't block the ones behind it; it stays in the outbox (with its error) for a look
-            if (reply?.invalid) continue
-            break
-          }
-          await client.query('delete from audit_outbox where id = $1', [row.id])
-          sent++
+          if (!failed) await client.query('delete from audit_outbox where id = any($1::bigint[])', [rows.map((row) => row.id)])
         }
         await client.query('commit')
       } catch (error) {
         await client.query('rollback').catch(() => {})
+        failed = true
         logger.warn('Audit relay paused', { error: error.message })
-        break
       } finally {
         client.release()
       }
-      if (!sent || rows.length < OUTBOX_BATCH || !ws.connected) break
+      if (failed || rows.length < OUTBOX_BATCH) break
     }
   } finally {
     relaying = false
   }
-  if (refused && !refusedRetry) {
-    // Connected, but reporting-service couldn't store an entry: try those again shortly
-    refusedRetry = setTimeout(() => {
-      refusedRetry = null
-      relayAuditsSoon()
-    }, REFUSED_RETRY_MS)
-    refusedRetry.unref?.()
-  }
+  if (failed) return retryLater()
+  if (warned) logger.info('Kafka is back; waiting audit entries were sent')
+  warned = false
+  retryDelay = RETRY_MIN_MS
   if (relayAgain) {
     relayAgain = false
     relayAuditsSoon()
   }
 }
 
-/**
- * Starts the relay (createService calls it). Connects only when there is something to send: entries left from before
- * a restart now, or the first new entry later.
- */
+// Monitoring: how many of this service's audit entries are waiting to be streamed (should stay near 0)
+gauge('audit_outbox_pending', 'Audit entries waiting in this service\'s outbox to be streamed to Kafka', async () =>
+  Number((await pool.query('select count(*)::int as n from audit_outbox where service = $1', [outboxService()])).rows[0].n),
+)
+
+/** Starts the relay (createService calls it): sends anything left in the outbox from before a restart */
 export function startAuditRelay(serviceName) {
   outboxName = serviceName
+  setKafkaClientId(serviceName)
   pool
     .query('select 1 from audit_outbox where service = $1 limit 1', [outboxService()])
     .then(({ rowCount }) => rowCount && relayAuditsSoon())

@@ -5,6 +5,8 @@ import { HttpError } from './errors.js'
 import { pool } from './db.js'
 import { startAuditRelay } from './events.js'
 import { logger, setServiceName } from './logger.js'
+import { initMetrics, metricsHandler, metricsMiddleware } from './metrics.js'
+import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
 
 /**
  * Builds and starts this microservice with the conventions every service shares:
@@ -22,6 +24,12 @@ export function createService({ name, key, routes, onStart, attach, bodyLimit = 
   setServiceName(name)
   const app = express()
   app.disable('x-powered-by')
+  initMetrics(name)
+  initTracing(name)
+  // Every request becomes a span of its trace (OpenTelemetry → Tempo → Grafana)
+  app.use(tracingMiddleware)
+  // Every request is timed and counted for monitoring (Prometheus → Grafana)
+  app.use(metricsMiddleware)
 
   app.get('/health', async (req, res) => {
     try {
@@ -31,6 +39,9 @@ export function createService({ name, key, routes, onStart, attach, bodyLimit = 
       res.status(503).json({ service: name, status: 'database unavailable', error: error.message })
     }
   })
+
+  // Read by Prometheus inside the Docker network; the gateway never routes it, so it isn't public
+  app.get('/metrics', metricsHandler)
 
   app.use(express.json({ limit: bodyLimit }))
   app.use(express.urlencoded({ extended: false }))
@@ -68,7 +79,7 @@ export function createService({ name, key, routes, onStart, attach, bodyLimit = 
   attach?.(server)
 
   const shutdown = () => {
-    server.close(() => pool.end().finally(() => process.exit(0)))
+    server.close(() => shutdownTracing().then(() => pool.end()).finally(() => process.exit(0)))
     setTimeout(() => process.exit(0), 5_000).unref()
   }
   process.on('SIGTERM', shutdown)

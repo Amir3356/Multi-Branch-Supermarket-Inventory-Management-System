@@ -1,4 +1,4 @@
-import { HttpError, audit, broadcast, money, nextId, serviceClient, transaction, validationError } from '../utils/index.js'
+import { HttpError, audit, money, nextId, serviceClient, transaction, validationError } from '../utils/index.js'
 import {
   allProducts,
   countInCategory,
@@ -8,12 +8,13 @@ import {
   setPrices,
   updateProduct,
 } from '../repositories/product.repository.js'
+import { catalogChanged } from './catalog.service.js'
 
 /** The whole catalog, by category then name */
 export const list = () => allProducts()
 
 /** Every screen reloads the catalog (e.g. a cashier can sell the product right away) */
-export const announceProducts = () => broadcast('products', 'products.changed', {})
+export const announceProducts = () => catalogChanged()
 
 /** The product's selling price, at every branch. Returns the updated products row. */
 export async function setSellingPrice(req, product, data) {

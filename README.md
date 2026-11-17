@@ -13,7 +13,9 @@ The platform provides end-to-end multi-branch retail operations: batch-level sto
   - [1.2 Microservice Decomposition Matrix](#12-microservice-decomposition-matrix)
   - [1.3 Inter-Service Communication & Coordination Patterns](#13-inter-service-communication--coordination-patterns)
   - [1.4 Ingress & API Gateway Security Model](#14-ingress--api-gateway-security-model)
-  - [1.5 Transactional Outbox & Event Streaming](#15-transactional-outbox--event-streaming)
+  - [1.5 Event Streaming with Apache Kafka & Transactional Outbox](#15-event-streaming-with-apache-kafka--transactional-outbox)
+  - [1.6 Monitoring with Prometheus, Loki & Grafana](#16-monitoring-with-prometheus-loki--grafana)
+  - [1.7 Distributed Tracing with OpenTelemetry & Grafana Tempo](#17-distributed-tracing-with-opentelemetry--grafana-tempo)
 - [2. Code Organization: Layered Architecture](#2-code-organization-layered-architecture)
   - [2.1 Backend Layered Architecture (All Services)](#21-backend-layered-architecture-all-services)
   - [2.2 Backend Request Processing Lifecycle](#22-backend-request-processing-lifecycle)
@@ -81,6 +83,8 @@ flowchart TD
 
     subgraph Data["Persistence & External Integrations"]
         DB[("PostgreSQL 17<br/>Schema Per Service / Isolated Ownership")]
+        CACHE[("Redis 7.4<br/>Shared Cache (optional)")]
+        KAFKA{{"Apache Kafka 3.8 (KRaft)<br/>audit.events · realtime.events · audit.events.dlq"}}
         GEMINI["Google Gemini API<br/>(Role-Bounded LLM)"]
         CHAPA["Chapa Payment Gateway<br/>(Telebirr / CBE / Cards)"]
         SMTP["SMTP Mail Server<br/>(Account Invitations & Password Resets)"]
@@ -97,12 +101,15 @@ flowchart TD
 
     %% Database Connections
     AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI --- DB
+    AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "Cache-aside reads / invalidation" .-> CACHE
 
     %% Inter-Service Communication
     SALES -. "Internal REST (Saga take/release)" .-> INV
     PROC -. "Internal REST (Stock receive)" .-> INV
-    AUTH & USER & BRANCH & INV & SALES & PROC & NOTIF -. "Durable Outbox WebSocket" .-> REP
-    AUTH & USER & BRANCH & INV & SALES & PROC & REP -. "Internal Broadcasts" .-> NOTIF
+    AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "produce audit.events (outbox)" .-> KAFKA
+    AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "produce realtime.events" .-> KAFKA
+    KAFKA -. "consume (reporting-audit)" .-> REP
+    KAFKA -. "consume (notification-realtime)" .-> NOTIF
 
     %% Third Party Integrations
     AI --> GEMINI
@@ -123,7 +130,7 @@ Each microservice encapsulates a cohesive bounded context:
 | **inventory-service** | `4004` | Catalog products, auto-generated Batch IDs, batch-level stock quantities, branch transfers, damaged items | `products`, `stock_batches`, `stock_movements`, `stock_transfers`, `stock_adjustments`, `damaged_items`, `audit_outbox` | `/products/*`, `/stock/*`, `/transfers/*`, `/damaged-items/*`, `/internal/stock/*` |
 | **sales-service** | `4005` | FEFO POS sales processing, idempotency management, branch daily operational expenses | `sales`, `expenses`, `audit_outbox` | `/sales/*`, `/expenses/*` |
 | **procurement-service** | `4006` | Purchase categories, supplier purchase orders, Chapa payment processing, goods receiving workflow | `procurement_categories`, `procurements`, `audit_outbox` | `/procurements/*`, `/internal/procurements/*` |
-| **reporting-service** | `4007` | Aggregate reporting (Sales, Inventory, Financial, Procurement, User), Owner Dashboard, centralized immutable audit log receiver | `audit_logs` | `/reports/*`, `/dashboard/*`, `/audit-logs/*`, `/internal/audit-socket` |
+| **reporting-service** | `4007` | Aggregate reporting (Sales, Inventory, Financial, Procurement, User), Owner Dashboard, centralized immutable audit log receiver | `audit_logs` | `/reports/*`, `/dashboard/*`, `/audit-logs/*` · consumes Kafka `audit.events` |
 | **ai-service** | `4008` | Role-bounded operational recommendations, sales & demand forecasting, conversational LLM assistance via Google Gemini | `audit_outbox` *(reads shared read-only tables via scoped models)* | `/ai/*` |
 | **notification-service** | `4009` | Real-time WebSocket event broadcasting (Socket.IO rooms) and transactional outbound emails (SMTP) | `audit_outbox` | `/socket.io/*`, `/internal/broadcast`, `/internal/mail` |
 
@@ -137,9 +144,25 @@ The system avoids fragile, tightly-coupled synchronous cascades by adopting esta
    - **Distributed Two-Phase Stock Reservation (Saga Pattern):** When `sales-service` records a sale, it executes a two-phase coordinated reservation:
      - Phase 1: Calls `inventory-service` at `POST /internal/stock/take` with a unique deterministic idempotency reference (`sale:{seller_id}:{idempotency_key}`).
      - Phase 2: Commits the local sale record. If the database commit fails, the catch block issues a compensating transaction to `inventory-service` at `POST /internal/stock/release` to restore the reserved units automatically.
-2. **Asynchronous Real-Time Event Broadcasting:**
-   - When entities mutate (e.g., stock changes, sales recorded, invitations accepted), the originating service fires a background HTTP request to `notification-service` (`POST /internal/broadcast`).
+2. **Asynchronous Event Streaming (Apache Kafka):**
+   - When entities mutate (e.g., stock changes, sales recorded, invitations accepted), the originating service publishes an event to the Kafka topic `realtime.events`; audit entries are published to `audit.events` (see [1.5](#15-event-streaming-with-apache-kafka--transactional-outbox)).
    - `notification-service` pushes targeted updates to scoped Socket.IO client channels (e.g., `branch.{branchId}.stock`).
+3. **Shared Cache (Redis, cache-aside):**
+   - Data that is read on almost every request but changes rarely is served from Redis instead of PostgreSQL, and the
+     cached copy is deleted the moment the data changes:
+
+     | Cached data | Service | Lifetime | Cleared when |
+     |---|---|---|---|
+     | Session + user for the per-request sign-in check | `auth-service` | 30 s | sign-out, session ended/removed, or any account change in `user-service` |
+     | Branch list and store policy | `branch-service` | 10 min | a branch or the policy is edited (and accounts change, for staff counts) |
+     | Product catalog | `inventory-service` | 10 min | a product is added, edited, deleted, or its prices change |
+     | AI recommendations per user | `ai-service` | 30 min | — (expires) |
+     | Rate-limit counters | all services | per window | — (expires) |
+
+   - Because every service uses the same Redis, one service can clear another's cached copy (e.g. `user-service`
+     clears `auth-service`'s copy of a user it just deactivated).
+   - Redis is **optional**: if `REDIS_URL` is empty or Redis is unreachable, every read falls back to PostgreSQL and
+     no request fails.
 
 ### 1.4 Ingress & API Gateway Security Model
 
@@ -180,37 +203,140 @@ The API Gateway (Nginx) enforces perimeter zero-trust security:
 3. **Identity Context Propagation:** `auth-service` unpacks the bearer token, verifies session activity and database status, and returns `x-auth-context` containing user identity (`id`, `role`, `branchId`, `status`). Nginx forwards this signed payload to downstream services.
 4. **Internal Route Concealment:** Requests attempting to target `/internal` or `/api/internal` directly from outside are rejected with `404 Not Found`.
 
-### 1.5 Transactional Outbox & Event Streaming
+### 1.5 Event Streaming with Apache Kafka & Transactional Outbox
 
-Audit logs require zero loss even if `reporting-service` experiences temporary network interruptions or restarts. The system utilizes the **Transactional Outbox Pattern**:
+The system uses an **event-streaming architecture built on Apache Kafka** (single node, KRaft mode — no ZooKeeper) for
+everything that doesn't need an immediate answer. Services **publish events to Kafka topics**; the services that need
+them **consume** those topics in their own **consumer groups**, at their own pace. Kafka stores every event for the
+topic's retention period, so a consumer that was down catches up from where it stopped.
+
+| Topic | Partitions | Retention | Producers | Consumer group → consumer | Purpose |
+|---|---|---|---|---|---|
+| `audit.events` | 3 (key = producing service, so each service's entries stay in order) | 7 days | every service (from its outbox) | `reporting-audit` → `reporting-service` | Audit trail: every create / update / approve / delete / view / sign-in |
+| `audit.events.dlq` | 1 | 30 days | `reporting-service` | — (kept for inspection) | **Dead-letter queue**: audit events that failed validation, with the reason in a header |
+| `realtime.events` | 3 (key = channel) | 1 hour | every service (`broadcast()`) | `notification-realtime` → `notification-service` | Live UI updates, pushed to browsers over Socket.IO |
+
+Synchronous **REST** is kept only where an immediate answer is required: taking / releasing stock for a sale (saga),
+receiving stock, the gateway's token check, and sending email.
+
+**Audit delivery — Transactional Outbox → Kafka.** Audit entries must never be lost, even while Kafka or
+`reporting-service` is down:
 
 ```mermaid
 sequenceDiagram
     participant S as Business Service (e.g. sales-service)
-    participant DB as Local PostgreSQL (audit_outbox)
-    participant Relay as Background Outbox Relay
-    participant RS as reporting-service (:4007)
-    participant AL as audit_logs Table (Immutable)
+    participant DB as PostgreSQL (audit_outbox)
+    participant Relay as Outbox Relay (in each service)
+    participant K as Apache Kafka (audit.events)
+    participant RS as reporting-service (consumer group reporting-audit)
+    participant AL as audit_logs (immutable)
 
-    Note over S,DB: 1. Business Transaction Completes
-    S->>DB: INSERT into audit_outbox (service, payload)
-    Note over S: Action committed immediately
+    Note over S,DB: 1. Business action completes
+    S->>DB: INSERT INTO audit_outbox (service, payload)
 
-    Note over Relay,RS: 2. WebSocket Push (Persistent Socket.IO)
-    Relay->>DB: Read pending outbox rows
-    Relay->>RS: emit('audit:record', entry)
-    RS->>RS: Validate schema (Zod)
-    RS->>AL: INSERT INTO audit_logs
-    Note over AL: DB Triggers prevent UPDATE/DELETE
-    RS-->>Relay: ack({ ok: true, id })
+    Note over Relay,K: 2. Publish (idempotent producer, acks = all)
+    Relay->>DB: Read pending rows (FOR UPDATE SKIP LOCKED)
+    Relay->>K: produce(audit.events, key = service)
+    K-->>Relay: stored on the log
+    Relay->>DB: DELETE the published rows
 
-    Note over Relay,DB: 3. Outbox Clean-Up
-    Relay->>DB: DELETE FROM audit_outbox WHERE id = entry.id
+    Note over K,AL: 3. Consume
+    K->>RS: deliver event
+    RS->>RS: Validate (Zod) — invalid → audit.events.dlq
+    RS->>AL: INSERT (duplicate sourceKey ignored)
+    Note over AL: DB triggers refuse UPDATE / DELETE
+    RS-->>K: commit offset
 ```
 
-- Each microservice writes audit events into its local `audit_outbox` table.
-- A persistent background WebSocket relay connects to `reporting-service` at `/internal/audit-socket` authenticating with `INTERNAL_SERVICE_SECRET`.
-- Entries are streamed in real time. `reporting-service` validates payload schemas using Zod, records them into `audit_logs`, and responds with an acknowledgment. Only upon acknowledgment does the originating service delete the outbox record.
+- An entry leaves the outbox only after Kafka has stored it. While Kafka is down, entries wait in the outbox and are
+  published, with their original timestamps, once it is back.
+- If the database is unavailable while consuming, the event is not committed and Kafka delivers it again: nothing is
+  skipped. Each event carries a `sourceKey`, so a re-delivered event is stored only once (exactly-once effect).
+- Live updates go through `realtime.events`; while Kafka is unreachable, services fall back to posting them to
+  `notification-service` directly, so screens keep updating.
+
+### 1.6 Monitoring with Prometheus, Loki & Grafana
+
+Every microservice exposes its metrics at `GET /metrics` (Prometheus format, via `prom-client`), reachable only inside
+the Docker network — the gateway never routes it. **Prometheus** collects them every 15 seconds, together with
+**exporters** for PostgreSQL, Redis and Kafka, and **Grafana** shows them on a provisioned dashboard.
+
+```
+ 9 microservices (/metrics) ─┐
+ postgres-exporter ──────────┤
+ redis-exporter ─────────────┼──► Prometheus (scrapes every 15 s, keeps 15 days) ──► Grafana ("Supermarket System" dashboard)
+ kafka-exporter ─────────────┤
+ cAdvisor, nginx-exporter ───┤
+ docker-info-exporter ───────┘
+ container logs ──► Promtail ──► Loki (7 days) ──────────────────────────────────────► Grafana (Logs Monitoring)
+```
+
+| Metric | Source | Shows |
+|---|---|---|
+| `http_requests_total`, `http_request_duration_seconds` | every service | Traffic, server errors (5xx) and p95 response time per service and per route |
+| `cache_requests_total{result}` | every service | Redis cache hits, misses and errors (hit ratio) |
+| `kafka_messages_total{topic,direction,result}` | every service | Events produced to / consumed from each Kafka topic, and failures |
+| `audit_outbox_pending` | every data service | Audit entries waiting to be streamed (should stay near 0) |
+| `kafka_consumergroup_lag` | kafka-exporter | Messages each consumer group still has to read |
+| `pg_*`, `redis_*` | postgres-exporter, redis-exporter | Database connections, transactions and size; Redis memory and keys |
+| `process_*`, `nodejs_*` | every service | Memory, CPU and event-loop delay of each Node.js process |
+
+**Logs** of every container are collected by **Promtail** into **Grafana Loki** (kept 7 days, labelled by service and
+log level). **cAdvisor** measures each container's CPU and memory, and a small **docker-info-exporter**
+(`server/monitoring/docker-info-exporter`) adds each container's network traffic and its service name. The **nginx
+exporter** reports the API gateway's connections and requests.
+
+Grafana opens on the **Supermarket Monitoring** index (no sign-in, read-only); every dashboard is in the
+*Dashboards → Supermarket Monitoring* folder and has an **All dashboards** menu at the top right:
+
+| Dashboard | What it shows |
+|---|---|
+| **System Overview** | Health of the whole system at a glance, with links into each area |
+| **Microservices Monitoring** | Each service up/down, traffic, 4xx/5xx errors, CPU, memory, event-loop delay, heap, GC, container resources, service graph |
+| **API Performance Monitoring** | p50 / p95 / p99 response times, throughput, status codes, busiest and slowest routes, routes with errors, gateway traffic |
+| **Database Monitoring** | PostgreSQL connections (by state, % of max), transactions, buffer cache hit ratio, rows, locks, longest transaction, largest tables, slowest queries (from traces) |
+| **Cache Monitoring** | Redis hit ratio (app and server), memory vs limit, keys, evictions, commands, command times |
+| **Event Streaming Monitoring** | Kafka brokers, topics, events per topic, produced / consumed, consumer lag, outbox backlog, dead-letter events, processing time |
+| **Logs Monitoring** | Log volume, errors and warnings per service, live log search (filter by service, level and text) |
+| **Network Monitoring** | Traffic, packets, errors and drops per service, top talkers, Docker network bridge, gateway connections |
+| **Distributed Tracing** | Service graph, requests and p95 per service, recent / slow / failed requests, slow database queries |
+
+All of it lives in `server/monitoring/` (Prometheus, Tempo, Loki and Promtail config, Grafana provisioning, and the
+dashboards, generated by `grafana/build_dashboards.py`), so it is version-controlled.
+
+### 1.7 Distributed Tracing with OpenTelemetry & Grafana Tempo
+
+Every API request becomes a **trace**: one tree of timed **spans** showing each step it took across the services.
+Services use the **OpenTelemetry** SDK and send spans to **Grafana Tempo** (OTLP over HTTP); Grafana shows them.
+
+| Span | Recorded in (shared file in every service) |
+|---|---|
+| The request itself, named after the browser's call (`GET /api/products`); the root is the gateway's sign-in check | `utils/tracing.js` (Express middleware), `auth-service` gateway check |
+| Each service's handling of the request (method, route, status, user id, role, branch) | `utils/tracing.js` |
+| Calls to other services (`/internal/...`) | `utils/serviceClient.js` |
+| PostgreSQL queries (command, table, statement without values) | `utils/db.js` |
+| Redis cache reads and writes (with hit / miss) | `utils/cache.js` |
+| Kafka publish and consume — the consumer's span joins the producer's trace, even in another service | `utils/kafka.js`, `utils/events.js` |
+
+**Propagation.** The trace id travels in the W3C `traceparent` header between services and in Kafka message headers
+between producer and consumer. Audit entries store it in the outbox, so the audit-log write joins the trace of the
+action that caused it. The gateway returns the trace id to the browser as **`X-Request-Id`**, so a slow or failed
+request can be looked up in Grafana by that id.
+
+**In Grafana**, the *Traces* section of the Supermarket System dashboard shows a live **service graph** (who calls
+whom, built by Tempo from the traces), **recent requests** and **slow requests (over 500 ms)**; clicking a trace opens
+its full timeline. Traces are kept 3 days. `TRACE_SAMPLE_RATIO` controls the share of new traces kept (default 1 = all).
+
+```
+GET /api/products                      auth-service        sign-in check (root span)
+   ├─ redis GET  (cache hit)           auth-service
+   ├─ publish realtime.events          auth-service
+   │    └─ process realtime.events     notification-service
+   └─ GET /products                    inventory-service
+        ├─ redis GET  (cache miss)     inventory-service
+        ├─ pg SELECT products          inventory-service
+        └─ redis SET                   inventory-service
+```
 
 ---
 
@@ -398,29 +524,31 @@ The system implements strict Role-Based Access Control across four distinct ente
 
 ### 5.3 Reliability, Fault Isolation & Resilience
 - **NFR-9 [Process Isolation]:** Every microservice shall run in an independent container with its own restart policy (`restart: unless-stopped`). A crash in one service (e.g., AI assistance) shall not affect sales, authentication, or inventory operations.
-- **NFR-10 [Guaranteed Audit Delivery]:** The Transactional Outbox pattern shall ensure that audit events survive downstream network failures, persisting locally until confirmed by `reporting-service`.
-- **NFR-11 [Graceful Degradation]:** If an external integration (Google Gemini or Chapa) experiences downtime, affected modules shall respond with informative, standardized JSON error messages without crashing host services.
+- **NFR-10 [Guaranteed Audit Delivery]:** The Transactional Outbox pattern shall ensure that audit events survive downstream failures, persisting locally until Apache Kafka has stored them; Kafka's retention and consumer offsets shall let `reporting-service` catch up after any outage without losing or duplicating an entry, and malformed events shall go to a dead-letter topic.
+- **NFR-11 [Observability]:** Every microservice shall expose request, error, latency, cache, event-streaming and process metrics, collected by Prometheus and shown on a provisioned Grafana dashboard, and shall emit OpenTelemetry traces (stored in Grafana Tempo) that follow each request across services, the database, the cache and Kafka, so failures and slowdowns can be located without reading logs.
+- **NFR-12 [Graceful Degradation]:** If an external integration (Google Gemini or Chapa) experiences downtime, affected modules shall respond with informative, standardized JSON error messages without crashing host services.
 
 ### 5.4 Performance & Scalability
-- **NFR-12 [Stateless Microservice Scaling]:** All backend services shall remain strictly stateless, allowing horizontal scaling behind load-balanced gateway proxies.
-- **NFR-13 [Keyset Cursor Pagination]:** The audit log and large reporting datasets shall implement keyset (cursor) pagination using indexed composite keys (`(occurred_at, id)`), ensuring constant-time ($O(1)$) pagination performance regardless of dataset depth.
-- **NFR-14 [Optimized AI Caching]:** LLM operational recommendations shall be cached in-memory with a 30-minute sliding window per user role to minimize latency and API consumption.
+- **NFR-13 [Stateless Microservice Scaling]:** All backend services shall remain strictly stateless, allowing horizontal scaling behind load-balanced gateway proxies.
+- **NFR-14 [Keyset Cursor Pagination]:** The audit log and large reporting datasets shall implement keyset (cursor) pagination using indexed composite keys (`(occurred_at, id)`), ensuring constant-time ($O(1)$) pagination performance regardless of dataset depth.
+- **NFR-15 [Optimized AI Caching]:** LLM operational recommendations shall be cached in Redis for 30 minutes per user and role (with an in-memory fallback) to minimize latency and API consumption.
+- **NFR-16 [Shared Read Cache]:** Frequently read, rarely changed data (the per-request session check, branches, store policy and the product catalog) shall be served from a Redis cache-aside layer and invalidated on every change, so repeated reads don't hit the database; the system shall keep working, reading from PostgreSQL, when Redis is unavailable.
 
 ### 5.5 Maintainability & Extensibility
-- **NFR-15 [Uniform Layering Convention]:** Every microservice shall adhere to the identical layered pattern (`routes` → `middleware` → `controllers` → `services` → `repositories` → `models`), simplifying code navigation and onboarding.
-- **NFR-16 [Automated Database Evolution]:** Each microservice shall automatically discover and execute its own versioned SQL migrations upon container startup.
+- **NFR-17 [Uniform Layering Convention]:** Every microservice shall adhere to the identical layered pattern (`routes` → `middleware` → `controllers` → `services` → `repositories` → `models`), simplifying code navigation and onboarding.
+- **NFR-18 [Automated Database Evolution]:** Each microservice shall automatically discover and execute its own versioned SQL migrations upon container startup.
 
 ### 5.6 Usability & Accessibility
-- **NFR-17 [Responsive Design]:** The web interface shall deliver a responsive, accessible layout functional across desktop monitors, tablets, and mobile devices.
-- **NFR-18 [Granular Form Validation]:** Client-side and server-side validation errors shall map directly to individual form fields with descriptive inline feedback.
+- **NFR-19 [Responsive Design]:** The web interface shall deliver a responsive, accessible layout functional across desktop monitors, tablets, and mobile devices.
+- **NFR-20 [Granular Form Validation]:** Client-side and server-side validation errors shall map directly to individual form fields with descriptive inline feedback.
 
 ### 5.7 Auditability & Compliance
-- **NFR-19 [Database-Enforced Immutability]:** The `audit_logs` table shall possess PostgreSQL engine triggers (`BEFORE UPDATE OR DELETE` and `BEFORE TRUNCATE`) that raise fatal exceptions, ensuring audit history cannot be altered even by database superusers.
-- **NFR-20 [Least Privilege Database Access]:** Application runtime services shall connect using a restricted role (`DB_APP_USERNAME`) granted only `INSERT` and `SELECT` privileges on `audit_logs`.
+- **NFR-21 [Database-Enforced Immutability]:** The `audit_logs` table shall possess PostgreSQL engine triggers (`BEFORE UPDATE OR DELETE` and `BEFORE TRUNCATE`) that raise fatal exceptions, ensuring audit history cannot be altered even by database superusers.
+- **NFR-22 [Least Privilege Database Access]:** Application runtime services shall connect using a restricted role (`DB_APP_USERNAME`) granted only `INSERT` and `SELECT` privileges on `audit_logs`.
 
 ### 5.8 Timezone & Regional Standardization
-- **NFR-21 [Universal UTC Storage]:** All timestamps across all microservices and database tables shall be persisted in UTC (ISO 8601).
-- **NFR-22 [Localized Display Standardization]:** Aggregations for "today", daily sales reports, and UI timestamps shall be rendered in the store's configured regional timezone (`STORE_TIMEZONE`).
+- **NFR-23 [Universal UTC Storage]:** All timestamps across all microservices and database tables shall be persisted in UTC (ISO 8601).
+- **NFR-24 [Localized Display Standardization]:** Aggregations for "today", daily sales reports, and UI timestamps shall be rendered in the store's configured regional timezone (`STORE_TIMEZONE`).
 
 ---
 
@@ -439,12 +567,19 @@ The system implements strict Role-Based Access Control across four distinct ente
 | **HTTP Framework** | Express | 5.x | Robust HTTP routing and middleware framework |
 | **Schema Validation** | Zod | 4.x | Declarative request payload & event validation |
 | **Database Engine** | PostgreSQL | 17-alpine | Advanced relational database with ACID guarantees |
+| **Cache** | Redis (node-redis client) | 7.4-alpine / 4.7 | Shared cache-aside layer and rate-limit counters |
 | **API Gateway** | Nginx | Alpine | High-performance reverse proxy & security gateway |
-| **Real-Time Engine** | Socket.IO | 4.8.x | Bi-directional WebSocket communication |
+| **Real-Time Engine** | Socket.IO | 4.8.x | Pushes live updates from notification-service to browsers |
+| **Event Streaming** | Apache Kafka (KRaft) + kafkajs | 3.8 / 2.2.4 | Event-streaming backbone: audit events, live updates, dead-letter queue |
 | **AI LLM Engine** | Google Gemini API | `gemini-1.5-flash` / Pro | Role-bounded operational analytics & chat |
 | **Payment Gateway** | Chapa API | REST v1 | Ethiopian payment gateway (Telebirr, CBE, Cards) |
 | **Cryptography** | bcryptjs + Node Crypto | Native | Password hashing and timing-safe comparisons |
 | **Containerization** | Docker & Docker Compose | Compose v2 | Multi-container orchestration and networking |
+| **Metrics** | Prometheus + prom-client | 2.53 / 15.1 | Collects service, database, cache and Kafka metrics |
+| **Dashboards** | Grafana | 11.1 | Nine provisioned monitoring dashboards (no sign-in, read-only) |
+| **Logs** | Grafana Loki + Promtail | 3.1 | Collects and searches the logs of every container |
+| **Container metrics** | cAdvisor + nginx exporter | 0.52 / 1.1 | Per-container CPU, memory and network; API gateway connections |
+| **Distributed Tracing** | OpenTelemetry SDK + Grafana Tempo | 1.25 / 2.5 | Traces each request across services, PostgreSQL, Redis and Kafka |
 
 ---
 
@@ -494,6 +629,7 @@ Multi-Branch-Supermarket-Inventory-Management-System/
     ├── reporting-service/             # Microservice 7: Reports, dashboard, immutable audit log
     ├── ai-service/                    # Microservice 8: Google Gemini role assistance
     ├── notification-service/          # Microservice 9: Socket.IO broadcasts & SMTP email
+    ├── monitoring/                    # Prometheus, Tempo, Loki & Promtail config; Grafana provisioning & dashboards
     └── nginx/                         # Alternative standalone Nginx configuration
 ```
 
@@ -548,6 +684,14 @@ docker compose ps
 
 The services will automatically execute their respective SQL migrations on startup.
 
+Monitoring starts with the stack:
+
+| What | Where |
+|---|---|
+| **Grafana** dashboards | <http://localhost:3000> — no sign-in; opens on the *Supermarket Monitoring* index of all nine dashboards (read-only, this machine only) |
+| **Prometheus** targets | <http://localhost:9090/targets> (this machine only) |
+| **Traces** | Grafana → *Explore* → **Tempo**, or the dashboard's *Traces* section; search by the `X-Request-Id` a response returned |
+
 ### 8.4 Initializing the System & Seeding Owner Account
 
 Once the containers are up, seed the initial system Owner account:
@@ -585,7 +729,7 @@ The client will connect to the backend API Gateway at `http://localhost:8000/api
 
 | Variable | Target Service | Default / Example | Purpose |
 |---|---|---|---|
-| `INTERNAL_SERVICE_SECRET` | All Services & Gateway | *64-hex string* | Shared cryptographic secret used to authenticate internal REST and WebSocket communication. |
+| `INTERNAL_SERVICE_SECRET` | All Services & Gateway | *64-hex string* | Shared cryptographic secret used to authenticate internal REST communication. |
 | `STORE_TIMEZONE` | All Services | `Africa/Addis_Ababa` | Reference timezone used to determine "today" for sales, expiry alerts, and dashboard calculations. |
 | `DB_HOST` | All Services | `postgres` (compose) | PostgreSQL database hostname. |
 | `DB_PORT` | All Services | `5432` | PostgreSQL database port. |
@@ -594,6 +738,10 @@ The client will connect to the backend API Gateway at `http://localhost:8000/api
 | `DB_PASSWORD` | All Services | `supermart_app` | Runtime database user password. |
 | `DB_MIGRATE_USERNAME` | All Services | `postgres` | Administrative user used strictly to execute schema migrations. |
 | `DB_MIGRATE_PASSWORD` | All Services | `postgres` | Administrative database user password. |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | All Services | `http://tempo:4318` (compose) | Where services send traces (Grafana Tempo). Empty = tracing off. |
+| `TRACE_SAMPLE_RATIO` | All Services | `1` | Share of new traces kept (0–1). Lower it under heavy traffic. |
+| `KAFKA_BROKERS` | All Services | `kafka:9092` (compose) | Apache Kafka brokers for event streaming (audit and live-update topics). |
+| `REDIS_URL` | All Services | `redis://redis:6379` (compose) | Shared Redis cache. Empty = no cache; everything is read from PostgreSQL. |
 | `SESSION_TIMEOUT_MINUTES` | `auth-service` | `120` | Duration of user inactivity before an access session is terminated. |
 | `ACCESS_REVIEW_DORMANT_DAYS`| `user-service`, `reporting-service` | `30` | Number of days without login before an active account is flagged as dormant. |
 | `CHAPA_MODE` | `procurement-service`| `fake` | Payment gateway mode: `fake` (instant local confirmation) or `live` (real Chapa checkout). |

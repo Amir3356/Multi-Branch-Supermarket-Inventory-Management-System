@@ -3,6 +3,8 @@ import { servicePort } from './config.js'
 import { internalOnly } from '../middleware/internalOnly.js'
 import { HttpError } from './errors.js'
 import { logger, setServiceName } from './logger.js'
+import { initMetrics, metricsHandler, metricsMiddleware } from './metrics.js'
+import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
 
 /**
  * Builds and starts this service: JSON bodies, every route behind internalOnly (only the gateway and other services
@@ -14,8 +16,17 @@ export function createService({ name, key, routes, onStart, bodyLimit = '1mb' })
   setServiceName(name)
   const app = express()
   app.disable('x-powered-by')
+  initMetrics(name)
+  initTracing(name)
+  // Every request becomes a span of its trace (OpenTelemetry → Tempo → Grafana)
+  app.use(tracingMiddleware)
+  // Every request is timed and counted for monitoring (Prometheus → Grafana)
+  app.use(metricsMiddleware)
 
   app.get('/health', (req, res) => res.json({ service: name, status: 'ok' }))
+
+  // Read by Prometheus inside the Docker network; the gateway never routes it, so it isn't public
+  app.get('/metrics', metricsHandler)
 
   app.use(express.json({ limit: bodyLimit }))
   app.use(internalOnly)
@@ -39,7 +50,7 @@ export function createService({ name, key, routes, onStart, bodyLimit = '1mb' })
   })
 
   const shutdown = () => {
-    server.close(() => process.exit(0))
+    server.close(() => shutdownTracing().finally(() => process.exit(0)))
     setTimeout(() => process.exit(0), 5_000).unref()
   }
   process.on('SIGTERM', shutdown)

@@ -1,3 +1,5 @@
+import { trace } from '@opentelemetry/api'
+import { traceHeaders } from '../utils/tracing.js'
 import { HEADERS, encodeContext } from '../utils/index.js'
 import { introspect as introspectToken } from '../services/introspection.service.js'
 import * as sessions from '../services/session.service.js'
@@ -44,6 +46,18 @@ function extractToken(req) {
  * x-auth-context set to the signed-in user when the token is valid. nginx forwards that header to the service.
  */
 export async function gatewayCheck(req, res) {
+  // This check is the first step of every API request, so its span is the trace's root: named after the request the
+  // browser made, and handed back to the gateway (traceparent) to pass on to the service that handles it
+  const span = trace.getActiveSpan()
+  const method = req.get('x-original-method')
+  const uri = req.get('x-original-uri')
+  if (span && method && uri) {
+    const path = uri.split('?')[0].replace(/\/[^/]*\d[^/]*/g, '/:id')
+    res.locals.spanName = `${method} ${path}`
+    span.setAttribute('app.gateway_check', true)
+    span.setAttribute('url.full_path', uri.split('?')[0])
+  }
+  res.set(traceHeaders())
   const token = extractToken(req)
   if (token) {
     const result = await introspectToken({ token, ip: req.clientIp, touch: true })

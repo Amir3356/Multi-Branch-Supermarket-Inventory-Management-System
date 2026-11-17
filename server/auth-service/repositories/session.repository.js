@@ -2,19 +2,25 @@ import { one, query } from '../utils/index.js'
 import { TOKENABLE_TYPE } from '../models/session.model.js'
 import { nowSeconds } from '../utils/timestamps.js'
 import { sha256 } from '../utils/tokens.js'
+import * as cache from '../utils/cache.js'
 
-// Every database read and write for sessions (Sanctum's personal_access_tokens table)
+// A session as the sign-in check reads it on every request is cached briefly; every write below clears it
+const SESSION_TTL_SECONDS = 30
+const sessionKey = (id) => `auth:session:${id}`
+const forgetSessions = (ids) => cache.forget(...ids.map(sessionKey))
+
+// Every database read and write for sessions (personal_access_tokens: one row per JWT sign-in)
 
 /** The user columns a session needs (SessionResource, the identity context) */
 const USER_COLUMNS = 'u.full_name, u.email, u.role, u.branch_id'
 
-/** A new session (Sanctum token) named after the browser it was issued to; returns the row */
-export async function createFor(userId, device, secret) {
+/** A new session named after the browser it was issued to, tied to its JWT by the JWT's ID (jti); returns the row */
+export async function createFor(userId, device, jwtId) {
   const now = nowSeconds()
   return one(
     `insert into personal_access_tokens (tokenable_type, tokenable_id, name, token, abilities, expires_at, created_at, updated_at)
      values ($1, $2, $3, $4, '["*"]', null, $5, $5) returning *`,
-    [TOKENABLE_TYPE, userId, device, sha256(secret), now],
+    [TOKENABLE_TYPE, userId, device, sha256(jwtId), now],
   )
 }
 
@@ -22,9 +28,8 @@ export async function find(id) {
   return one('select * from personal_access_tokens where id = $1', [id])
 }
 
-export async function findByHash(hash) {
-  return one('select * from personal_access_tokens where token = $1', [hash])
-}
+/** The session for the sign-in check: from the cache when it's there (dates come back as ISO strings) */
+export const findCached = (id) => cache.remember(sessionKey(id), SESSION_TTL_SECONDS, () => find(id))
 
 /** One session with its user (tokenable; the user columns are null if it no longer exists), or null */
 export async function withUser(id) {
@@ -52,6 +57,7 @@ export async function recent(days) {
 /** Deletes rows created more than $days days ago; returns how many */
 export async function pruneOlderThan(days) {
   const rows = await query('delete from personal_access_tokens where created_at < $1 returning id', [new Date(Date.now() - days * 86_400_000)])
+  await forgetSessions(rows.map((row) => row.id))
   return rows.length
 }
 
@@ -73,6 +79,7 @@ export async function markEnded(id, reason) {
     'update personal_access_tokens set ended_at = $2, ended_reason = $3, updated_at = $2 where id = $1 and ended_at is null returning id',
     [id, now, reason],
   )
+  await forgetSessions([id])
   return row !== null
 }
 
@@ -82,16 +89,19 @@ export async function markManyEnded(userId, ids, reason) {
     'update personal_access_tokens set ended_at = $4, ended_reason = $3, updated_at = $4 where tokenable_type = $1 and tokenable_id = $2 and id = any($5::bigint[])',
     [TOKENABLE_TYPE, userId, reason, now, ids],
   )
+  await forgetSessions(ids)
 }
 
-/** Sanctum stamps every authenticated request */
+/** Stamps the session as used now (the sign-in check does it at most every TOUCH_EVERY_SECONDS) */
 export async function touch(id) {
   const now = nowSeconds()
   await query('update personal_access_tokens set last_used_at = $2, updated_at = $2 where id = $1', [id, now])
+  await forgetSessions([id])
 }
 
 export async function setAddress(id, ip) {
   await query('update personal_access_tokens set ip_address = $2, updated_at = $3 where id = $1', [id, ip, nowSeconds()])
+  await forgetSessions([id])
 }
 
 /** source: 'ip' (looked up from the address) or 'device' (reported by the browser) */
@@ -103,6 +113,7 @@ export async function setLocation(id, location, source) {
     source,
     nowSeconds(),
   ])
+  await forgetSessions([id])
 }
 
 export async function locationSource(id) {
@@ -112,10 +123,12 @@ export async function locationSource(id) {
 
 export async function remove(id) {
   await query('delete from personal_access_tokens where id = $1', [id])
+  await forgetSessions([id])
 }
 
 /** Signs the user out everywhere by removing every session row (used when the account is deleted); returns how many */
 export async function deleteAllFor(userId) {
   const rows = await query('delete from personal_access_tokens where tokenable_type = $1 and tokenable_id = $2 returning id', [TOKENABLE_TYPE, userId])
+  await forgetSessions(rows.map((row) => row.id))
   return rows.length
 }

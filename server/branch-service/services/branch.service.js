@@ -2,14 +2,22 @@ import { HttpError, audit, broadcast, isUniqueViolation, validationError } from 
 import { str } from '../utils/rules.js'
 import * as branches from '../repositories/branch.repository.js'
 import { NAME_TAKEN } from '../models/branch.model.js'
+import * as cache from '../utils/cache.js'
 
 /**
  * Branches (Laravel's BranchController logic and BranchBroadcaster). The live payload is what the old event sent: its
  * public properties (BranchesChanged: reason).
  */
 
+// The branch list as GET /branches returns it, cached; user-service clears it too (staff counts) when accounts change
+export const BRANCHES_KEY = 'branches:list'
+export const BRANCHES_TTL_SECONDS = 600
+
 /** Every open screen reloads its branch list, so an inactive branch stops being offered at once */
-export const branchesChanged = (reason) => broadcast('branches', 'branches.changed', { reason })
+export async function branchesChanged(reason) {
+  await cache.forget(BRANCHES_KEY)
+  broadcast('branches', 'branches.changed', { reason })
+}
 
 /** Route-model binding: the branch in the URL, or Laravel's 404 */
 export async function findOrFail(id) {

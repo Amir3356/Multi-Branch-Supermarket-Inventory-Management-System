@@ -1,5 +1,5 @@
 import { iso8601 } from '../utils/index.js'
-import { recommendationCache as cache } from '../utils/recommendationCache.js'
+import { getRecommendations, putRecommendations } from '../utils/recommendationCache.js'
 import { brief, chatRules, recommendationRules } from '../utils/templates/aiPrompts.js'
 import { parseRecommendations } from '../models/recommendation.model.js'
 import { chat as askAi } from './gemini.service.js'
@@ -16,9 +16,8 @@ const CACHE_MINUTES = 30
 /** { summary, recommendations: [{ title, detail, priority, category, action }], generatedAt, cached } */
 export async function recommendations(user, refresh = false) {
   const key = `ai:recommendations:${user.id}:${user.role}:${user.branchId ?? 'all'}`
-  const hit = cache.get(key)
-  if (hit && hit.expiresAt <= Date.now()) cache.delete(key)
-  if (!refresh && hit && hit.expiresAt > Date.now()) return { ...hit.value, cached: true }
+  const hit = refresh ? undefined : await getRecommendations(key)
+  if (hit) return { ...hit, cached: true }
 
   const snapshot = await snapshotFor(user)
   const reply = await askAi(
@@ -31,7 +30,7 @@ export async function recommendations(user, refresh = false) {
   )
 
   const result = { ...parseRecommendations(reply), generatedAt: iso8601(new Date()) }
-  cache.set(key, { value: result, expiresAt: Date.now() + CACHE_MINUTES * 60_000 })
+  await putRecommendations(key, result, CACHE_MINUTES * 60)
   return { ...result, cached: false }
 }
 
