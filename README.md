@@ -453,6 +453,7 @@ The system implements strict Role-Based Access Control across four distinct ente
 ```
 Multi-Branch-Supermarket-Inventory-Management-System/
 ├── README.md                          # Comprehensive system documentation
+├── docker-compose.yml                 # Orchestration for DB, gateway, and 9 microservices (run from here)
 ├── client/                            # React 19 single-page application
 │   ├── api/                           # Domain HTTP API service clients
 │   ├── components/                    # Reusable atomic UI components
@@ -481,7 +482,6 @@ Multi-Branch-Supermarket-Inventory-Management-System/
 │   ├── package.json
 │   └── vite.config.js
 └── server/                            # Microservices backend
-    ├── docker-compose.yml             # Orchestration for DB, gateway, and 9 microservices
     ├── api-gateway/                   # Nginx reverse proxy gateway container
     │   ├── Dockerfile
     │   └── nginx.conf                 # Routing table, auth_request, header stripping
@@ -533,10 +533,11 @@ Multi-Branch-Supermarket-Inventory-Management-System/
 
 ### 8.3 Running with Docker Compose
 
-Start PostgreSQL, the Nginx API gateway, and all nine microservices with a single command:
+Start PostgreSQL, the Nginx API gateway, and all nine microservices with a single command, run from the **project
+root** (where `docker-compose.yml` is):
 
 ```bash
-cd server
+cd ..   # back to the project root, if you are still in server/
 DB_PASSWORD=supersecret DB_APP_PASSWORD=appsecret docker compose up --build -d
 ```
 

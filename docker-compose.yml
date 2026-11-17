@@ -1,12 +1,18 @@
-# The whole server in containers: PostgreSQL, the gateway and every service. Each service builds from its own folder
-# (<name>/Dockerfile), reads its own <name>/.env, and applies its own migrations when it starts.
+# The whole server in containers: PostgreSQL, the gateway and every service. Run it from the project root (this
+# folder). Each service builds from server/<name>/Dockerfile, reads its own server/<name>/.env, and applies its own
+# migrations when it starts.
 #
-#   for s in */; do cp -n "$s.env.example" "$s.env"; done   # then give every .env the SAME INTERNAL_SERVICE_SECRET
+#   for s in server/*/; do cp -n "$s.env.example" "$s.env"; done   # then give every .env the SAME INTERNAL_SERVICE_SECRET
 #   DB_PASSWORD=choose-one DB_APP_PASSWORD=choose-another docker compose up --build
-#   docker compose exec auth-service npm run seed        # Owner (auth-service/seed/)
+#   docker compose exec auth-service npm run seed        # Owner (server/auth-service/seed/)
 #
 # Inside compose, the database address/password and the service addresses below override what the .env files say.
 # The gateway listens on http://localhost:8000; the other services are reachable only inside the compose network.
+
+# The project keeps the name it had when this file lived in server/, so the same containers and the same database
+# volume (server_pgdata) are used: without it, Docker would name everything after this folder and start an empty database.
+name: server
+
 x-service-env: &service-env
   DB_HOST: postgres
   DB_PORT: "5432"
@@ -50,45 +56,45 @@ services:
 
   api-gateway:
     <<: *service
-    build: ./api-gateway
-    env_file: ./api-gateway/.env
+    build: ./server/api-gateway
+    env_file: ./server/api-gateway/.env
     ports: ["8000:8000"]
   auth-service:
     <<: *service
-    build: ./auth-service
-    env_file: ./auth-service/.env
+    build: ./server/auth-service
+    env_file: ./server/auth-service/.env
   user-service:
     <<: *service
-    build: ./user-service
-    env_file: ./user-service/.env
+    build: ./server/user-service
+    env_file: ./server/user-service/.env
   branch-service:
     <<: *service
-    build: ./branch-service
-    env_file: ./branch-service/.env
+    build: ./server/branch-service
+    env_file: ./server/branch-service/.env
   inventory-service:
     <<: *service
-    build: ./inventory-service
-    env_file: ./inventory-service/.env
+    build: ./server/inventory-service
+    env_file: ./server/inventory-service/.env
   sales-service:
     <<: *service
-    build: ./sales-service
-    env_file: ./sales-service/.env
+    build: ./server/sales-service
+    env_file: ./server/sales-service/.env
   procurement-service:
     <<: *service
-    build: ./procurement-service
-    env_file: ./procurement-service/.env
+    build: ./server/procurement-service
+    env_file: ./server/procurement-service/.env
   reporting-service:
     <<: *service
-    build: ./reporting-service
-    env_file: ./reporting-service/.env
+    build: ./server/reporting-service
+    env_file: ./server/reporting-service/.env
   ai-service:
     <<: *service
-    build: ./ai-service
-    env_file: ./ai-service/.env
+    build: ./server/ai-service
+    env_file: ./server/ai-service/.env
   notification-service:
     <<: *service
-    build: ./notification-service
-    env_file: ./notification-service/.env
+    build: ./server/notification-service
+    env_file: ./server/notification-service/.env
 
 volumes:
   pgdata:
