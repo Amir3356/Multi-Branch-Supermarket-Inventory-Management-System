@@ -1,9 +1,10 @@
-import { HttpError, audit, broadcast, isUniqueViolation, logger, money, nextId, serviceClient, transaction } from '../utils/index.js'
+import { HttpError, audit, broadcast, grpcClient, isUniqueViolation, logger, money, nextId, transaction } from '../utils/index.js'
 import { nowSeconds, roundNumber, toInt } from '../utils/dataUtils.js'
 import * as sales from '../repositories/sale.repository.js'
 import { IDEMPOTENCY_CONSTRAINT, ID_PREFIX, STATUS_PAID, TABLE, toResource } from '../models/sale.model.js'
 
-const inventory = serviceClient('inventory')
+// inventory-service's internal gRPC API (TakeStock / ReleaseStock)
+const inventory = grpcClient('inventory')
 
 /** The sales this user can see, newest first */
 export function visibleTo(user) {
@@ -82,8 +83,8 @@ export async function recordOnce(req, attributes) {
   if (existing) return { sale: existing, created: false }
 
   const reference = `sale:${attributes.sold_by}:${attributes.idempotency_key}`
-  await inventory.post(
-    '/internal/stock/take',
+  await inventory.call(
+    'TakeStock',
     { reference, branchId: attributes.branch_id, product: attributes.product, parts: attributes.batches, expiredAction: 'sold' },
     { req },
   )
@@ -99,7 +100,7 @@ export async function recordOnce(req, attributes) {
     }
     // Our sale wasn't saved: put the units back so stock matches the sales on record
     await inventory
-      .post('/internal/stock/release', { reference }, { req })
+      .call('ReleaseStock', { reference }, { req })
       .catch((releaseError) => logger.error('Stock not released after a failed sale', { reference, error: releaseError.message }))
     throw error
   }

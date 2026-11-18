@@ -3,7 +3,7 @@ import { TOPICS, publish, setKafkaClientId } from './kafka.js'
 import { logger } from './logger.js'
 import { gauge } from './metrics.js'
 import { traceHeaders } from './tracing.js'
-import { serviceClient } from './serviceClient.js'
+import { grpcClient } from './grpc.js'
 
 /**
  * Side effects owned by other services, sent fire-and-forget through Kafka: a stopped notification or reporting service
@@ -13,15 +13,15 @@ import { serviceClient } from './serviceClient.js'
 
 /**
  * Pushes a live update to every browser subscribed to a channel: streamed through Kafka's realtime.events topic to
- * notification-service, which emits it over Socket.IO. While Kafka is unreachable it is posted to notification-service
- * directly instead, so screens still update.
+ * notification-service, which emits it over Socket.IO. While Kafka is unreachable it is sent to notification-service
+ * directly (gRPC Broadcast) instead, so screens still update.
  *   broadcast('branch.BR-01.sales', 'sale.recorded', { sale })
  * The client listens with realtime().private('branch.BR-01.sales').listen('.sale.recorded', handler).
  */
 export function broadcast(channel, event, data = {}) {
   publish(TOPICS.REALTIME, [{ key: channel, value: JSON.stringify({ channel, event, data }) }]).catch(() =>
-    serviceClient('notification')
-      .post('/internal/broadcast', { channel, event, data }, { timeoutMs: 5_000 })
+    grpcClient('notification')
+      .call('Broadcast', { channel, event, dataJson: JSON.stringify(data ?? {}) }, { timeoutMs: 5_000 })
       .catch((error) => logger.warn('Live update not sent', { channel, event, error: error.message })),
   )
 }
@@ -229,11 +229,11 @@ function snapshot(value) {
 }
 
 /**
- * Sends an email through notification-service. Unlike broadcast/audit this resolves or rejects, because some callers
+ * Sends an email through notification-service (gRPC SendEmail). Unlike broadcast/audit this resolves or rejects, because some callers
  * tell the user when an email could not be sent.
  *   await sendMail('invitation', 'someone@example.com', { fullName, roleLabel, branchName, link, expiresIn })
  *   await sendMail('reset-password', email, { fullName, link, expiresInMinutes })
  */
 export function sendMail(template, to, data) {
-  return serviceClient('notification').post('/internal/email', { template, to, data }, { timeoutMs: 30_000 })
+  return grpcClient('notification').call('SendEmail', { template, to, dataJson: JSON.stringify(data ?? {}) }, { timeoutMs: 30_000 })
 }

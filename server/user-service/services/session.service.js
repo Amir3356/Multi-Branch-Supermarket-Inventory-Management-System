@@ -1,7 +1,7 @@
-import { logger, serviceClient } from '../utils/index.js'
+import { grpcClient, logger } from '../utils/index.js'
 
-// Sessions (personal_access_tokens) belong to auth-service: ending or deleting them goes through its internal API
-const auth = serviceClient('auth')
+// Sessions (personal_access_tokens) belong to auth-service: ending or deleting them goes through its internal gRPC API
+const auth = grpcClient('auth')
 
 /**
  * Ends every open session of the user (deactivated account). The account change has already been saved, so a stopped
@@ -9,7 +9,8 @@ const auth = serviceClient('auth')
  */
 export async function endAllFor(userId, reason) {
   try {
-    return await auth.post('/internal/sessions/end-all', { userId, reason })
+    const { count } = await auth.call('EndAllSessions', { userId, reason })
+    return { ended: count }
   } catch (error) {
     logger.error('Sessions not ended', { userId, reason, error: error.message })
     return { ended: 0 }
@@ -20,4 +21,4 @@ export async function endAllFor(userId, reason) {
  * Deletes every session of the user (account deleted). Called before the user row is deleted, and its errors
  * propagate, so an account is never removed while its sessions could live on.
  */
-export const deleteAllFor = (userId, reason) => auth.post('/internal/sessions/delete-all', { userId, reason })
+export const deleteAllFor = async (userId, reason) => ({ deleted: (await auth.call('DeleteAllSessions', { userId, reason })).count })

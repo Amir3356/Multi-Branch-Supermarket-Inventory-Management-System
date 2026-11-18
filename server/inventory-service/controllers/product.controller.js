@@ -35,8 +35,3 @@ export async function destroy(req, res) {
   const product = await productService.remove(req, req.product)
   res.json({ message: `${product.name} deleted.` })
 }
-
-/** GET /internal/products/category-count?category= (procurement-service) */
-export async function categoryCount(req, res) {
-  res.json({ count: await productService.productsInCategory(req.validatedQuery.category) })
-}

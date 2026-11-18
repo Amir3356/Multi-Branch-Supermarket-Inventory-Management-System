@@ -1,4 +1,4 @@
-import { HttpError, audit, isUniqueViolation, notFound, serviceClient, validationError } from '../utils/index.js'
+import { HttpError, audit, grpcClient, isUniqueViolation, notFound, validationError } from '../utils/index.js'
 import { NAME_UNIQUE_INDEX } from '../models/category.model.js'
 import * as categories from '../repositories/category.repository.js'
 
@@ -16,7 +16,7 @@ async function findOrFail(id) {
 
 /** Catalog products (inventory-service) are filed under the category's name; it stays fixed while any are */
 async function refuseIfUsed(req, category, doing) {
-  const { count } = await serviceClient('inventory').get(`/internal/products/category-count?category=${encodeURIComponent(category.name)}`, { req })
+  const { count } = await grpcClient('inventory').call('CountProductsInCategory', { category: category.name }, { req })
   if (count > 0) {
     throw new HttpError(422, `${count} product${count === 1 ? ' is' : 's are'} in "${category.name}", so it can't be ${doing}. Move or delete ${count === 1 ? 'it' : 'them'} first.`)
   }

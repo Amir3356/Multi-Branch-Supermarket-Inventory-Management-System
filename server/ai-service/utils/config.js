@@ -33,6 +33,13 @@ export const config = Object.freeze({
   trustedProxies: env('TRUSTED_PROXIES', ''),
 
   gatewayPort: int('GATEWAY_PORT', 8000),
+  // Internal gRPC API of the services that serve one (proto/supermarket.proto): host:port
+  grpc: {
+    auth: env('AUTH_GRPC_URL', 'localhost:5001'),
+    inventory: env('INVENTORY_GRPC_URL', 'localhost:5004'),
+    procurement: env('PROCUREMENT_GRPC_URL', 'localhost:5006'),
+    notification: env('NOTIFICATION_GRPC_URL', 'localhost:5009'),
+  },
   services: {
     auth: env('AUTH_SERVICE_URL', 'http://localhost:4001'),
     user: env('USER_SERVICE_URL', 'http://localhost:4002'),

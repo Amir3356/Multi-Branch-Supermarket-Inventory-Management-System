@@ -1,0 +1,179 @@
+// Internal service-to-service API (gRPC). Every service keeps an identical copy of this file in proto/.
+//
+// Calls carry metadata: x-internal-secret (required), x-auth-context / x-client-ip / user-agent (the signed-in
+// caller, when there is one) and traceparent (OpenTelemetry). A failure keeps its original HTTP meaning in the
+// trailing metadata `http-status` and `error-body-bin` (UTF-8 JSON { message, errors }), so a 422 from inventory-service
+// ("Only 3 units left…") still reaches the browser unchanged.
+//
+// Free-form payloads (an email's template variables, a live update's data, the signed-in user returned by
+// IssueToken) travel as JSON strings; everything else is typed.
+syntax = "proto3";
+
+package supermarket.internal.v1;
+
+// ---- inventory-service ------------------------------------------------------------------------------------------
+service Inventory {
+  // Takes units out of named batches (a sale, a transfer) under a unique reference: a retry is answered, not repeated
+  rpc TakeStock (TakeStockRequest) returns (TakeStockReply);
+  // Puts back what a reference took (a sale whose save failed): the saga's compensation step
+  rpc ReleaseStock (ReleaseStockRequest) returns (ReleaseStockReply);
+  // Adds a paid procurement's units under its Batch ID and sets the product's prices
+  rpc ReceiveStock (ReceiveStockRequest) returns (ReceiveStockReply);
+  // How many catalog products are filed under a category (a category in use can't be renamed or deleted)
+  rpc CountProductsInCategory (CategoryCountRequest) returns (CategoryCountReply);
+}
+
+message StockPart {
+  string batch = 1;
+  int32 qty = 2;
+}
+
+message TakeStockRequest {
+  string reference = 1;
+  string branch_id = 2;
+  string product = 3;
+  repeated StockPart parts = 4;
+  string expired_action = 5;  // "sold" | "sent" | "" (expired batches allowed)
+}
+
+message TakeStockReply {
+  string batches_json = 1;  // the stock rows as they are afterwards
+}
+
+message ReleaseStockRequest {
+  string reference = 1;
+}
+
+message ReleaseStockReply {
+  bool released = 1;
+}
+
+message ReceiveStockRequest {
+  string reference = 1;
+  string branch_id = 2;
+  string product = 3;
+  string category = 4;
+  string med_id = 5;
+  string batch = 6;          // the Batch ID bought ("" = generate one)
+  string expiry = 7;         // YYYY-MM-DD
+  int32 units = 8;
+  string received_at = 9;    // ISO 8601
+  double purchase_price = 10;
+  double selling_price = 11;
+  bool prices_given = 12;    // false = leave the product's prices as they are
+}
+
+message ReceiveStockReply {
+  string batch = 1;          // the batch number the units went in under
+  string product_json = 2;   // the catalog product afterwards, or "null"
+}
+
+message CategoryCountRequest {
+  string category = 1;
+}
+
+message CategoryCountReply {
+  int32 count = 1;
+}
+
+// ---- procurement-service ----------------------------------------------------------------------------------------
+service Procurement {
+  // A category by name (as the Purchase Officer spelled it); NOT_FOUND when there is none
+  rpc LookupCategory (LookupCategoryRequest) returns (LookupCategoryReply);
+}
+
+message LookupCategoryRequest {
+  string name = 1;
+}
+
+message Category {
+  int64 id = 1;
+  string name = 2;
+  string created_at = 3;
+}
+
+message LookupCategoryReply {
+  Category category = 1;
+}
+
+// ---- auth-service -----------------------------------------------------------------------------------------------
+service Auth {
+  // Who a bearer token belongs to (the live-updates connection checks it); no user = not signed in
+  rpc Introspect (IntrospectRequest) returns (IntrospectReply);
+  // Signs a user in right after they accepted their invitation
+  rpc IssueToken (IssueTokenRequest) returns (IssueTokenReply);
+  // Ends every open session of a user (account deactivated)
+  rpc EndAllSessions (UserSessionsRequest) returns (SessionsReply);
+  // Removes every session of a user (account deleted)
+  rpc DeleteAllSessions (UserSessionsRequest) returns (SessionsReply);
+}
+
+message IntrospectRequest {
+  string token = 1;
+  string ip = 2;
+  bool touch = 3;  // true = count as activity
+}
+
+message UserContext {
+  int64 id = 1;
+  string full_name = 2;
+  string email = 3;
+  string role = 4;
+  string role_label = 5;
+  string status = 6;
+  string branch_id = 7;
+  bool covers_all_branches = 8;
+  bool is_owner = 9;
+}
+
+message IntrospectReply {
+  UserContext user = 1;  // absent = not signed in
+  int64 token_id = 2;
+}
+
+message IssueTokenRequest {
+  int64 user_id = 1;
+}
+
+message IssueTokenReply {
+  string token = 1;
+  string user_json = 2;  // the signed-in user as the browser receives it at sign-in
+}
+
+message UserSessionsRequest {
+  int64 user_id = 1;
+  string reason = 2;
+}
+
+message SessionsReply {
+  int32 count = 1;  // sessions ended / removed
+}
+
+// ---- notification-service ---------------------------------------------------------------------------------------
+service Notification {
+  // Sends a templated email (invitation, password reset); UNAVAILABLE when the mail server refuses
+  rpc SendEmail (SendEmailRequest) returns (SendEmailReply);
+  // Pushes a live update to the browsers on a channel (used while Kafka is unreachable)
+  rpc Broadcast (BroadcastRequest) returns (BroadcastReply);
+}
+
+message SendEmailRequest {
+  string template = 1;
+  string to = 2;
+  string data_json = 3;
+}
+
+message SendEmailReply {
+  bool sent = 1;
+}
+
+message BroadcastRequest {
+  string channel = 1;
+  string event = 2;
+  string data_json = 3;
+}
+
+message BroadcastReply {
+  bool sent = 1;
+  int32 listeners = 2;
+}

@@ -104,8 +104,10 @@ flowchart TD
     AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "Cache-aside reads / invalidation" .-> CACHE
 
     %% Inter-Service Communication
-    SALES -. "Internal REST (Saga take/release)" .-> INV
-    PROC -. "Internal REST (Stock receive)" .-> INV
+    SALES -. "gRPC TakeStock / ReleaseStock (saga)" .-> INV
+    PROC -. "gRPC ReceiveStock" .-> INV
+    INV -. "gRPC LookupCategory" .-> PROC
+    USER -. "gRPC IssueToken / EndAllSessions" .-> AUTH
     AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "produce audit.events (outbox)" .-> KAFKA
     AUTH & USER & BRANCH & INV & SALES & PROC & REP & AI -. "produce realtime.events" .-> KAFKA
     KAFKA -. "consume (reporting-audit)" .-> REP
@@ -126,24 +128,42 @@ Each microservice encapsulates a cohesive bounded context:
 | **api-gateway** | `8000` | Single entry point, SSL termination, route dispatching, token verification (`auth_request`), header sanitization | *None (stateless)* | `/api/*`, `/socket.io/*`, `/health` |
 | **auth-service** | `4001` | Sign-in, sign-out, JWT issuance, session activity tracking, password reset, login rate-limiting | `personal_access_tokens`, `account_sign_ins`, `password_reset_tokens` | `/auth/*`, `/sessions/*`, `/internal/auth/*` |
 | **user-service** | `4002` | Staff accounts, email invitation lifecycle, account status, dormant account reviews, role management | `users`, `account_invitations`, `account_role_changes`, `account_changes`, `access_reviews` | `/accounts/*`, `/invitations/*`, `/access-reviews/*`, `/internal/accounts/*` |
-| **branch-service** | `4003` | Store branch CRUD, operating status, store-wide thresholds (low stock, expiry notice days) | `branches`, `policy_settings` | `/branches/*`, `/policy/*`, `/internal/branches/*` |
-| **inventory-service** | `4004` | Catalog products, auto-generated Batch IDs, batch-level stock quantities, branch transfers, damaged items | `products`, `stock_batches`, `stock_movements`, `stock_transfers`, `stock_adjustments`, `damaged_items`, `audit_outbox` | `/products/*`, `/stock/*`, `/transfers/*`, `/damaged-items/*`, `/internal/stock/*` |
+| **branch-service** | `4003` | Store branch CRUD, operating status, store-wide thresholds (low stock, expiry notice days) | `branches`, `policy_settings` | `/branches/*`, `/policy/*` |
+| **inventory-service** | `4004` | Catalog products, auto-generated Batch IDs, batch-level stock quantities, branch transfers, damaged items | `products`, `stock_batches`, `stock_movements`, `stock_transfers`, `stock_adjustments`, `damaged_items`, `audit_outbox` | `/products/*`, `/stock/*`, `/transfers/*`, `/damaged-items/*` · gRPC `Inventory` (:5004) |
 | **sales-service** | `4005` | FEFO POS sales processing, idempotency management, branch daily operational expenses | `sales`, `expenses`, `audit_outbox` | `/sales/*`, `/expenses/*` |
-| **procurement-service** | `4006` | Purchase categories, supplier purchase orders, Chapa payment processing, goods receiving workflow | `procurement_categories`, `procurements`, `audit_outbox` | `/procurements/*`, `/internal/procurements/*` |
+| **procurement-service** | `4006` | Purchase categories, supplier purchase orders, Chapa payment processing, goods receiving workflow | `procurement_categories`, `procurements`, `audit_outbox` | `/procurements/*` · gRPC `Procurement` (:5006) |
 | **reporting-service** | `4007` | Aggregate reporting (Sales, Inventory, Financial, Procurement, User), Owner Dashboard, centralized immutable audit log receiver | `audit_logs` | `/reports/*`, `/dashboard/*`, `/audit-logs/*` · consumes Kafka `audit.events` |
 | **ai-service** | `4008` | Role-bounded operational recommendations, sales & demand forecasting, conversational LLM assistance via Google Gemini | `audit_outbox` *(reads shared read-only tables via scoped models)* | `/ai/*` |
-| **notification-service** | `4009` | Real-time WebSocket event broadcasting (Socket.IO rooms) and transactional outbound emails (SMTP) | `audit_outbox` | `/socket.io/*`, `/internal/broadcast`, `/internal/mail` |
+| **notification-service** | `4009` | Real-time WebSocket event broadcasting (Socket.IO rooms) and transactional outbound emails (SMTP) | `audit_outbox` | `/socket.io/*` · gRPC `Notification` (:5009) |
 
 ### 1.3 Inter-Service Communication & Coordination Patterns
 
 The system avoids fragile, tightly-coupled synchronous cascades by adopting established enterprise integration patterns:
 
-1. **Synchronous Inter-Service REST (Orchestration & Sagas):**
-   - Services communicate over private container network addresses using internal endpoints under `/internal/*`.
-   - Every request is guarded by constant-time verification of `x-internal-secret`.
+1. **Synchronous Service-to-Service Calls (gRPC, Orchestration & Sagas):**
+   - When a service needs an answer from another, it calls that service's internal **gRPC** API over the private
+     container network. The contract is one shared Protocol Buffers file, `proto/supermarket.proto` (identical in every
+     service), loaded at start-up with `@grpc/proto-loader` — no generated code.
+
+     | gRPC service (port) | Served by | Methods | Called by |
+     |---|---|---|---|
+     | `Inventory` (5004) | inventory-service | `TakeStock`, `ReleaseStock`, `ReceiveStock`, `CountProductsInCategory` | sales, procurement |
+     | `Procurement` (5006) | procurement-service | `LookupCategory` | inventory |
+     | `Auth` (5001) | auth-service | `Introspect`, `IssueToken`, `EndAllSessions`, `DeleteAllSessions` | notification, user |
+     | `Notification` (5009) | notification-service | `SendEmail`, `Broadcast` | every service |
+
+   - Every call carries **metadata**: `x-internal-secret` (verified in constant time; anything else is refused with
+     `PERMISSION_DENIED`), the signed-in caller (`x-auth-context`, `x-client-ip`, `user-agent`) and the trace
+     (`traceparent`). Shared code: `utils/grpc.js` (server and client).
+   - **Errors keep their HTTP meaning:** a failure is returned with the matching gRPC status (404 → `NOT_FOUND`,
+     422 → `FAILED_PRECONDITION`, 503 → `UNAVAILABLE` …) plus `http-status` and `error-body-bin` (UTF-8 JSON) trailing
+     metadata, and the caller rethrows the same error — so *"Batch BT-00001 isn’t in stock at this branch"* still
+     reaches the Cashier unchanged.
+   - The only internal HTTP call left is the gateway's sign-in check (`GET /internal/auth/gateway-check`), because
+     nginx's `auth_request` can only call HTTP.
    - **Distributed Two-Phase Stock Reservation (Saga Pattern):** When `sales-service` records a sale, it executes a two-phase coordinated reservation:
-     - Phase 1: Calls `inventory-service` at `POST /internal/stock/take` with a unique deterministic idempotency reference (`sale:{seller_id}:{idempotency_key}`).
-     - Phase 2: Commits the local sale record. If the database commit fails, the catch block issues a compensating transaction to `inventory-service` at `POST /internal/stock/release` to restore the reserved units automatically.
+     - Phase 1: Calls `Inventory.TakeStock` with a unique deterministic idempotency reference (`sale:{seller_id}:{idempotency_key}`).
+     - Phase 2: Commits the local sale record. If the database commit fails, it issues the compensating call `Inventory.ReleaseStock` to restore the reserved units automatically.
 2. **Asynchronous Event Streaming (Apache Kafka):**
    - When entities mutate (e.g., stock changes, sales recorded, invitations accepted), the originating service publishes an event to the Kafka topic `realtime.events`; audit entries are published to `audit.events` (see [1.5](#15-event-streaming-with-apache-kafka--transactional-outbox)).
    - `notification-service` pushes targeted updates to scoped Socket.IO client channels (e.g., `branch.{branchId}.stock`).
@@ -313,7 +333,7 @@ Services use the **OpenTelemetry** SDK and send spans to **Grafana Tempo** (OTLP
 |---|---|
 | The request itself, named after the browser's call (`GET /api/products`); the root is the gateway's sign-in check | `utils/tracing.js` (Express middleware), `auth-service` gateway check |
 | Each service's handling of the request (method, route, status, user id, role, branch) | `utils/tracing.js` |
-| Calls to other services (`/internal/...`) | `utils/serviceClient.js` |
+| gRPC calls between services (client and server spans) | `utils/grpc.js` |
 | PostgreSQL queries (command, table, statement without values) | `utils/db.js` |
 | Redis cache reads and writes (with hit / miss) | `utils/cache.js` |
 | Kafka publish and consume — the consumer's span joins the producer's trace, even in another service | `utils/kafka.js`, `utils/events.js` |
@@ -513,7 +533,7 @@ The system implements strict Role-Based Access Control across four distinct ente
 ### 5.1 Security & Protection
 - **NFR-1 [Perimeter Defense & Header Sanitization]:** The API Gateway shall strip all incoming client headers matching internal security headers (`x-internal-secret`, `x-auth-context`) to prevent identity spoofing.
 - **NFR-2 [Zero Direct Service Exposure]:** Downstream microservices shall operate strictly within an internal isolated Docker network; public traffic is accepted exclusively through the Nginx gateway on port 8000.
-- **NFR-3 [Service-to-Service Authentication]:** All internal REST endpoints (`/internal/*`) and internal WebSockets shall validate a high-entropy shared secret (`INTERNAL_SERVICE_SECRET`) using timing-safe comparisons (`crypto.timingSafeEqual`).
+- **NFR-3 [Service-to-Service Authentication]:** All internal gRPC methods and the gateway's internal HTTP check (`/internal/*`) shall validate a high-entropy shared secret (`INTERNAL_SERVICE_SECRET`) using timing-safe comparisons (`crypto.timingSafeEqual`).
 - **NFR-4 [Credential Protection]:** Passwords shall be salted and hashed using `bcrypt` (10 rounds). Tokens and passwords shall be stripped from audit snapshots before database insertion.
 - **NFR-5 [Rate Limiting]:** Public authentication routes (login, password reset, invitation acceptance) and AI query endpoints shall enforce IP and user-based rate limit windows to mitigate brute-force and DDoS attacks.
 
@@ -569,6 +589,7 @@ The system implements strict Role-Based Access Control across four distinct ente
 | **Database Engine** | PostgreSQL | 17-alpine | Advanced relational database with ACID guarantees |
 | **Cache** | Redis (node-redis client) | 7.4-alpine / 4.7 | Shared cache-aside layer and rate-limit counters |
 | **API Gateway** | Nginx | Alpine | High-performance reverse proxy & security gateway |
+| **Service-to-Service RPC** | gRPC (`@grpc/grpc-js` + `@grpc/proto-loader`), Protocol Buffers | 1.11 / 0.7 | Internal calls between services (`proto/supermarket.proto`) |
 | **Real-Time Engine** | Socket.IO | 4.8.x | Pushes live updates from notification-service to browsers |
 | **Event Streaming** | Apache Kafka (KRaft) + kafkajs | 3.8 / 2.2.4 | Event-streaming backbone: audit events, live updates, dead-letter queue |
 | **AI LLM Engine** | Google Gemini API | `gemini-1.5-flash` / Pro | Role-bounded operational analytics & chat |
@@ -729,7 +750,7 @@ The client will connect to the backend API Gateway at `http://localhost:8000/api
 
 | Variable | Target Service | Default / Example | Purpose |
 |---|---|---|---|
-| `INTERNAL_SERVICE_SECRET` | All Services & Gateway | *64-hex string* | Shared cryptographic secret used to authenticate internal REST communication. |
+| `INTERNAL_SERVICE_SECRET` | All Services & Gateway | *64-hex string* | Shared cryptographic secret used to authenticate internal gRPC calls and the gateway's sign-in check. |
 | `STORE_TIMEZONE` | All Services | `Africa/Addis_Ababa` | Reference timezone used to determine "today" for sales, expiry alerts, and dashboard calculations. |
 | `DB_HOST` | All Services | `postgres` (compose) | PostgreSQL database hostname. |
 | `DB_PORT` | All Services | `5432` | PostgreSQL database port. |
@@ -740,6 +761,7 @@ The client will connect to the backend API Gateway at `http://localhost:8000/api
 | `DB_MIGRATE_PASSWORD` | All Services | `postgres` | Administrative database user password. |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | All Services | `http://tempo:4318` (compose) | Where services send traces (Grafana Tempo). Empty = tracing off. |
 | `TRACE_SAMPLE_RATIO` | All Services | `1` | Share of new traces kept (0–1). Lower it under heavy traffic. |
+| `AUTH_GRPC_URL`, `INVENTORY_GRPC_URL`, `PROCUREMENT_GRPC_URL`, `NOTIFICATION_GRPC_URL` | All Services | `inventory-service:5004` (compose) | Where each internal gRPC API listens (`host:port`). |
 | `KAFKA_BROKERS` | All Services | `kafka:9092` (compose) | Apache Kafka brokers for event streaming (audit and live-update topics). |
 | `REDIS_URL` | All Services | `redis://redis:6379` (compose) | Shared Redis cache. Empty = no cache; everything is read from PostgreSQL. |
 | `SESSION_TIMEOUT_MINUTES` | `auth-service` | `120` | Duration of user inactivity before an access session is terminated. |

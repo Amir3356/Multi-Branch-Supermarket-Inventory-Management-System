@@ -1,12 +1,13 @@
 import { config, createService, schedule } from './utils/index.js'
 import { registerRoutes } from './routes/index.js'
 import { expireInactiveSessions, pruneOldSessions } from './services/session.service.js'
+import { authGrpc } from './controllers/internal.grpc.js'
 
 /**
  * auth-service: sign-in, password reset, and sessions (one Sanctum-compatible bearer token per signed-in browser).
  * Public routes in routes/auth.routes.js and routes/session.routes.js; service-to-service ones in routes/internal.routes.js.
  */
-createService({
+createService({ grpc: authGrpc,
   name: 'auth-service',
   key: 'auth',
   routes: registerRoutes,

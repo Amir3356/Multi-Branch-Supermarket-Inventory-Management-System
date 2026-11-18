@@ -7,6 +7,7 @@ import { startAuditRelay } from './events.js'
 import { logger, setServiceName } from './logger.js'
 import { initMetrics, metricsHandler, metricsMiddleware } from './metrics.js'
 import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
+import { closeGrpcClients, startGrpcServer, stopGrpcServer } from './grpc.js'
 
 /**
  * Builds and starts this microservice with the conventions every service shares:
@@ -20,7 +21,7 @@ import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
  * Public routes are mounted at the path the client uses minus the /api prefix (the gateway strips it):
  * the client's POST /api/sales arrives here as POST /sales. Service-to-service routes live under /internal/….
  */
-export function createService({ name, key, routes, onStart, attach, bodyLimit = '1mb' }) {
+export function createService({ name, key, routes, onStart, grpc: grpcHandlers, attach, bodyLimit = '1mb' }) {
   setServiceName(name)
   const app = express()
   app.disable('x-powered-by')
@@ -72,6 +73,8 @@ export function createService({ name, key, routes, onStart, attach, bodyLimit = 
     logger.info(`${name} listening on http://localhost:${port}`)
     // Delivers audit entries waiting in the outbox (e.g. from before a restart), then keeps checking
     startAuditRelay(name)
+    // The internal API other services call (gRPC), when this service serves one
+    if (grpcHandlers) startGrpcServer(key, grpcHandlers)
     onStart?.()
   })
 
@@ -79,7 +82,7 @@ export function createService({ name, key, routes, onStart, attach, bodyLimit = 
   attach?.(server)
 
   const shutdown = () => {
-    server.close(() => shutdownTracing().then(() => pool.end()).finally(() => process.exit(0)))
+    server.close(() => stopGrpcServer().then(() => closeGrpcClients()).then(() => shutdownTracing()).then(() => pool.end()).finally(() => process.exit(0)))
     setTimeout(() => process.exit(0), 5_000).unref()
   }
   process.on('SIGTERM', shutdown)

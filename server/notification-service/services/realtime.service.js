@@ -1,6 +1,6 @@
 import { Server } from 'socket.io'
 import { canListen } from '../models/channel.model.js'
-import { logger, serviceClient } from '../utils/index.js'
+import { grpcClient, logger } from '../utils/index.js'
 
 /**
  * Live updates over Socket.IO (reached through the gateway at /socket.io):
@@ -9,7 +9,8 @@ import { logger, serviceClient } from '../utils/index.js'
  *   'unsubscribe'   (channel): leaves it
  *   server → browser: 'broadcast' { channel, event, data }
  */
-const auth = serviceClient('auth')
+// auth-service's internal gRPC API (Introspect)
+const auth = grpcClient('auth')
 let io = null
 
 /** Starts Socket.IO on the service's HTTP server */
@@ -21,9 +22,11 @@ export function attachRealtime(server) {
     const token = socket.handshake.auth?.token
     if (!token) return next(new Error('unauthenticated'))
     try {
-      const result = await auth.post('/internal/auth/introspect', { token, touch: false }, { timeoutMs: 5_000 })
+      const result = await auth.call('Introspect', { token, touch: false }, { timeoutMs: 5_000 })
       if (!result?.user) return next(new Error('unauthenticated'))
-      socket.data.who = { user: result.user, tokenId: result.tokenId }
+      // gRPC has no null strings: a user with no branch (Owner, Purchase Officer) arrives with ""
+      const user = { ...result.user, branchId: result.user.branchId || null }
+      socket.data.who = { user, tokenId: result.tokenId }
       next()
     } catch (error) {
       logger.warn('Socket sign-in check failed', { error: error.message })

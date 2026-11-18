@@ -1,4 +1,4 @@
-import { HttpError, audit, money, nextId, serviceClient, transaction, validationError } from '../utils/index.js'
+import { HttpError, audit, grpcClient, money, nextId, transaction, validationError } from '../utils/index.js'
 import {
   allProducts,
   countInCategory,
@@ -41,7 +41,7 @@ export async function setSellingPrice(req, product, data) {
 /** The category as procurement-service spells it; 422 when it isn't there */
 async function resolveCategory(req, name) {
   try {
-    const { category } = await serviceClient('procurement').get(`/internal/categories/lookup?name=${encodeURIComponent(name)}`, { req })
+    const { category } = await grpcClient('procurement').call('LookupCategory', { name }, { req })
     return category.name
   } catch (error) {
     if (error.status === 404) throw validationError({ category: 'Choose a category from the list. Add new ones on the Category & Product page.' })

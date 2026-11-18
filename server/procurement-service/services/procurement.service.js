@@ -1,11 +1,12 @@
-import { HttpError, abort, audit, isUniqueViolation, money, serviceClient, transaction, validationError } from '../utils/index.js'
+import { HttpError, abort, audit, grpcClient, isUniqueViolation, money, transaction, validationError } from '../utils/index.js'
 import { modelNotFound, nowSeconds } from '../utils/dataUtils.js'
 import { BATCH_BOUGHT, MODEL_CLASS, awaitsReceipt } from '../models/procurement.model.js'
 import * as procurements from '../repositories/procurement.repository.js'
 import { procurementChanged } from './procurementEvents.service.js'
 import { startCheckout, sync } from './procurementPayment.service.js'
 
-const inventory = serviceClient('inventory')
+// inventory-service's internal gRPC API (ReceiveStock)
+const inventory = grpcClient('inventory')
 
 // Route-model binding for {procurement}
 export async function findOrFail(id) {
@@ -83,8 +84,8 @@ export async function receive(req, procurement, data) {
       abort(422, locked.received_at ? 'This procurement was already added to stock.' : 'Only a paid procurement can be added to stock.')
     }
     const receivedAt = nowSeconds()
-    const stock = await inventory.post(
-      '/internal/stock/receive',
+    const stock = await inventory.call(
+      'ReceiveStock',
       {
         reference: `procurement:${locked.id}`,
         branchId: locked.branch_id,
@@ -98,6 +99,7 @@ export async function receive(req, procurement, data) {
         receivedAt: receivedAt.toISOString(),
         purchasePrice: Number(locked.unit_price),
         sellingPrice: Number(data.sellingPrice),
+        pricesGiven: true,
       },
       { req },
     )

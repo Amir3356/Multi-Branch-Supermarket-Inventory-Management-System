@@ -39,6 +39,11 @@ x-service-env: &service-env
   REPORTING_SERVICE_URL: http://reporting-service:4007
   AI_SERVICE_URL: http://ai-service:4008
   NOTIFICATION_SERVICE_URL: http://notification-service:4009
+  # Service-to-service calls are gRPC (server/*/proto/supermarket.proto); these services serve the internal API
+  AUTH_GRPC_URL: auth-service:5001
+  INVENTORY_GRPC_URL: inventory-service:5004
+  PROCUREMENT_GRPC_URL: procurement-service:5006
+  NOTIFICATION_GRPC_URL: notification-service:5009
 
 x-service: &service
   environment: *service-env

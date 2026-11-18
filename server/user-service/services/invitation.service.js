@@ -1,11 +1,12 @@
 import crypto from 'node:crypto'
-import { ACCOUNT_STATUSES, HttpError, audit, config, hashPassword, logger, roleLabel, sendMail, serviceClient, transaction } from '../utils/index.js'
+import { ACCOUNT_STATUSES, HttpError, audit, config, hashPassword, logger, roleLabel, sendMail, grpcClient, transaction } from '../utils/index.js'
 import * as invitations from '../repositories/invitation.repository.js'
 import * as users from '../repositories/user.repository.js'
 import { recordAccountChange } from '../repositories/accountHistory.repository.js'
 
 // Opening the session after an invitation is accepted belongs to auth-service
-const auth = serviceClient('auth')
+// auth-service's internal gRPC API (IssueToken)
+const auth = grpcClient('auth')
 
 /** An invitation email that couldn't be sent; withMail turns it into the 503 Laravel sent */
 export class InvitationMailFailed extends Error {}
@@ -104,5 +105,7 @@ export async function acceptAndSignIn(req, token, password) {
     after: { status: user.status },
   })
 
-  return auth.post('/internal/auth/issue-token', { userId: user.id }, { req })
+  // Signed in straight away: { token, user } as at sign-in
+  const signedIn = await auth.call('IssueToken', { userId: user.id }, { req })
+  return { token: signedIn.token, user: JSON.parse(signedIn.userJson) }
 }

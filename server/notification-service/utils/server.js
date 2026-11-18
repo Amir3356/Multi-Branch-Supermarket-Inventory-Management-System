@@ -5,6 +5,7 @@ import { HttpError } from './errors.js'
 import { logger, setServiceName } from './logger.js'
 import { initMetrics, metricsHandler, metricsMiddleware } from './metrics.js'
 import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
+import { closeGrpcClients, startGrpcServer, stopGrpcServer } from './grpc.js'
 
 /**
  * Builds and starts this service: JSON bodies, every route behind internalOnly (only the gateway and other services
@@ -12,7 +13,7 @@ import { initTracing, shutdownTracing, tracingMiddleware } from './tracing.js'
  * so unlike the others its health check doesn't touch the database. Returns { app, server } (Socket.IO attaches to
  * the server).
  */
-export function createService({ name, key, routes, onStart, bodyLimit = '1mb' }) {
+export function createService({ name, key, routes, onStart, grpc: grpcHandlers, bodyLimit = '1mb' }) {
   setServiceName(name)
   const app = express()
   app.disable('x-powered-by')
@@ -46,11 +47,13 @@ export function createService({ name, key, routes, onStart, bodyLimit = '1mb' })
   const port = servicePort(key)
   const server = app.listen(port, () => {
     logger.info(`${name} listening on http://localhost:${port}`)
+    // The internal API other services call (gRPC), when this service serves one
+    if (grpcHandlers) startGrpcServer(key, grpcHandlers)
     onStart?.()
   })
 
   const shutdown = () => {
-    server.close(() => shutdownTracing().finally(() => process.exit(0)))
+    server.close(() => stopGrpcServer().then(() => closeGrpcClients()).then(() => shutdownTracing()).finally(() => process.exit(0)))
     setTimeout(() => process.exit(0), 5_000).unref()
   }
   process.on('SIGTERM', shutdown)

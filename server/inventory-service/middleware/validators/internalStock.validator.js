@@ -1,5 +1,4 @@
 import { z } from '../../utils/index.js'
-import { validateBody } from '../index.js'
 
 const text = (field, maxLength = 255) =>
   z.string({ error: `The ${field} field is required.` }).min(1, { error: `The ${field} field is required.` }).max(maxLength, { error: `The ${field} field is too long.` })
@@ -11,7 +10,7 @@ const price = (field) =>
     z.number({ error: `The ${field} field must be a number.` }).nonnegative({ error: `The ${field} field must not be negative.` }).nullish(),
   )
 
-const takeSchema = z.object({
+export const takeSchema = z.object({
   reference: text('reference', 120),
   branchId: text('branchId', 20),
   product: text('product'),
@@ -19,9 +18,9 @@ const takeSchema = z.object({
   expiredAction: z.enum(['sold', 'sent'], { error: 'The expiredAction field must be sold, sent or null.' }).nullish(),
 })
 
-const releaseSchema = z.object({ reference: text('reference', 120) })
+export const releaseSchema = z.object({ reference: text('reference', 120) })
 
-const receiveSchema = z.object({
+export const receiveSchema = z.object({
   reference: text('reference', 120),
   branchId: text('branchId', 20),
   product: text('product'),
@@ -36,7 +35,3 @@ const receiveSchema = z.object({
   sellingPrice: price('sellingPrice'),
 })
 
-// Each replaces req.body with the parsed value, or answers with a Laravel-shaped 422
-export const validateTake = validateBody(takeSchema)
-export const validateRelease = validateBody(releaseSchema)
-export const validateReceive = validateBody(receiveSchema)

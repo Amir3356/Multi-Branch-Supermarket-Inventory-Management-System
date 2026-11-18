@@ -15,7 +15,7 @@ BY_SERVICE = 'on (container_id) group_left(service) docker_container_info'
 DASHBOARDS = [
     ("sm-home", "Supermarket Monitoring", "Start here: every monitoring dashboard of the system"),
     ("supermarket-overview", "System Overview", "Health of the whole system at a glance"),
-    ("sm-microservices", "Microservices Monitoring", "Each microservice: up/down, traffic, errors, CPU, memory, Node.js runtime"),
+    ("sm-microservices", "Microservices Monitoring", "Each microservice: up/down, traffic, errors, gRPC calls between services, CPU, memory, Node.js runtime"),
     ("sm-api", "API Performance Monitoring", "API latency, throughput and error rate of the REST API"),
     ("sm-database", "Database Monitoring", "PostgreSQL: connections, transactions, cache hit ratio, tables, slowest queries"),
     ("sm-cache", "Cache Monitoring", "Redis cache: hit ratio, memory, keys, evictions, command times"),
@@ -215,6 +215,18 @@ b.place([
     ts("Heap used", [(f'nodejs_heap_size_used_bytes{{job="services", {S}}}', '{{service}}')], w=8, unit="bytes"),
     ts("Garbage collection time", [(f'sum by (service) (rate(nodejs_gc_duration_seconds_sum{{job="services", {S}}}[5m]))', '{{service}}')], w=8, unit="s"),
     ts("Open handles (sockets, timers)", [(f'nodejs_active_handles_total{{job="services", {S}}}', '{{service}}')], w=8),
+], 8)
+b.row("Service-to-service calls (gRPC)")
+b.place([
+    stat("gRPC calls / s", 'sum(rate(grpc_server_handled_total[5m])) or vector(0)', w=6, unit="ops", decimals=2, desc="Internal calls between services (proto/supermarket.proto)"),
+    stat("gRPC errors (1 h)", 'sum(increase(grpc_server_handled_total{grpc_code!~"OK|NOT_FOUND|FAILED_PRECONDITION|INVALID_ARGUMENT"}[1h])) or vector(0)', w=6, decimals=0, th=bad_above(1, 10), desc="Calls that failed for a technical reason (refused, unavailable, internal); expected answers such as not found or not enough stock aren't counted"),
+    stat("gRPC p95 time", 'histogram_quantile(0.95, sum by (le) (rate(grpc_server_handling_seconds_bucket[5m])))', w=6, unit="s", decimals=3),
+    stat("Refused calls (1 h)", 'sum(increase(grpc_server_handled_total{grpc_code="PERMISSION_DENIED"}[1h])) or vector(0)', w=6, decimals=0, th=bad_above(1, 5), desc="Calls without the right internal secret"),
+], 4)
+b.place([
+    ts("gRPC calls per method", [('sum by (grpc_service, grpc_method) (rate(grpc_server_handled_total[5m]))', '{{grpc_service}}/{{grpc_method}}')], w=8, unit="ops"),
+    ts("gRPC answers by status", [('sum by (grpc_code) (rate(grpc_server_handled_total[5m]))', '{{grpc_code}}')], w=8, unit="ops", stack=True, desc="OK, or the status a failure kept from its HTTP meaning (NOT_FOUND = 404, FAILED_PRECONDITION = 422 …)"),
+    ts("gRPC time per method (p95)", [('histogram_quantile(0.95, sum by (le, grpc_service, grpc_method) (rate(grpc_server_handling_seconds_bucket[5m])))', '{{grpc_service}}/{{grpc_method}}')], w=8, unit="s"),
 ], 8)
 b.row("Containers (all, including infrastructure)")
 b.place([
