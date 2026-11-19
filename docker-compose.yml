@@ -247,8 +247,11 @@ services:
 
   # Exporters: turn PostgreSQL, Redis and Kafka statistics into Prometheus metrics
   postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:v0.15.0
+    image: prometheuscommunity/postgres-exporter:v0.16.0
     restart: unless-stopped
+    # The background-writer collector still reads columns PostgreSQL 17 renamed (pg_stat_bgwriter.checkpoints_timed),
+    # which logged an error on every scrape; no dashboard uses it
+    command: ["--no-collector.stat_bgwriter"]
     environment:
       DATA_SOURCE_NAME: postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_DATABASE:-multi_branch_supermarket}?sslmode=disable
     depends_on:
